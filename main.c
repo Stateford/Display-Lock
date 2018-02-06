@@ -5,19 +5,16 @@
 #include <Windows.h>
 
 #include "src\win.h"
-
+#include "src\menu.h"
 
 int main()
 {
-    WINDOWLIST windows;
-    windows.count = 0;
 
-    openWindows(&windows);
+    //WINDOWLIST foo;
 
-    for (int i = 0; i < windows.count; i++)
-    {
-        printf("%s\n", windows.windows[i].title);
-    }
+    
+    
+    //start();
 
     return 0;
 }
