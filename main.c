@@ -10,9 +10,8 @@
 int main()
 {
 
-    //WINDOWLIST foo;
+    WINDOWLIST foo;
 
-    
     
     start();
 
