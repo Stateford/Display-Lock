@@ -45,10 +45,10 @@ typedef struct Menu
     HANDLE hConsole;
 } Menu;
 
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 
-void openWindows(WINDOWLIST *windows);
-
+void openWindows(WINDOWLIST*);
+void clearWindows(WINDOWLIST*);
 void getCurrentMousePos(POINT*);
 
 void lockFocused(WINDOW*);

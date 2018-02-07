@@ -5,6 +5,7 @@
 
 void openWindows(WINDOWLIST *windows)
 {
+    windows->count = 0;
     EnumWindows(&EnumWindowsProc, (LPARAM)windows);
 }
 
@@ -26,7 +27,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
         if (strlen(title) != 0)
         {
             // get rectangle
-            GetWindowRect(hwnd, &win->windows[win->count].size);
+            //GetWindowRect(hwnd, &win->windows[win->count].size);
             // get handle
             win->windows[win->count].hWnd = hwnd;
             // copy title
@@ -64,14 +65,19 @@ void cursorLock(Menu *menu)
 {
     while(menu->active)
     {
-        GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
+        //GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
+        GetClientRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
+        ClientToScreen(menu->selectedWindow.hWnd, &menu->selectedWindow.size.left);
+        ClientToScreen(menu->selectedWindow.hWnd, &menu->selectedWindow.size.right);
+        
+
         HWND active = GetForegroundWindow();
 
         if(menu->selectedWindow.hWnd == active)
         {
             ClipCursor(&menu->selectedWindow.size);
         }
-        Sleep(500);
+        Sleep(100);
     }
     _endthread();
 }

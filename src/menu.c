@@ -136,6 +136,7 @@ void display(Menu *menu)
             case MAIN:
                 if (menu->currentSelection == 0)
                 {
+                    openWindows(&menu->windows);
                     menu->currentMenu = WINDOWS;
                     redraw(menu);
                 }
