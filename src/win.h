@@ -2,6 +2,9 @@
 #define WIN_H
 
 #include <Windows.h>
+//#include "menu.h"
+
+
 
 typedef struct WINDOW
 {
@@ -19,6 +22,29 @@ typedef struct WINDOWLIST
     WINDOW windows[25];
 } WINDOWLIST;
 
+
+typedef struct Main
+{
+    int maxSelections;
+    char options[5][30];
+} Main;
+
+typedef struct Menu
+{
+    Main mainMenu;
+    WINDOWLIST windows;
+    WINDOW selectedWindow;
+    BOOL active;
+    int currentMenu;
+    int currentSelection;
+    BOOL live;
+    BOOL consoleWindowIsFocused;
+    DWORD mode;
+    INPUT_RECORD event;
+    HANDLE hstdin;
+    HANDLE hConsole;
+} Menu;
+
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
 
 void openWindows(WINDOWLIST *windows);
@@ -26,5 +52,7 @@ void openWindows(WINDOWLIST *windows);
 void getCurrentMousePos(POINT*);
 
 void lockFocused(WINDOW*);
+
+void cursorLock(Menu*);
 
 #endif

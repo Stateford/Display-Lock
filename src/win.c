@@ -1,5 +1,7 @@
 #include "win.h"
 #include <string.h>
+#include <process.h>
+
 
 void openWindows(WINDOWLIST *windows)
 {
@@ -56,4 +58,20 @@ void lockFocused(WINDOW *win)
 
         Sleep(500);
     }
+}
+
+void cursorLock(Menu *menu)
+{
+    while(menu->active)
+    {
+        GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
+        HWND active = GetForegroundWindow();
+
+        if(menu->selectedWindow.hWnd == active)
+        {
+            ClipCursor(&menu->selectedWindow.size);
+        }
+        Sleep(500);
+    }
+    _endthread();
 }

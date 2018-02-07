@@ -3,16 +3,25 @@
 
 #include "win.h"
 
-typedef enum MENU
+typedef enum MAINMENU
 {
-    SPLASH,
+    MAIN,
+    WINDOWS,
     DEFAULT,
     ACTIVE
-} MENU;
+} MAINMENU;
+/*
+typedef struct Main
+{
+    int maxSelections;
+    char options[5][30];
+} Main;
 
 typedef struct Menu
 {
+    Main mainMenu;
     WINDOWLIST windows;
+    WINDOW selectedWindow;
     BOOL active;
     int currentMenu;
     int currentSelection;
@@ -23,10 +32,14 @@ typedef struct Menu
     HANDLE hstdin;
     HANDLE hConsole;
 } Menu;
-
+*/
 
 void start();
-void draw(Menu*);
+void initMenu(Menu*);
+
+void redraw(Menu*);
+void drawWindows(Menu*);
+void drawMain(Menu*);
 void display(Menu*);
 
 #endif
