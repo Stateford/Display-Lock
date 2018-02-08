@@ -8,7 +8,7 @@
 
 typedef struct WINDOW
 {
-    char title[120];
+    char title[500];
     int x;
     int y;
     RECT size;
@@ -45,6 +45,14 @@ typedef struct Menu
     HANDLE hConsole;
 } Menu;
 
+typedef enum MAINMENU
+{
+    MAIN,
+    WINDOWS,
+    DEFAULT,
+    ACTIVE
+} MAINMENU;
+
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 
 void openWindows(WINDOWLIST*);
@@ -53,6 +61,8 @@ void getCurrentMousePos(POINT*);
 
 void lockFocused(WINDOW*);
 
-void cursorLock(Menu*);
+void cursorLock(void*);
+
+int __stdcall cursorLockEx(void* arguments);
 
 #endif
