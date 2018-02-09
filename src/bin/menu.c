@@ -31,6 +31,7 @@ void updateComboBox(void *arguments)
     int prevCount = 0;              // keep count of our previous count to reduce flickering
     BOOL init = FALSE;
     int prevValue = 0;
+    int currentSel = 0;
     while(args->menu->live)
     {
         WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
@@ -39,7 +40,6 @@ void updateComboBox(void *arguments)
         args->mutex = CreateMutex(NULL, FALSE, NULL);   // lock the mutex
 
         openWindows(&args->menu->windows);    // open open windows
-        
         
 
         // if the count changes
@@ -55,30 +55,34 @@ void updateComboBox(void *arguments)
                 strcpy_s(foo, 500, args->menu->windows.windows[i].title);
                 SendMessageA(*args->hWnd, CB_ADDSTRING, (WPARAM)NULL, (LPARAM)foo);
             }
+            
+            
+            
         }
-
-
         if (!init)
         {
-            int curSel = SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
+            init = TRUE;
+            currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
 
-            if (curSel == -1)
+            if (currentSel == -1)
             {
                 SendMessage(*args->hWnd, CB_SETCURSEL, 0, 0);
-                init = TRUE;
             }
         }
-        /*
-        else
+        else if (init)
         {
-            int curSel = SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
+            currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
 
-            if (prevValue != 0 && curSel == -1)
-                SendMessage(*args->hWnd, CB_SETCURSEL, 0, prevValue);
-            else if (prevValue != curSel && curSel != -1)
-                prevValue = curSel;
+
+            if (prevValue != currentSel && currentSel != -1)
+            {
+                prevValue = currentSel;
+            }
+            else
+            {
+                SendMessage(*args->hWnd, CB_SETCURSEL, prevValue, 0);
+            }
         }
-        */
  
         ReleaseMutex(args->mutex);  // unlock mutex
         Sleep(100);

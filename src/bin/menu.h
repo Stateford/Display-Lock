@@ -8,6 +8,7 @@ typedef struct Args
     Menu *menu;
     HWND *hWnd;
     HANDLE *mutex;
+    int *currentSel;
 } Args;
 
 typedef struct winArgs
