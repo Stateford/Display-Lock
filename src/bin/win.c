@@ -103,7 +103,7 @@ int __stdcall cursorLockEx(void* arguments)
     HANDLE hMessageStop = CreateEvent(NULL, FALSE, FALSE, _T("STOP"));
     HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
     winArgs *args = (winArgs*)arguments;
-    WINDOW *activeWindow = args->window;
+    WINDOW activeWindow = *args->window;
 
     while (*args->active)
     {
@@ -112,15 +112,15 @@ int __stdcall cursorLockEx(void* arguments)
         WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
 
         //GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
-        GetClientRect(activeWindow->hWnd, &args->window->size);
-        ClientToScreen(args->window->hWnd, &args->window->size.left);
-        ClientToScreen(args->window->hWnd, &args->window->size.right);
+        GetClientRect(activeWindow.hWnd, &activeWindow.size);
+        ClientToScreen(activeWindow.hWnd, &activeWindow.size.left);
+        ClientToScreen(activeWindow.hWnd, &activeWindow.size.right);
 
         HWND active = GetForegroundWindow();
 
-        if (args->window->hWnd == active)
+        if (activeWindow.hWnd == active)
         {
-            ClipCursor(&args->window->size);
+            ClipCursor(&activeWindow.size);
         }
 
         Sleep(1);

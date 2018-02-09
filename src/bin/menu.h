@@ -20,7 +20,7 @@ typedef struct winArgs
 
 void initMenu(Menu*);
 
-void updateComboBox(Args*);
+void updateComboBox(void*);
 
 WINDOW *sortWindow(Args*, char*, int);
 

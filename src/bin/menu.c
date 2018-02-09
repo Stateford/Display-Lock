@@ -51,7 +51,7 @@ void updateComboBox(void *arguments)
             // write to combo box
             for (int i = 0; i < args->menu->windows.count; i++)
             {
-                wchar_t foo[500];
+                char foo[500];
                 strcpy_s(foo, 500, args->menu->windows.windows[i].title);
                 SendMessageA(*args->hWnd, CB_ADDSTRING, (WPARAM)NULL, (LPARAM)foo);
             }
