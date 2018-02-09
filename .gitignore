@@ -1,4 +1,5 @@
 /debug/
 /release/
+/x64/
 *.vcxproj
 *.vcxproj.*
