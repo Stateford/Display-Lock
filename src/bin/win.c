@@ -71,6 +71,8 @@ void cursorLock(void* arguments)
     HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
     winArgs *args = (winArgs*)arguments;
 
+	POINT cursorPos;
+
     while(args->active)
     {
         //DWORD waiting = WaitForSingleObject(hMessageStop, INFINITE);
@@ -85,6 +87,8 @@ void cursorLock(void* arguments)
         ClientToScreen(args->window->hWnd, &args->window->size.left);
         ClientToScreen(args->window->hWnd, &args->window->size.right);
         
+		getCurrentMousePos(&cursorPos);
+
         HWND active = GetForegroundWindow();
 
         if(args->window->hWnd == active)
@@ -98,12 +102,20 @@ void cursorLock(void* arguments)
     _endthread();
 }
 
+BOOL checkClientArea(POINT* cursorPos, RECT* rect)
+{
+	return cursorPos->y <= rect->bottom && cursorPos->y >= rect->top;
+}
+
+
 int __stdcall cursorLockEx(void* arguments)
 {
     HANDLE hMessageStop = CreateEvent(NULL, FALSE, FALSE, _T("STOP"));
     HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
     winArgs *args = (winArgs*)arguments;
     WINDOW activeWindow = *args->window;
+
+	POINT cursorPos;
 
     while (*args->active)
     {
@@ -118,7 +130,9 @@ int __stdcall cursorLockEx(void* arguments)
 
         HWND active = GetForegroundWindow();
 
-        if (activeWindow.hWnd == active)
+		getCurrentMousePos(&cursorPos);
+
+        if (activeWindow.hWnd == active && checkClientArea(&cursorPos, &activeWindow.size))
         {
             ClipCursor(&activeWindow.size);
         }

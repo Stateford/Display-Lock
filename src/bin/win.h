@@ -63,6 +63,8 @@ void lockFocused(WINDOW*);
 
 void cursorLock(void*);
 
+BOOL checkClientArea(POINT*, RECT*);
+
 int __stdcall cursorLockEx(void* arguments);
 
 #endif
