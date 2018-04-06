@@ -14,6 +14,7 @@ void openWindows(WINDOWLIST *windows)
 
 }
 
+// enumerate windows and get current window list
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     // cast lParam to windowList
@@ -50,64 +51,13 @@ void getCurrentMousePos(POINT *cursor)
     GetCursorPos(cursor);
 }
 
-void lockFocused(WINDOW *win)
-{
-    while (1)
-    {
-        RECT foo;
-
-        HWND active = GetForegroundWindow();
-
-        GetWindowRect(active, &foo);
-        ClipCursor(&foo);
-
-        Sleep(500);
-    }
-}
-
-void cursorLock(void* arguments)
-{
-    HANDLE hMessageStop = CreateEvent(NULL, FALSE, FALSE, _T("STOP"));
-    HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
-    winArgs *args = (winArgs*)arguments;
-
-	POINT cursorPos;
-
-    while(args->active)
-    {
-        //DWORD waiting = WaitForSingleObject(hMessageStop, INFINITE);
-
-        
-
-        WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
-
-
-        //GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
-        GetClientRect(args->window->hWnd, &args->window->size);
-        ClientToScreen(args->window->hWnd, &args->window->size.left);
-        ClientToScreen(args->window->hWnd, &args->window->size.right);
-        
-		getCurrentMousePos(&cursorPos);
-
-        HWND active = GetForegroundWindow();
-
-        if(args->window->hWnd == active)
-        {
-            ClipCursor(&args->window->size);
-        }
-
-        Sleep(1);
-    }
-    ClipCursor(NULL);
-    _endthread();
-}
-
+// checks if the cursor is within the client area of specified windows RECT object
 BOOL checkClientArea(POINT* cursorPos, RECT* rect)
 {
-	return cursorPos->y <= rect->bottom && cursorPos->y >= rect->top;
+	return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
 
-
+// threaded function to lock the cursor to specified window
 int __stdcall cursorLockEx(void* arguments)
 {
     HANDLE hMessageStop = CreateEvent(NULL, FALSE, FALSE, _T("STOP"));
@@ -119,27 +69,30 @@ int __stdcall cursorLockEx(void* arguments)
 
     while (*args->active)
     {
-        //DWORD waiting = WaitForSingleObject(hMessageStop, INFINITE);
-
         WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
 
-        //GetWindowRect(menu->selectedWindow.hWnd, &menu->selectedWindow.size);
         GetClientRect(activeWindow.hWnd, &activeWindow.size);
         ClientToScreen(activeWindow.hWnd, &activeWindow.size.left);
         ClientToScreen(activeWindow.hWnd, &activeWindow.size.right);
 
         HWND active = GetForegroundWindow();
 
-		getCurrentMousePos(&cursorPos);
+		GetCursorPos(&cursorPos);
 
+		// if the window is active and the cursor is in the client area clip the cursor to the window
+		// check this first to make another check to see if user is clicking on the title bar to move the window around
         if (activeWindow.hWnd == active && checkClientArea(&cursorPos, &activeWindow.size))
-        {
             ClipCursor(&activeWindow.size);
-        }
-
+		
+		// if the window is active and the user is not clicking (on the title bar)
+		// clip the cursor to the window
+		else if(activeWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
+			ClipCursor(&activeWindow.size);
+		
         Sleep(1);
     }
-    ClipCursor(NULL);
-    _endthreadex(1);
+
+    ClipCursor(NULL);	// release the cursor clip
+    _endthreadex(1);	// end thread_ex
     return 1;
 }
