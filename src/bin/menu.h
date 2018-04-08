@@ -21,7 +21,7 @@ typedef struct winArgs
 void initMenu(Menu*);
 
 void updateComboBox(void*);
-
+int __stdcall updateComboBoxEx(void *arguments);
 WINDOW *sortWindow(Args*, char*, int);
 
 #endif
