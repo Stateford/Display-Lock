@@ -73,6 +73,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -138,11 +141,21 @@
     <ClCompile Include="src\displayLock-win32.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\bin\menu.h" />
-    <ClInclude Include="src\bin\win.h" />
-    <ClInclude Include="src\displayLock-win32.h" />
-    <ClInclude Include="src\header.h" />
-    <ClInclude Include="src\resource.h" />
+    <ClInclude Include="src\bin\menu.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="src\bin\win.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="src\displayLock-win32.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="src\header.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
+    <ClInclude Include="src\resource.h">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClInclude Include="src\targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -152,7 +165,16 @@
     <None Include="src\displayLock-win32.aps" />
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="src\displayLock-win32.manifest" />
+    <Manifest Include="src\displayLock-win32.manifest">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+    </Manifest>
   </ItemGroup>
   <ItemGroup>
     <Image Include="src\displayLock-win32.ico" />
