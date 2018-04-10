@@ -4,7 +4,6 @@
 #include <process.h>
 #include "../resource.h"
 
-
 void initMenu(Menu *menu)
 {
     menu->currentMenu = MAIN;
@@ -25,70 +24,9 @@ void initMenu(Menu *menu)
     menu->hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 
-void updateComboBox(void *arguments)
+void updateComboBoxT(Args *arguments)
 {
-    Args *args = (Args*)arguments;  // cast arguments into proper data type
-    int prevCount = 0;              // keep count of our previous count to reduce flickering
-    BOOL init = FALSE;
-    int prevValue = 0;
-    int currentSel = 0;
-    while(args->menu->live)
-    {
-        WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
-
-
-        args->mutex = CreateMutex(NULL, FALSE, NULL);   // lock the mutex
-
-        openWindows(&args->menu->windows);    // open open windows
-        
-
-        // if the count changes
-        if(prevCount != args->menu->windows.count)
-        {
-            prevCount = args->menu->windows.count;  // reset count
-            SendMessage(*args->hWnd, CB_RESETCONTENT, (WPARAM)NULL, 0); // clear combo box
-
-            // write to combo box
-            for (int i = 0; i < args->menu->windows.count; i++)
-            {
-                char foo[500];
-                strcpy_s(foo, 500, args->menu->windows.windows[i].title);
-                SendMessageA(*args->hWnd, CB_ADDSTRING, (WPARAM)NULL, (LPARAM)foo);
-            }
-            
-            
-            
-        }
-        if (!init)
-        {
-            init = TRUE;
-            currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
-
-            if (currentSel == -1)
-            {
-                SendMessage(*args->hWnd, CB_SETCURSEL, 0, 0);
-            }
-        }
-        else if (init)
-        {
-            currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
-
-
-            if (prevValue != currentSel && currentSel != -1)
-            {
-                prevValue = currentSel;
-            }
-            else
-            {
-                SendMessage(*args->hWnd, CB_SETCURSEL, prevValue, 0);
-            }
-        }
-		//windowArgs->window = sortWindow(ComboBoxArgs, selector, menu.windows.count);
-        ReleaseMutex(args->mutex);  // unlock mutex
-        Sleep(100);
-    }
-    //free(args);
-    _endthread();
+	openWindows(&arguments->menu->windows);    // open open windows
 }
 
 WINDOW *sortWindow(Args *args, char* str, int count)
@@ -101,71 +39,4 @@ WINDOW *sortWindow(Args *args, char* str, int count)
             return &args->menu->windows.windows[i];
         }
     }
-}
-
-int __stdcall updateComboBoxEx(void *arguments)
-{
-	Args *args = (Args*)arguments;  // cast arguments into proper data type
-	int prevCount = 0;              // keep count of our previous count to reduce flickering
-	BOOL init = FALSE;
-	int prevValue = 0;
-	int currentSel = 0;
-	while (args->menu->live)
-	{
-		WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
-
-
-		args->mutex = CreateMutex(NULL, FALSE, NULL);   // lock the mutex
-
-		openWindows(&args->menu->windows);    // open open windows
-
-
-											  // if the count changes
-		if (prevCount != args->menu->windows.count)
-		{
-			prevCount = args->menu->windows.count;  // reset count
-			SendMessage(*args->hWnd, CB_RESETCONTENT, (WPARAM)NULL, 0); // clear combo box
-
-																		// write to combo box
-			for (int i = 0; i < args->menu->windows.count; i++)
-			{
-				char foo[500];
-				strcpy_s(foo, 500, args->menu->windows.windows[i].title);
-				SendMessageA(*args->hWnd, CB_ADDSTRING, (WPARAM)NULL, (LPARAM)foo);
-			}
-
-
-
-		}
-		if (!init)
-		{
-			init = TRUE;
-			currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
-
-			if (currentSel == -1)
-			{
-				SendMessage(*args->hWnd, CB_SETCURSEL, 0, 0);
-			}
-		}
-		else if (init)
-		{
-			currentSel = (int)SendMessage(*args->hWnd, CB_GETCURSEL, 0, 0);
-
-
-			if (prevValue != currentSel && currentSel != -1)
-			{
-				prevValue = currentSel;
-			}
-			else
-			{
-				SendMessage(*args->hWnd, CB_SETCURSEL, prevValue, 0);
-			}
-		}
-
-		ReleaseMutex(args->mutex);  // unlock mutex
-		Sleep(100);
-	}
-	//free(args);
-	_endthreadex(1);
-	return 1;
 }
