@@ -1,10 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
-##[1.0.4]
+## [1.0.4]
 ### Added
 - Added Settings Menu
 - Added Config File
+	- Config File saves to appdata/roaming/DisplayLock/settings.DLOCK
 
 ### Fixed
 - Fixed issue when using alt+tab to switch windows would change the currently selected window in the drop down list
