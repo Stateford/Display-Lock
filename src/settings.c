@@ -35,27 +35,30 @@ void writeSettings(SETTINGS settings)
 {
     PWSTR path = NULL;
     HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, 0, &path);
-    /*
-    if(SUCCEEDED(hr))
-    {
-        
-    }
-    */
-    // TODO: cannot create folder if it doesn't exist
-    PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
-    
+
+    // create directory
+    PathAppend(path, TEXT("DisplayLock"));
+    CreateDirectory(path, NULL);
+    // create file
+    PathAppend(path, TEXT("\\settings.DLOCK"));
     FILE *file = _wfopen(path, TEXT("w"));
- 
-    // TODO : Need to create directory if it does not exist
 
     fwrite(&settings, sizeof(settings), 1, file);
     fclose(file);
+
+    // free the memory
     CoTaskMemFree(path);
 }
 
+// TODO: read from new folder
 void readSettings(SETTINGS *settings)
 {
-    FILE *file = fopen("settings.DLOCK", "r");
+    PWSTR path = NULL;
+    HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, 0, &path);
+
+    PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
+
+    FILE *file = _wfopen(path, TEXT("r"));
     if(file != NULL)
     {
         fread(settings, sizeof(settings), 1, file);
@@ -66,4 +69,6 @@ void readSettings(SETTINGS *settings)
         strcpy(settings->header, "DLOCK");
         settings->minimize = 1;
     }
+    // free memory
+    CoTaskMemFree(path);
 }
