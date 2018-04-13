@@ -30,7 +30,6 @@ void updateSettings(HWND hDlg, SETTINGS* settings)
 	settings->minimize = SendMessage(checkbox, BM_GETCHECK, 0, 0);
 }
 
-// TODO: This should probably save to a temp folder instead of a local folder to make the program more portable
 void writeSettings(SETTINGS settings)
 {
     PWSTR path = NULL;
@@ -50,13 +49,14 @@ void writeSettings(SETTINGS settings)
     CoTaskMemFree(path);
 }
 
-// TODO: read from new folder
 void readSettings(SETTINGS *settings)
 {
     PWSTR path = NULL;
     HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, 0, &path);
 
     PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
+
+    // TODO: check header of file to ensure it's a valid config file using strcmp
 
     FILE *file = _wfopen(path, TEXT("r"));
     if(file != NULL)
