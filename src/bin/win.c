@@ -57,6 +57,11 @@ BOOL checkClientArea(POINT* cursorPos, RECT* rect)
 	return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
 
+BOOL checkResizeStyle(HWND activeWindow)
+{
+    return (GetWindowLongPtr(activeWindow, GWL_STYLE)&WS_SIZEBOX);
+}
+
 // threaded function to lock the cursor to specified window
 int __stdcall cursorLockEx(void* arguments)
 {
@@ -64,8 +69,19 @@ int __stdcall cursorLockEx(void* arguments)
     HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
     winArgs *args = (winArgs*)arguments;
     WINDOW activeWindow = *args->window;
-
+    HWND const currentWindow = activeWindow.hWnd;
 	POINT cursorPos;
+    
+    // keeps track if style was changed
+    BOOL styleChanged = FALSE;
+
+    // if window style has WS_SIZEBOX, remove it with EXCLUSIVE OR (^)
+    if(checkResizeStyle(activeWindow.hWnd))
+    {
+        // TODO: Might want to get error message here and check if elevated permissions are required, and display that to the user
+        SetWindowLongPtr(activeWindow.hWnd, GWL_STYLE, GetWindowLongPtr(activeWindow.hWnd, GWL_STYLE)^WS_SIZEBOX);
+        styleChanged = TRUE;
+    }
 
     while (*args->active)
     {
@@ -91,6 +107,10 @@ int __stdcall cursorLockEx(void* arguments)
 		
         Sleep(1);
     }
+
+    // if window style was changed, change it back using the OR (|)
+    if(styleChanged)
+        SetWindowLongPtr(currentWindow, GWL_STYLE, GetWindowLongPtr(currentWindow, GWL_STYLE)|WS_SIZEBOX);
 
     ClipCursor(NULL);	// release the cursor clip
     _endthreadex(1);	// end thread_ex

@@ -55,6 +55,8 @@ void cursorLock(void*);
 
 BOOL checkClientArea(POINT*, RECT*);
 
+BOOL checkResizeStyle(HWND);
+
 int __stdcall cursorLockEx(void* arguments);
 
 #endif
