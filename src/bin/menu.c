@@ -6,7 +6,6 @@
 
 void initMenu(Menu *menu)
 {
-    menu->currentMenu = MAIN;
     menu->windows.count = 0;
     menu->currentSelection = 0;
     menu->active = FALSE;

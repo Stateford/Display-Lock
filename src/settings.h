@@ -7,6 +7,11 @@ typedef struct SETTINGS
 {
     char header[5];
 	BOOL minimize;
+    BOOL borderlessWindow;
+    BOOL fullScreen;
+    BYTE HOTKEY;
+    UINT8 hotKeyCount;
+    BYTE HOTKEY_MODIFIERS[3];
 } SETTINGS;
 #pragma pack(pop)
 
