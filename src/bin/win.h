@@ -4,7 +4,13 @@
 #include <Windows.h>
 //#include "menu.h"
 
-
+typedef struct PREVIOUSRECT
+{
+    int width;
+    int height;
+    int x;
+    int y;
+} PREVIOUSRECT;
 
 typedef struct WINDOW
 {
@@ -28,35 +34,26 @@ typedef struct Menu
     WINDOWLIST windows;
     WINDOW selectedWindow;
     BOOL active;
-    int currentMenu;
     int currentSelection;
     BOOL live;
     DWORD mode;
     INPUT_RECORD event;
 } Menu;
 
-typedef enum MAINMENU
-{
-    MAIN,
-    WINDOWS,
-    DEFAULT,
-    ACTIVE
-} MAINMENU;
 
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 
 void openWindows(WINDOWLIST*);
 void clearWindows(WINDOWLIST*);
 void getCurrentMousePos(POINT*);
-
 void lockFocused(WINDOW*);
-
 void cursorLock(void*);
-
 BOOL checkClientArea(POINT*, RECT*);
-
 BOOL checkResizeStyle(HWND);
-
+void borderlessWindow(HWND);
+void undoborderlessWindow(HWND);
+void fullScreen(WINDOW, PREVIOUSRECT*);
+void disableFullScreen(WINDOW, PREVIOUSRECT*);
 int __stdcall cursorLockEx(void* arguments);
 
 #endif

@@ -2,9 +2,14 @@
 All notable changes to this project will be documented in this file
 
 ## [1.0.5]
+### Added
+- Added option for borderless windowed mode
+- Added option for fullscreen mode
 ### Fixed
 - Fixed issue where window could be resized when locked in the window
     - This could create an issue with programs running in elevated permissions
+### Removed
+- Removed the ability for display lock to select the itself
 
 ## [1.0.4]
 ### Added

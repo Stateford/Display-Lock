@@ -9,25 +9,36 @@
 void initalizeSettings(HWND hDlg, SETTINGS* settings)
 {
     // get the checkbox
-	HWND checkbox = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
+	HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
+    HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
+    HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
 
-    // check the current setting
-	int checkState;
-	if (!settings->minimize)
-		checkState = BST_UNCHECKED;
-	else
-		checkState = BST_CHECKED;
+
     
     // update the dialog window
-	SendMessage(checkbox, BM_SETCHECK, checkState, 0);
+	SendMessage(minimize, BM_SETCHECK, settings->minimize, 0);
+    SendMessage(borderless, BM_SETCHECK, settings->borderlessWindow, 0);
+    SendMessage(fullScreen, BM_SETCHECK, settings->fullScreen, 0);
 }
 
 // update settings
 void updateSettings(HWND hDlg, SETTINGS* settings)
 {
     // check the checkbox
-	HWND checkbox = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
-	settings->minimize = SendMessage(checkbox, BM_GETCHECK, 0, 0);
+	HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
+    HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
+    HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
+
+    
+    //WORD wHotKey = LOWORD(SendMessage(GetDlgItem(hDlg, IDC_SETTINGS_HOTKEY), HKM_GETHOTKEY, 0, 0));
+    //settings->hotKeyCount = 0;
+
+	settings->minimize = SendMessage(minimize, BM_GETCHECK, 0, 0);
+    settings->borderlessWindow = SendMessage(borderless, BM_GETCHECK, 0, 0);
+    settings->fullScreen = SendMessage(fullScreen, BM_GETCHECK, 0, 0);
+    //settings->HOTKEY = LOBYTE(wHotKey);
+    //settings->HOTKEY_MODIFIERS[0] = HIBYTE(wHotKey);
+    //settings->hotKeyCount;
 }
 
 void writeSettings(SETTINGS settings)
@@ -61,13 +72,15 @@ void readSettings(SETTINGS *settings)
     FILE *file = _wfopen(path, TEXT("r"));
     if(file != NULL)
     {
-        fread(settings, sizeof(settings), 1, file);
+        fread(settings, sizeof(*settings), 1, file);
         fclose(file);
     } 
     else
     {
         strcpy(settings->header, "DLOCK");
         settings->minimize = 1;
+        settings->borderlessWindow = 0;
+        settings->fullScreen = 0;
     }
     // free memory
     CoTaskMemFree(path);

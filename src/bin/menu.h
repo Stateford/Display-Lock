@@ -3,6 +3,8 @@
 
 #include "win.h"
 
+typedef struct SETTINGS SETTINGS;
+
 typedef struct Args
 {
     Menu *menu;
@@ -15,6 +17,7 @@ typedef struct winArgs
 {
     HANDLE *mutex;
     WINDOW *window;
+    SETTINGS *settings;
     BOOL *active;
 } winArgs;
 
