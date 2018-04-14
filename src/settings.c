@@ -30,15 +30,15 @@ void updateSettings(HWND hDlg, SETTINGS* settings)
     HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
 
     
-    WORD wHotKey = LOWORD(SendMessage(GetDlgItem(hDlg, IDC_SETTINGS_HOTKEY), HKM_GETHOTKEY, 0, 0));
-    settings->hotKeyCount = 0;
+    //WORD wHotKey = LOWORD(SendMessage(GetDlgItem(hDlg, IDC_SETTINGS_HOTKEY), HKM_GETHOTKEY, 0, 0));
+    //settings->hotKeyCount = 0;
 
 	settings->minimize = SendMessage(minimize, BM_GETCHECK, 0, 0);
     settings->borderlessWindow = SendMessage(borderless, BM_GETCHECK, 0, 0);
     settings->fullScreen = SendMessage(fullScreen, BM_GETCHECK, 0, 0);
-    settings->HOTKEY = LOBYTE(wHotKey);
-    settings->HOTKEY_MODIFIERS[0] = HIBYTE(wHotKey);
-    settings->hotKeyCount;
+    //settings->HOTKEY = LOBYTE(wHotKey);
+    //settings->HOTKEY_MODIFIERS[0] = HIBYTE(wHotKey);
+    //settings->hotKeyCount;
 }
 
 void writeSettings(SETTINGS settings)
