@@ -7,6 +7,7 @@ Lightweight program that locks cursor in selected window, designed with performa
 - Keeps cursor in a windowed game to prevent clicking outside
 - Will stay active while the window is focused
 - Keeps cursor in a fullscreen game while using a multi-monitor setup
+- Converts any window into a borderless fullscreen window (when set in settings)
 
 ### EXAMPLE
 ---------------
