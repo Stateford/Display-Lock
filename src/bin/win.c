@@ -44,23 +44,23 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
     return TRUE;
 }
 
-void getCurrentMousePos(POINT *cursor)
+inline void getCurrentMousePos(POINT *cursor)
 {
     GetCursorPos(cursor);
 }
 
 // checks if the cursor is within the client area of specified windows RECT object
-BOOL checkClientArea(POINT* cursorPos, RECT* rect)
+inline BOOL checkClientArea(POINT* cursorPos, RECT* rect)
 {
 	return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
 
-BOOL checkResizeStyle(HWND activeWindow)
+inline BOOL checkResizeStyle(HWND activeWindow)
 {
     return (GetWindowLongPtr(activeWindow, GWL_STYLE)&WS_SIZEBOX);
 }
 
-void borderlessWindow(HWND activeWindow)
+inline void borderlessWindow(HWND activeWindow)
 {
     SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE)^WS_OVERLAPPED^WS_THICKFRAME^WS_SYSMENU^WS_CAPTION);
     SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE)^WS_EX_WINDOWEDGE);
@@ -80,13 +80,13 @@ void fullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
     SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
 }
 
-void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
+inline void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
 }
 
 // NOTE: this causes compiler warning, but works.
-BOOL checkProcess(WINDOW activeWindow)
+inline BOOL checkProcess(WINDOW activeWindow)
 {
     return (BOOL)GetWindow(activeWindow.hWnd, 0);
 }
