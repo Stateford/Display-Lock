@@ -27,4 +27,14 @@ WINDOW *sortWindow(Args *args, char* str, int count)
             return &args->menu->windows.windows[i];
         }
     }
+    return NULL;
+}
+
+void closeThread(HANDLE *thread)
+{
+    if(*thread)
+    {
+        CloseHandle(*thread);
+        *thread = NULL;
+    }
 }
