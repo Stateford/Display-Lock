@@ -1,13 +1,25 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+## [1.0.6]
+### Added
+- Added option to bring selected window to the foreground
+
+### Fixed
+- Fixed an issue where when Display Lock was closed before pressing stop, the window would not revert
+- Fixed an issue where the window that was locked being closed before pressing stop would not unlock menu items
+- Fixed an issue where the settings window would not close from the title bar
+- Fixed an issue where the program was not shutting down properly
+
 ## [1.0.5]
 ### Added
 - Added option for borderless windowed mode
 - Added option for fullscreen mode
+
 ### Fixed
 - Fixed issue where window could be resized when locked in the window
     - This could create an issue with programs running in elevated permissions
+
 ### Removed
 - Removed the ability for display lock to select the itself
 

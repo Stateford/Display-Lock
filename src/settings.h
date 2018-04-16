@@ -9,6 +9,7 @@ typedef struct SETTINGS
 	BOOL minimize;
     BOOL borderlessWindow;
     BOOL fullScreen;
+    BOOL foreground;
     //BYTE HOTKEY;
     //UINT8 hotKeyCount;
     //BYTE HOTKEY_MODIFIERS[3];

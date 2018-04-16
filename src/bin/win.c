@@ -69,32 +69,35 @@ void borderlessWindow(HWND activeWindow)
 void fullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     GetClientRect(activeWindow.hWnd, &activeWindow.size);
-    ClientToScreen(activeWindow.hWnd, &activeWindow.size.left);
-    ClientToScreen(activeWindow.hWnd, &activeWindow.size.right);
+    ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.left);
+    ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.right);
 
     prev->width = activeWindow.size.right - activeWindow.size.left;
     prev->height = activeWindow.size.bottom - activeWindow.size.top;
     prev->x = activeWindow.size.left;
     prev->y = activeWindow.size.top;
 
-    SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), NULL);
+    SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
 }
 
 void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
-    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, NULL);
+    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
 }
 
+// NOTE: this causes compiler warning, but works.
+BOOL checkProcess(WINDOW activeWindow)
+{
+    return (BOOL)GetWindow(activeWindow.hWnd, 0);
+}
 
 // threaded function to lock the cursor to specified window
 int __stdcall cursorLockEx(void* arguments)
 {
-    HANDLE hMessageStop = CreateEvent(NULL, FALSE, FALSE, _T("STOP"));
-    HANDLE hMessageEmpty = CreateEvent(NULL, FALSE, TRUE, _T("EMPTY"));
     winArgs *args = (winArgs*)arguments;
     WINDOW activeWindow = *args->window;
 
-    const HWND currentWindow = activeWindow.hWnd;
+    HWND currentWindow = activeWindow.hWnd;
 
 	POINT cursorPos;
     
@@ -103,13 +106,23 @@ int __stdcall cursorLockEx(void* arguments)
 
     SETTINGS *settings = (SETTINGS*)args->settings;
 
+    // this stores the previous X / Y position, as well as height and width of the window
     PREVIOUSRECT previousrect;
 
+    // TODO: should borderless fullscreen be one setting??
+    // borderless window w/o full screen breaks cursor placement
+    // on most games...
     if(settings->borderlessWindow)
         borderlessWindow(currentWindow);
 
     if(settings->fullScreen)
         fullScreen(activeWindow, &previousrect);
+
+    if(settings->foreground)
+    {
+        SetForegroundWindow(currentWindow);
+        SetActiveWindow(currentWindow);
+    }
 
     // TODO: bring to foreground
     // TODO: keep on top (WS_EX_TOP???)
@@ -126,13 +139,24 @@ int __stdcall cursorLockEx(void* arguments)
     {
         WaitForSingleObject(&args->mutex, INFINITE);    // wait for mutex
 
+        args->mutex = CreateMutex(NULL, FALSE, NULL);
+
         GetClientRect(activeWindow.hWnd, &activeWindow.size);
-        ClientToScreen(activeWindow.hWnd, &activeWindow.size.left);
-        ClientToScreen(activeWindow.hWnd, &activeWindow.size.right);
+        ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.left);
+        ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.right);
 
         HWND active = GetForegroundWindow();
 
 		GetCursorPos(&cursorPos);
+
+        
+        // see if process is running
+        if(!checkProcess(activeWindow))
+        {
+            *args->active = FALSE;
+            break;
+        }
+        
 
 		// if the window is active and the cursor is in the client area clip the cursor to the window
 		// check this first to make another check to see if user is clicking on the title bar to move the window around
@@ -140,10 +164,13 @@ int __stdcall cursorLockEx(void* arguments)
             ClipCursor(&activeWindow.size);
 		
 		// if the window is active and the user is not clicking (on the title bar)
-		// clip the cursor to the window
+		// clip the cursor to the window automatically.
+        // this will place the cursor in the window
 		else if(activeWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
 			ClipCursor(&activeWindow.size);
 		
+        ReleaseMutex(&args->mutex);
+
         Sleep(1);
     }
 

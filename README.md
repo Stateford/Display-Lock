@@ -13,3 +13,5 @@ Lightweight program that locks cursor in selected window, designed with performa
 ![](/res/example.gif)
 
 ![](/res/displayLock-preview.png)
+
+# ![Download](https://github.com/idietmoran/Display-Lock/releases/)

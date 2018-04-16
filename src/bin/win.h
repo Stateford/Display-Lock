@@ -54,6 +54,9 @@ void borderlessWindow(HWND);
 void undoborderlessWindow(HWND);
 void fullScreen(WINDOW, PREVIOUSRECT*);
 void disableFullScreen(WINDOW, PREVIOUSRECT*);
+
+BOOL checkProcess(WINDOW);
+
 int __stdcall cursorLockEx(void* arguments);
 
 #endif
