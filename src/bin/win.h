@@ -2,7 +2,6 @@
 #define WIN_H
 
 #include <Windows.h>
-//#include "menu.h"
 
 typedef struct PREVIOUSRECT
 {
@@ -25,7 +24,7 @@ typedef struct WINDOW
 typedef struct WINDOWLIST
 {
     int count;
-    WINDOW windows[25];
+    WINDOW windows[35];
 } WINDOWLIST;
 
 
@@ -43,9 +42,10 @@ typedef struct Menu
 
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 
+BOOL checkWindowTaskbar(HWND);
+
 void openWindows(WINDOWLIST*);
 void clearWindows(WINDOWLIST*);
-void getCurrentMousePos(POINT*);
 void lockFocused(WINDOW*);
 void cursorLock(void*);
 BOOL checkClientArea(POINT*, RECT*);

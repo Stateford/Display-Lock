@@ -1,6 +1,16 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+## [1.0.7]
+### Added
+- Added recommendation to using only borderless window without fullscreen
+
+### Fixed
+- Fixed an issue where background processes would appear in the selection box
+- Fixed an issue where display would not handle reading files properly
+    - This caused the program to not open properly on occasion
+    - This caused the program to not save settings on occasion
+
 ## [1.0.6]
 ### Added
 - Added option to bring selected window to the foreground

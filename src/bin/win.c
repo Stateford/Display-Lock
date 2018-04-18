@@ -12,6 +12,12 @@ void openWindows(WINDOWLIST *windows)
     EnumWindows(&EnumWindowsProc, (LPARAM)windows);
 }
 
+BOOL checkWindowTaskbar(HWND hwnd)
+{
+    return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE)&WS_EX_WINDOWEDGE) > 0);
+}
+
+
 // enumerate windows and get current window list
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
@@ -23,11 +29,12 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
     // check if window is visible
     if (IsWindowVisible(hwnd))
     {
+        
         // get text and store to title
         GetWindowTextA(hwnd, title, sizeof(title));
 
         // if title contains more than 1 character
-        if (strlen(title) != 0 && strcmp(title, "Display Lock") != 0)
+        if (strlen(title) != 0 && strcmp(title, "Display Lock") != 0 && checkWindowTaskbar(hwnd))
         {
             // get rectangle
             //GetWindowRect(hwnd, &win->windows[win->count].size);
@@ -42,11 +49,6 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
     //GetClassName(hwnd, class_name, sizeof(class_name));
 
     return TRUE;
-}
-
-inline void getCurrentMousePos(POINT *cursor)
-{
-    GetCursorPos(cursor);
 }
 
 // checks if the cursor is within the client area of specified windows RECT object
@@ -85,10 +87,9 @@ inline void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
     SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
 }
 
-// NOTE: this causes compiler warning, but works.
 inline BOOL checkProcess(WINDOW activeWindow)
 {
-    return (BOOL)GetWindow(activeWindow.hWnd, 0);
+    return (GetWindow(activeWindow.hWnd, 0) > 0);
 }
 
 // threaded function to lock the cursor to specified window
