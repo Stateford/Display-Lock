@@ -5,7 +5,7 @@
 #pragma pack(push, 1)
 typedef struct SETTINGS
 {
-    char header[5];
+    char header[6];
 	BOOL minimize;
     BOOL borderlessWindow;
     BOOL fullScreen;
@@ -21,3 +21,5 @@ void updateSettings(HWND hDlg, SETTINGS *settings);
 
 void writeSettings(SETTINGS settings);
 void readSettings(SETTINGS *settings);
+
+void defaultSettings(SETTINGS *settings);

@@ -1,8 +1,7 @@
 #include "menu.h"
-#include <stdio.h>
 #include <Windows.h>
 #include <process.h>
-#include "../resource.h"
+#include "../settings.h"
 
 void initMenu(Menu *menu)
 {
@@ -38,3 +37,4 @@ void closeThread(HANDLE *thread)
         *thread = NULL;
     }
 }
+

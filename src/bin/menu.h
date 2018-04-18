@@ -4,6 +4,7 @@
 #include "win.h"
 
 typedef struct SETTINGS SETTINGS;
+typedef struct Args Args;
 
 typedef struct Args
 {
@@ -24,7 +25,7 @@ typedef struct winArgs
 void initMenu(Menu*);
 void updateComboBox(Args*);
 WINDOW *sortWindow(Args*, char*, int);
-
 void closeThread(HANDLE*);
+void initalizeProgram(Menu*, Args*, SETTINGS*);
 
 #endif
