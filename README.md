@@ -11,6 +11,8 @@ Lightweight program that locks cursor in selected window, designed with performa
 
 ### EXAMPLE
 ---------------
+![](/res/borderless_example.gif)
+
 ![](/res/example.gif)
 
 ![](/res/displayLock-preview.png)
