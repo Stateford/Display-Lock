@@ -1,7 +1,0 @@
-/.idea/
-*.swp
-*.gitignore~
-*.un~
-/node_modules/
-server.js
-package.json
