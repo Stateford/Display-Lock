@@ -52,6 +52,7 @@ BOOL checkClientArea(POINT*, RECT*);
 BOOL checkResizeStyle(HWND);
 void borderlessWindow(HWND);
 void undoborderlessWindow(HWND);
+void resizeBorderless(WINDOW, PREVIOUSRECT*);
 void fullScreen(WINDOW, PREVIOUSRECT*);
 void disableFullScreen(WINDOW, PREVIOUSRECT*);
 

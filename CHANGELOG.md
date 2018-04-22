@@ -1,9 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+## [1.0.8]
+### Fixed
+- Fixed an issue where borderless windows without fullscreen would cause the game to not work properly
+    - This was caused by not resizing the window after removing the title bar
+
+### Removed
+- Removed recommendation to using only borderless window with fullscreen
+
+
 ## [1.0.7]
 ### Added
-- Added recommendation to using only borderless window without fullscreen
+- Added recommendation to using only borderless window with fullscreen
 
 ### Fixed
 - Fixed an issue where background processes would appear in the selection box
