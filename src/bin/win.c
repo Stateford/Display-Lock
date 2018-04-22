@@ -68,6 +68,21 @@ inline void borderlessWindow(HWND activeWindow)
     SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE)^WS_EX_WINDOWEDGE);
 }
 
+void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT* prev)
+{
+    GetClientRect(activeWindow.hWnd, &activeWindow.size);
+    ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.left);
+    ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.right);
+
+    prev->width = activeWindow.size.right - activeWindow.size.left;
+    prev->height = activeWindow.size.bottom - activeWindow.size.top;
+    prev->x = activeWindow.size.left;
+    prev->y = activeWindow.size.top;
+
+    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
+}
+
+
 void fullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     GetClientRect(activeWindow.hWnd, &activeWindow.size);
@@ -114,7 +129,11 @@ int __stdcall cursorLockEx(void* arguments)
     // borderless window w/o full screen breaks cursor placement
     // on most games...
     if(settings->borderlessWindow)
+    {
         borderlessWindow(currentWindow);
+        if (!settings->fullScreen)
+            resizeBorderless(activeWindow, &previousrect);
+    }
 
     if(settings->fullScreen)
         fullScreen(activeWindow, &previousrect);
@@ -180,7 +199,11 @@ int __stdcall cursorLockEx(void* arguments)
         SetWindowLongPtr(currentWindow, GWL_STYLE, GetWindowLongPtr(currentWindow, GWL_STYLE)|WS_SIZEBOX);
 
     if(settings->borderlessWindow)
+    {
         borderlessWindow(currentWindow);
+        if (!settings->fullScreen)
+            resizeBorderless(activeWindow, &previousrect);
+    }
 
     if (settings->fullScreen)
         disableFullScreen(activeWindow, &previousrect);

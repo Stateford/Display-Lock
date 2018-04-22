@@ -58,7 +58,7 @@ void writeSettings(SETTINGS settings)
         PathAppend(path, TEXT("\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("w"));
 
-        if(file != NULL)
+        if(file != NULL || file == 0)
         {
             fwrite(&settings, sizeof(settings), 1, file);
         }
@@ -85,7 +85,7 @@ void readSettings(SETTINGS *settings)
 
         // if if opening file is succcessful read into struct
         // otherwise use default settings
-        if (file != NULL)
+        if (file != NULL || file == 0)
             fread(settings, sizeof(*settings), 1, file);
         else
             defaultSettings(settings);
