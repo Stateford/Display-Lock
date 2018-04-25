@@ -54,7 +54,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 // checks if the cursor is within the client area of specified windows RECT object
 inline BOOL checkClientArea(POINT* cursorPos, RECT* rect)
 {
-	return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
+    return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
 
 inline BOOL checkResizeStyle(HWND activeWindow)
@@ -115,7 +115,7 @@ int __stdcall cursorLockEx(void* arguments)
 
     HWND currentWindow = activeWindow.hWnd;
 
-	POINT cursorPos;
+    POINT cursorPos;
     
     // keeps track if style was changed
     BOOL styleChanged = FALSE;
@@ -167,7 +167,7 @@ int __stdcall cursorLockEx(void* arguments)
 
         HWND active = GetForegroundWindow();
 
-		GetCursorPos(&cursorPos);
+        GetCursorPos(&cursorPos);
 
         
         // see if process is running
@@ -178,17 +178,17 @@ int __stdcall cursorLockEx(void* arguments)
         }
         
 
-		// if the window is active and the cursor is in the client area clip the cursor to the window
-		// check this first to make another check to see if user is clicking on the title bar to move the window around
+        // if the window is active and the cursor is in the client area clip the cursor to the window
+        // check this first to make another check to see if user is clicking on the title bar to move the window around
         if (activeWindow.hWnd == active && checkClientArea(&cursorPos, &activeWindow.size))
             ClipCursor(&activeWindow.size);
-		
-		// if the window is active and the user is not clicking (on the title bar)
-		// clip the cursor to the window automatically.
+        
+        // if the window is active and the user is not clicking (on the title bar)
+        // clip the cursor to the window automatically.
         // this will place the cursor in the window
-		else if(activeWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
-			ClipCursor(&activeWindow.size);
-		
+        else if(activeWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
+            ClipCursor(&activeWindow.size);
+        
         ReleaseMutex(&args->mutex);
 
         Sleep(1);

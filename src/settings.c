@@ -9,10 +9,10 @@
 void initalizeSettings(HWND hDlg, SETTINGS* settings)
 {
     // get the checkbox
-	const HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
-    const HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
-    const HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
-    const HWND foreground = GetDlgItem(hDlg, IDC_SETTINGS_FOREGROUND);
+    HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
+    HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
+    HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
+    HWND foreground = GetDlgItem(hDlg, IDC_SETTINGS_FOREGROUND);
 
     
     // update the dialog window
@@ -26,10 +26,10 @@ void initalizeSettings(HWND hDlg, SETTINGS* settings)
 void updateSettings(HWND hDlg, SETTINGS* settings)
 {
     // check the checkbox
-	const HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
-    const HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
-    const HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
-    const HWND foreground = GetDlgItem(hDlg, IDC_SETTINGS_FOREGROUND);
+    HWND minimize = GetDlgItem(hDlg, IDC_SETTINGS_MINIMIZE);
+    HWND borderless = GetDlgItem(hDlg, IDC_SETTINGS_BORDERLESS);
+    HWND fullScreen = GetDlgItem(hDlg, IDC_SETTINGS_FULLSCREEN);
+    HWND foreground = GetDlgItem(hDlg, IDC_SETTINGS_FOREGROUND);
     
     //WORD wHotKey = LOWORD(SendMessage(GetDlgItem(hDlg, IDC_SETTINGS_HOTKEY), HKM_GETHOTKEY, 0, 0));
     //settings->hotKeyCount = 0;
@@ -46,10 +46,10 @@ void updateSettings(HWND hDlg, SETTINGS* settings)
 // write settings to roaming directory
 void writeSettings(SETTINGS settings)
 {
-    PWSTR path = NULL;
-    HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, 0, &path);
+    PWSTR path;
+    //const HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
-    if(hr == S_OK)
+    if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         // create directory
         PathAppend(path, TEXT("DisplayLock"));
@@ -72,13 +72,11 @@ void writeSettings(SETTINGS settings)
 // read settings from roaming directory
 void readSettings(SETTINGS *settings)
 {
-    PWSTR path = NULL;
-    HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, 0, &path);
-
+    PWSTR path;
 
     // TODO: check header of file to ensure it's a valid config file using strcmp
 
-    if(hr == S_OK)
+    if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("r"));
