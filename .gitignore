@@ -13,3 +13,5 @@ makefile
 /CMakeFiles/
 .gitignore~
 *.txt~
+.gitattributes
+.gitattributes~

@@ -13,7 +13,7 @@ void initMenu(Menu *menu)
 
 void updateComboBox(Args *arguments)
 {
-	openWindows(&arguments->menu->windows);    // open open windows
+    openWindows(&arguments->menu->windows);    // open open windows
 }
 
 WINDOW *sortWindow(Args *args, char* str, int count)
