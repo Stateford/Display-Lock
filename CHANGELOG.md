@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+## [1.0.8] HOTFIX 
+### Fixed 
+- Fixed an issue where the program would fail to start on some systems.
+
 ## [1.0.8]
 ### Fixed
 - Fixed an issue where borderless windows without fullscreen would cause the game to not work properly

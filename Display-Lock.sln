@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2027
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Display-Lock", "Display-Lock.vcxproj", "{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Debug|x64.ActiveCfg = Debug|x64
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Debug|x64.Build.0 = Debug|x64
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Debug|x86.ActiveCfg = Debug|Win32
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Debug|x86.Build.0 = Debug|Win32
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Release|x64.ActiveCfg = Release|x64
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Release|x64.Build.0 = Release|x64
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Release|x86.ActiveCfg = Release|Win32
+		{D4B31B75-0BA0-4A34-94DD-84A3BE35E848}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {306CC9B4-3A6A-4B6A-A3A7-1A23462D1ABD}
+	EndGlobalSection
+EndGlobal
