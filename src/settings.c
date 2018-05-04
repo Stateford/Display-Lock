@@ -52,18 +52,18 @@ void writeSettings(SETTINGS settings)
     if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         // create directory
-        PathAppend(path, TEXT("DisplayLock"));
+        PathAppendW(path, TEXT("DisplayLock"));
         CreateDirectory(path, NULL);
         // create file
-        PathAppend(path, TEXT("\\settings.DLOCK"));
+        PathAppendW(path, TEXT("\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("w"));
 
         if(file != NULL || file == 0)
         {
             fwrite(&settings, sizeof(settings), 1, file);
+            fclose(file);
         }
 
-        fclose(file);
     }
     // free memory allocated by SHGetKnownFolderPath
     CoTaskMemFree(path);
@@ -78,17 +78,19 @@ void readSettings(SETTINGS *settings)
 
     if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
-        PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
+        PathAppendW(path, TEXT("DisplayLock\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("r"));
 
         // if if opening file is succcessful read into struct
         // otherwise use default settings
-        if (file != NULL || file == 0)
+        if (file != NULL && file == 0)
+        {
             fread(settings, sizeof(*settings), 1, file);
+            fclose(file);
+        }
         else
             defaultSettings(settings);
 
-        fclose(file);
     } 
     else
         defaultSettings(settings);
