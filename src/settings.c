@@ -49,7 +49,7 @@ void writeSettings(SETTINGS settings)
     PWSTR path;
     //const HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
-    if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
+    if(SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         // create directory
         PathAppendW(path, TEXT("DisplayLock"));
@@ -76,7 +76,7 @@ void readSettings(SETTINGS *settings)
 
     // TODO: check header of file to ensure it's a valid config file using strcmp
 
-    if(!FAILED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
+    if(SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         PathAppendW(path, TEXT("DisplayLock\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("r"));
@@ -101,9 +101,14 @@ void readSettings(SETTINGS *settings)
 
 void defaultSettings(SETTINGS* settings)
 {
-    strcpy(settings->header, "DLOCK");
+    strcpy(settings->header, "DLOCK");      // sets the header to verify it's a valid config file
     settings->minimize = 1;
     settings->borderlessWindow = 0;
     settings->fullScreen = 0;
     settings->foreground = 0;
+}
+
+inline BOOL checkHeader(SETTINGS* settings)
+{
+    return (strcmp(settings->header, "DLOCK") == 0);
 }

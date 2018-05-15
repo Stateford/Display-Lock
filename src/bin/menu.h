@@ -26,6 +26,6 @@ void initMenu(Menu*);
 void updateComboBox(Args*);
 WINDOW *sortWindow(Args*, char*, int);
 void closeThread(HANDLE*);
-void initalizeProgram(Menu*, Args*, SETTINGS*);
+void initalizeProgram(Menu*, winArgs*, Args*, SETTINGS*);
 
 #endif

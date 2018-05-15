@@ -37,4 +37,24 @@ void closeThread(HANDLE *thread)
         *thread = NULL;
     }
 }
+/*
+void initalizeProgram(Menu* menu, winArgs* windowArgs, Args* ComboBoxArgs, SETTINGS* settings)
+{
+    settings = malloc(sizeof(SETTINGS));
+    readSettings(settings);
 
+    ComboBoxArgs = malloc(sizeof(Args));
+
+    
+    ComboBoxArgs->menu = &menu;
+    ComboBoxArgs->hWnd = &hWndListBox;
+    ComboBoxArgs->mutex = &mutex;
+    ComboBoxArgs->currentSel = &currentSel;
+
+    windowArgs = malloc(sizeof(winArgs));
+
+    windowArgs->mutex = &mutex;
+    windowArgs->active = &active;
+    windowArgs->settings = settings;
+}
+*/

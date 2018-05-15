@@ -126,12 +126,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\bin\hotkey.c" />
     <ClCompile Include="src\bin\menu.c" />
     <ClCompile Include="src\bin\win.c" />
     <ClCompile Include="src\displayLock-win32.c" />
     <ClCompile Include="src\settings.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\bin\hotkey.h" />
     <ClInclude Include="src\bin\menu.h" />
     <ClInclude Include="src\bin\win.h" />
     <ClInclude Include="src\displayLock-win32.h" />

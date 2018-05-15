@@ -47,13 +47,11 @@ BOOL checkWindowTaskbar(HWND);
 void openWindows(WINDOWLIST*);
 void clearWindows(WINDOWLIST*);
 void lockFocused(WINDOW*);
-void cursorLock(void*);
 BOOL checkClientArea(POINT*, RECT*);
 BOOL checkResizeStyle(HWND);
-void borderlessWindow(HWND);
-void undoborderlessWindow(HWND);
+void toggleBorderlessWindow(HWND);
 void resizeBorderless(WINDOW, PREVIOUSRECT*);
-void fullScreen(WINDOW, PREVIOUSRECT*);
+void enableFullScreen(WINDOW, PREVIOUSRECT*);
 void disableFullScreen(WINDOW, PREVIOUSRECT*);
 
 BOOL checkProcess(WINDOW);

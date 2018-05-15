@@ -1,7 +1,11 @@
 #pragma once
 #include "header.h"
+#include "bin/hotkey.h"
+
+
 
 // pack the struct to easily read from file
+// TODO: unpack struct for compatibility
 #pragma pack(push, 1)
 typedef struct SETTINGS
 {
@@ -10,16 +14,20 @@ typedef struct SETTINGS
     BOOL borderlessWindow;
     BOOL fullScreen;
     BOOL foreground;
-    //BYTE HOTKEY;
-    //UINT8 hotKeyCount;
-    //BYTE HOTKEY_MODIFIERS[3];
+    HOTKEY hotkeys[20]; // this is probably too much
+                        // TODO: find out how many options will be available
 } SETTINGS;
 #pragma pack(pop)
+
+
+// TODO: create listener for hotkeys
 
 void initalizeSettings(HWND hDlg, SETTINGS* settings);
 void updateSettings(HWND hDlg, SETTINGS *settings);
 
 void writeSettings(SETTINGS settings);
 void readSettings(SETTINGS *settings);
+
+BOOL checkHeader(SETTINGS *settings);
 
 void defaultSettings(SETTINGS *settings);
