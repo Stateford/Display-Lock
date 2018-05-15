@@ -3,18 +3,22 @@
 #include <process.h>
 #include "../header.h"
 
-
+// Get open windows
 void openWindows(WINDOWLIST *windows)
 {
     //mutex = CreateMutex(NULL, FALSE, NULL);
     windows->count = 0;
 
+    // enumerate through open windows
     EnumWindows(&EnumWindowsProc, (LPARAM)windows);
 }
 
+// checks if window is an open window or fullscreen application
 BOOL checkWindowTaskbar(HWND hwnd)
 {
-    return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE)&WS_EX_WINDOWEDGE) > 0);
+    // WS_EX_WINDOWEDGE checks if the program is a window
+    // WS_POPUP checks if the window is a fullscreen application
+    return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_WINDOWEDGE) > 0) || ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_POPUP) > 0);
 }
 
 
@@ -57,17 +61,23 @@ inline BOOL checkClientArea(POINT* cursorPos, RECT* rect)
     return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
 
+// checks if resize is allowed
 inline BOOL checkResizeStyle(HWND activeWindow)
 {
     return (GetWindowLongPtr(activeWindow, GWL_STYLE)&WS_SIZEBOX);
 }
 
-inline void borderlessWindow(HWND activeWindow)
+// toggles borderlessWindow
+inline void toggleBorderlessWindow(HWND activeWindow)
 {
+    // XOR WS_OVERLAPPED, WS_THICKFRAME, WS_SYSMENU, WS_CAPTION
     SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE)^WS_OVERLAPPED^WS_THICKFRAME^WS_SYSMENU^WS_CAPTION);
+    // XOR WS_EX_WINDOWEDGE
     SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE)^WS_EX_WINDOWEDGE);
 }
 
+// resizes borderless window
+// This prevents a window that has windows styles removed from having incorrect cursor placements by resizing the window the current size
 void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT* prev)
 {
     GetClientRect(activeWindow.hWnd, &activeWindow.size);
@@ -82,8 +92,8 @@ void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT* prev)
     SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
 }
 
-
-void fullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
+// enable fullscreen
+void enableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     GetClientRect(activeWindow.hWnd, &activeWindow.size);
     ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.left);
@@ -97,11 +107,13 @@ void fullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
     SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
 }
 
+// disable full screen
 inline void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
 }
 
+// check if process is still running
 inline BOOL checkProcess(WINDOW activeWindow)
 {
     return (GetWindow(activeWindow.hWnd, 0) > 0);
@@ -130,22 +142,19 @@ int __stdcall cursorLockEx(void* arguments)
     // on most games...
     if(settings->borderlessWindow)
     {
-        borderlessWindow(currentWindow);
+        toggleBorderlessWindow(currentWindow);
         if (!settings->fullScreen)
             resizeBorderless(activeWindow, &previousrect);
     }
 
     if(settings->fullScreen)
-        fullScreen(activeWindow, &previousrect);
+        enableFullScreen(activeWindow, &previousrect);
 
     if(settings->foreground)
     {
         SetForegroundWindow(currentWindow);
         SetActiveWindow(currentWindow);
     }
-
-    // TODO: bring to foreground
-    // TODO: keep on top (WS_EX_TOP???)
 
     // if window style has WS_SIZEBOX, remove it with EXCLUSIVE OR (^)
     if(checkResizeStyle(activeWindow.hWnd))
@@ -200,7 +209,7 @@ int __stdcall cursorLockEx(void* arguments)
 
     if(settings->borderlessWindow)
     {
-        borderlessWindow(currentWindow);
+        toggleBorderlessWindow(currentWindow);
         if (!settings->fullScreen)
             resizeBorderless(activeWindow, &previousrect);
     }
@@ -209,6 +218,6 @@ int __stdcall cursorLockEx(void* arguments)
         disableFullScreen(activeWindow, &previousrect);
 
     ClipCursor(NULL);	// release the cursor clip
-    _endthreadex(1);	// end thread_ex
+    _endthreadex(1);	// end the thread
     return 1;
 }
