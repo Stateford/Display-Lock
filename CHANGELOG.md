@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [1.0.9]
+### Fixed
+- Fixed a serious issue where exclusive fullscreen games were not shown
+    - This was fixed by allowing windows with the windows style WS_POPUP
+
 ## [1.0.8] HOTFIX 
 ### Fixed 
 - Fixed an issue where the program would fail to start on some systems.

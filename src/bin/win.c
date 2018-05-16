@@ -18,7 +18,7 @@ BOOL checkWindowTaskbar(HWND hwnd)
 {
     // WS_EX_WINDOWEDGE checks if the program is a window
     // WS_POPUP checks if the window is a fullscreen application
-    return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE)&WS_EX_WINDOWEDGE) > 0) || ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_POPUP) > 0);
+    return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_WINDOWEDGE) > 0) || ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_POPUP) > 0);
 }
 
 
