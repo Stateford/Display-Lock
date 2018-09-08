@@ -5,13 +5,8 @@
 .vs/
 *.DLOCK
 notes.MD
-*.un~
-*.swp
 *.cmake
 *.txt
 makefile
 /CMakeFiles/
-.gitignore~
-*.txt~
 .gitattributes
-.gitattributes~
