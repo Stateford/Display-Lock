@@ -108,11 +108,17 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)resources;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)resources;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Image Include="resources\dl_logo_ZEB_icon.ico">
@@ -121,15 +127,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\DisplayLock.c" />
+    <ClCompile Include="src\menu.c" />
+    <ClCompile Include="src\settings.c" />
+    <ClCompile Include="src\win.c" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\resource.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\header.h" />
+    <ClInclude Include="include\menu.h" />
+    <ClInclude Include="include\settings.h" />
+    <ClInclude Include="include\win.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="resources\targetver.h" />
     <ClInclude Include="include\common.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="resources\DisplayLock.manifest" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
