@@ -3,7 +3,6 @@
 #include <Windows.h>
 #include "common.h"
 
-
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 
 BOOL checkWindowTaskbar(HWND);
@@ -20,3 +19,4 @@ void disableFullScreen(WINDOW, PREVIOUSRECT*);
 
 BOOL checkProcess(WINDOW);
 
+int CALLBACK cursorLock(void* arguments);
