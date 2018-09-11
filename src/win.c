@@ -1,5 +1,5 @@
 #include "win.h"
-
+#include <process.h>
 
 // Get open windows
 void openWindows(WINDOWLIST *windows)
