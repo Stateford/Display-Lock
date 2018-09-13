@@ -4,7 +4,7 @@ import shutil
 def main():
     configPath = os.getenv("APPDATA")
     configPath += "\\displayLock"
-    print configPath
+    print (configPath)
     shutil.rmtree(configPath)
 
 
