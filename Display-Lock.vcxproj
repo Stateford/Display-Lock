@@ -94,10 +94,12 @@
       </Command>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>python $(ProjectDir)scripts\removeConfig.py</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Remove Config File</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -132,10 +134,12 @@
       </Command>
     </CustomBuildStep>
     <PreBuildEvent>
-      <Command>python $(ProjectDir)scripts\removeConfig.py</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Remove Config File</Message>
+      <Message>
+      </Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
