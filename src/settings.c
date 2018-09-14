@@ -29,7 +29,7 @@ void defaultSettings(SETTINGS *settings)
 {
     wchar_t buff[4];
     LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
-
+    strcpy(settings->header, "DLOCK");
     settings->version = 0;
     for (unsigned int i = 0; i < wcslen(buff); i++)
     {
@@ -46,6 +46,9 @@ void defaultSettings(SETTINGS *settings)
 // checks the version of the config file
 BOOL checkVersion(SETTINGS *settings)
 {
+    if (strcmp(settings->header, "DLOCK") != 0)
+        return FALSE;
+
     wchar_t buff[4];
     LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
 
@@ -63,25 +66,35 @@ BOOL readSettings(SETTINGS *settings)
 {
     PWSTR path;
 
-    // TODO: check header of file to ensure it's a valid config file using strcmp
 
     if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
-        PathAppendW(path, TEXT("DisplayLock\\settings.DLOCK"));
-        FILE *file = _wfopen(path, TEXT("r"));
+        PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
+        FILE *file = _wfopen(path, TEXT("rb"));
 
         // if if opening file is succcessful read into struct
         // otherwise use default settings
-        if (file != NULL && file == 0)
+        if (file == NULL)
         {
-            fread(settings, sizeof(*settings), 1, file);
-            fclose(file);
-        }
-        else
             defaultSettings(settings);
+            CoTaskMemFree(path);
+            return FALSE;
+        }
 
+        fread(settings, sizeof(*settings), 1, file);
+        
+
+        fclose(file);
+        _fcloseall();
     }
     else
+    {
+        defaultSettings(settings);
+        CoTaskMemFree(path);
+        return FALSE;
+    }
+
+    if (!checkVersion(settings))
         defaultSettings(settings);
 
     // free memory allocated by SHGetKnownFolderPath
@@ -89,20 +102,21 @@ BOOL readSettings(SETTINGS *settings)
     return TRUE;
 }
 
-BOOL writeSettings(SETTINGS *settings)
+BOOL writeSettings(SETTINGS settings)
 {
     PWSTR path;
-    //const HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
     if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
         // create directory
-        PathAppendW(path, TEXT("DisplayLock"));
+        PathAppend(path, TEXT("DisplayLock"));
+        // TODO: check if directory was created
         CreateDirectory(path, NULL);
         // create file
-        PathAppendW(path, TEXT("\\settings.DLOCK"));
-        FILE *file = _wfopen(path, TEXT("w"));
-        if (file == NULL || file == 0)
+        PathAppend(path, TEXT("\\settings.DLOCK"));
+        FILE *file = _wfopen(path, TEXT("wb"));
+
+        if (file == NULL)
         {
             CoTaskMemFree(path);
             return FALSE;
@@ -110,7 +124,10 @@ BOOL writeSettings(SETTINGS *settings)
 
         fwrite(&settings, sizeof(settings), 1, file);
         fclose(file);
+        _fcloseall();
     }
+    else
+        return FALSE;
 
     // free memory allocated by SHGetKnownFolderPath
     CoTaskMemFree(path);
