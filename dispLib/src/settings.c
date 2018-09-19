@@ -12,10 +12,10 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls, SETT
     settingsControls->fullScreen = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FULL_SCREEN);
     settingsControls->settingsChanged = FALSE;
 
-    settings->borderless = SendMessage(settingsControls->borderless, BM_GETCHECK, 0, 0);
-    settings->foreground = SendMessage(settingsControls->foreground, BM_GETCHECK, 0, 0);
-    settings->fullScreen = SendMessage(settingsControls->fullScreen, BM_GETCHECK, 0, 0);
-    settings->minimize = SendMessage(settingsControls->minimize, BM_GETCHECK, 0, 0);
+    settings->borderless = (BOOL)SendMessage(settingsControls->borderless, BM_GETCHECK, 0, 0);
+    settings->foreground = (BOOL)SendMessage(settingsControls->foreground, BM_GETCHECK, 0, 0);
+    settings->fullScreen = (BOOL)SendMessage(settingsControls->fullScreen, BM_GETCHECK, 0, 0);
+    settings->minimize = (BOOL)SendMessage(settingsControls->minimize, BM_GETCHECK, 0, 0);
 }
 
 void setSettingsDlg(HWND hDlg, SETTINGS settings)
@@ -27,7 +27,7 @@ void setSettingsDlg(HWND hDlg, SETTINGS settings)
 
 void defaultSettings(SETTINGS *settings)
 {
-    wchar_t buff[5];
+    wchar_t buff[4];
     LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
     strcpy(settings->header, "DLOCK");
     settings->version = 0;
