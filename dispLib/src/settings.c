@@ -4,18 +4,13 @@
 #include <shtypes.h>
 #include "Shlwapi.h"
 
-void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls, SETTINGS *settings)
+void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
 {
     settingsControls->minimize = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_MINIMIZE);
     settingsControls->foreground = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FOREGROUND);
     settingsControls->borderless = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_BORDERLESS);
     settingsControls->fullScreen = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FULL_SCREEN);
     settingsControls->settingsChanged = FALSE;
-
-    settings->borderless = (BOOL)SendMessage(settingsControls->borderless, BM_GETCHECK, 0, 0);
-    settings->foreground = (BOOL)SendMessage(settingsControls->foreground, BM_GETCHECK, 0, 0);
-    settings->fullScreen = (BOOL)SendMessage(settingsControls->fullScreen, BM_GETCHECK, 0, 0);
-    settings->minimize = (BOOL)SendMessage(settingsControls->minimize, BM_GETCHECK, 0, 0);
 }
 
 void setSettingsDlg(HWND hDlg, SETTINGS settings)
