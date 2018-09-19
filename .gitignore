@@ -1,0 +1,14 @@
+/debug/
+/release/
+/x64/
+*.vcxproj.*
+.vs/
+*.DLOCK
+notes.MD
+*.cmake
+*.txt
+makefile
+/CMakeFiles/
+.gitattributes
+*/x64/
+*/Debug/
