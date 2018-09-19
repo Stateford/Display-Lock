@@ -27,9 +27,9 @@ void setSettingsDlg(HWND hDlg, SETTINGS settings)
 
 void defaultSettings(SETTINGS *settings)
 {
-    wchar_t buff[4];
+    wchar_t buff[5];
     LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
-    strcpy_s(settings->header, 4, "DLOCK");
+    strcpy(settings->header, "DLOCK");
     settings->version = 0;
     for (unsigned int i = 0; i < wcslen(buff); i++)
     {
