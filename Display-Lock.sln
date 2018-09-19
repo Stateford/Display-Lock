@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.28010.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Display-Lock", "Display-Lock\Display-Lock.vcxproj", "{293E2BAD-0F56-458B-AF84-718F92CAF6DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C1A9B46E-F571-4367-B918-ED7081C41C10} = {C1A9B46E-F571-4367-B918-ED7081C41C10}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dispLib", "dispLib\dispLib.vcxproj", "{AB25AA47-E252-41AD-A8D0-C7923358817C}"
 EndProject
