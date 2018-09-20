@@ -63,10 +63,17 @@ BOOL readSettings(SETTINGS *settings)
 
     HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
+    
+
     if (SUCCEEDED(hr))
     {
-        PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
-        FILE *file = _wfopen(path, TEXT("rb"));
+        wchar_t fullPath[MAX_PATH];
+        wcscpy(fullPath, path);
+
+        LPCWSTR x = L"DisplayLock\\settings.DLOCK";
+        PathAppend(fullPath, x);
+
+        FILE *file = _wfopen(path, L"rb");
 
         // if if opening file is succcessful read into struct
         // otherwise use default settings
@@ -104,13 +111,16 @@ BOOL writeSettings(SETTINGS settings)
 
     if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
     {
+        wchar_t fullPath[MAX_PATH];
+        wcscpy(fullPath, path);
+
         // create directory
-        PathAppend(path, TEXT("DisplayLock"));
+        PathAppend(fullPath, TEXT("DisplayLock"));
         // TODO: check if directory was created
-        CreateDirectory(path, NULL);
+        CreateDirectory(fullPath, NULL);
         // create file
-        PathAppend(path, TEXT("\\settings.DLOCK"));
-        FILE *file = _wfopen(path, TEXT("wb"));
+        PathAppend(fullPath, TEXT("\\settings.DLOCK"));
+        FILE *file = _wfopen(fullPath, TEXT("wb"));
 
         if (file == NULL)
         {
