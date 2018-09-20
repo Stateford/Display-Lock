@@ -20,16 +20,14 @@ void setSettingsDlg(HWND hDlg, SETTINGS settings)
 }
 
 
-void defaultSettings(SETTINGS *settings)
+void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
 {
-    wchar_t buff[4];
-    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 3);
     strcpy(settings->header, "DLOCK");
     settings->version = 0;
-    for (unsigned int i = 0; i < wcslen(buff); i++)
+    for (unsigned int i = 0; i < wcslen(versionStr); i++)
     {
-        if(buff[i] >= '0' && buff[i] <= '9')
-            settings->version += (int)buff[i] - '0';
+        if(versionStr[i] >= '0' && versionStr[i] <= '9')
+            settings->version += (int)versionStr[i] - '0';
     }
     
     settings->borderless = FALSE;
@@ -38,32 +36,29 @@ void defaultSettings(SETTINGS *settings)
     settings->minimize = TRUE;
 }
 
-// checks the version of the config file
-BOOL checkVersion(SETTINGS *settings)
+BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
 {
-    if (strcmp(settings->header, "DLOCK") != 0)
+    if (strcmp(settings->header, "DLOCK") != 0 || wcslen(versionStr) == 0)
         return FALSE;
 
-    wchar_t buff[4];
-    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 3);
-
     int version = 0;
-    for (unsigned int i = 0; i < wcslen(buff); i++)
+    for (unsigned int i = 0; i < wcslen(versionStr); i++)
     {
-        if (buff[i] >= '0' && buff[i] <= '9')
-            version += (int)buff[i] - '0';
+        if (versionStr[i] >= '0' && versionStr[i] <= '9')
+            version += (int)versionStr[i] - '0';
+        else
+            return FALSE;
     }
 
     return settings->version == version;
 }
 
-BOOL readSettings(SETTINGS *settings)
+
+BOOL readSettings(SETTINGS *settings, wchar_t *versionStr)
 {
     PWSTR path;
 
     HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
-
-    
 
     if (SUCCEEDED(hr))
     {
@@ -79,7 +74,7 @@ BOOL readSettings(SETTINGS *settings)
         // otherwise use default settings
         if (file == NULL)
         {
-            defaultSettings(settings);
+            defaultSettings(settings, versionStr);
             CoTaskMemFree(path);
             return FALSE;
         }
@@ -92,13 +87,13 @@ BOOL readSettings(SETTINGS *settings)
     }
     else
     {
-        defaultSettings(settings);
+        defaultSettings(settings, versionStr);
         CoTaskMemFree(path);
         return FALSE;
     }
 
-    if (!checkVersion(settings))
-        defaultSettings(settings);
+    if (!checkVersion(settings, versionStr))
+        defaultSettings(settings, versionStr);
 
     // free memory allocated by SHGetKnownFolderPath
     CoTaskMemFree(path);
@@ -107,6 +102,10 @@ BOOL readSettings(SETTINGS *settings)
 
 BOOL writeSettings(SETTINGS settings)
 {
+    // if loadstring could not be read, do not write the file
+    if (settings.version <= 0)
+        return;
+
     PWSTR path;
 
     if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
