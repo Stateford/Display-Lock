@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.0.0]
+### Fixed
+- Fixed a crash cause by a buffer overflow
+- Fixed an issue where minimizing the window would cause the dropdown list to become empty
+
+### Added
+- Tests for build
+
+### Removed
+- Removed a thread made for constantly polling active windows
+    - Open windows will now only be polled when the combo box is activated
+    - This removes the need to check for the window string
+
+### Changed
+- Refactored program to fit better coding standards
+
 # [1.0.9]
 ### Fixed
 - Fixed a serious issue where exclusive fullscreen games were not shown
