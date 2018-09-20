@@ -167,6 +167,9 @@
       <Project>{ab25aa47-e252-41ad-a8d0-c7923358817c}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\dl_logo_ZEB_icon.ico" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

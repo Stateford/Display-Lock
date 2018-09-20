@@ -73,7 +73,7 @@ BOOL readSettings(SETTINGS *settings)
         LPCWSTR x = L"DisplayLock\\settings.DLOCK";
         PathAppend(fullPath, x);
 
-        FILE *file = _wfopen(path, L"rb");
+        FILE *file = _wfopen(fullPath, TEXT("rb"));
 
         // if if opening file is succcessful read into struct
         // otherwise use default settings

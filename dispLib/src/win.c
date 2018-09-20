@@ -120,8 +120,36 @@ int CALLBACK cursorLock(void* arguments)
     SETTINGS *settings = args->settings;
     WINDOW selectedWindow = args->selectedWindow;
     volatile BOOL *isRunning = args->clipRunning;
+    POINT cursorPos;
+    BOOL styleChanged = FALSE;
+    PREVIOUSRECT previousRect;
 
-    while (isRunning)
+    if (settings->borderless)
+    {
+        toggleBorderlessWindow(selectedWindow.hWnd);
+        if (!settings->fullScreen)
+            resizeBorderless(selectedWindow, &previousRect);
+    }
+
+    if (settings->fullScreen)
+        enableFullScreen(selectedWindow, &previousRect);
+
+    if (settings->foreground)
+    {
+        SetForegroundWindow(selectedWindow.hWnd);
+        SetActiveWindow(selectedWindow.hWnd);
+    }
+
+    
+    if (checkResizeStyle(selectedWindow.hWnd))
+    {
+        // TODO: might want to get error message here and check if elevated permissions are required
+        SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE) ^ WS_SIZEBOX);
+        styleChanged = TRUE;
+    }
+
+
+    while (*isRunning)
     {
         // check if window is closed
 
@@ -130,9 +158,51 @@ int CALLBACK cursorLock(void* arguments)
         // check for active window
             // clip cursor to screen
 
+        GetClientRect(selectedWindow.hWnd, &selectedWindow.size);
+        ClientToScreen(selectedWindow.hWnd, (LPPOINT)&selectedWindow.size.left);
+        ClientToScreen(selectedWindow.hWnd, (LPPOINT)&selectedWindow.size.right);
+
+        HWND active = GetForegroundWindow();
+
+        GetCursorPos(&cursorPos);
+
+        if (!checkProcess(selectedWindow))
+        {
+            *args->clipRunning = FALSE;
+            break;
+        }
+
+        // if the window is active and the cursor is in the client area clip the cursor to the window
+        // check this first to make another check to see if user is clicking on the title bar to move the window around
+        if (selectedWindow.hWnd == active && checkClientArea(&cursorPos, &selectedWindow.size))
+            ClipCursor(&selectedWindow.size);
+
+        // if the window is active and the user is not clicking (on the title bar)
+        // clip the cursor to the window automatically.
+        // this will place the cursor in the window
+        else if (selectedWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
+            ClipCursor(&selectedWindow.size);
+
 
         Sleep(1);
     }
+
+
+    // if window style was changed, change it back using the OR (|)
+    if (styleChanged)
+        SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE) | WS_SIZEBOX);
+
+    if (settings->borderless)
+    {
+        toggleBorderlessWindow(selectedWindow.hWnd);
+        if (!settings->fullScreen)
+            resizeBorderless(selectedWindow, &previousRect);
+    }
+
+    if (settings->fullScreen)
+        disableFullScreen(selectedWindow, &previousRect);
+
+
 
     ClipCursor(NULL);	// release the cursor clip
     _endthreadex(1);	// end the thread
