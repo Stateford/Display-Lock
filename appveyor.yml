@@ -1,4 +1,4 @@
-version: '1.0.{build}'
+version: '{branch}2.0.0{build}'
 
 image: Visual Studio 2017
 
@@ -13,4 +13,4 @@ build:
 
 test_script:
 - cmd: >-
-    vstest.console /logger:Appveyor $(PLATFORM)\$(CONFIGURATION)\unittest1.dll
+    vstest.console /logger:Appveyor $(APPVEYOR_BUILD_FOLDER)\$(configuration)
