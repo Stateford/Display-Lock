@@ -1,5 +1,8 @@
 # Display Lock
----------------------
+[![Build status](https://ci.appveyor.com/api/projects/status/4nqt7c0a51umdm7c/branch/master?svg=true)](https://ci.appveyor.com/project/idietmoran/display-lock/branch/master)
+
+
+
 Lightweight program that locks cursor in selected window, designed with performance in mind.
 
 #### USES
