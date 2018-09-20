@@ -11,5 +11,6 @@ configuration:
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
 
-test:
-  vstest.console /logger:Appveyor unittest1.dll
+test_script:
+- cmd: >-
+    vstest.console /logger:Appveyor $(Platform)\$(Configuration)\unittest1.dll
