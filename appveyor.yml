@@ -13,4 +13,4 @@ build:
 
 test_script:
 - cmd: >-
-    vstest.console /logger:Appveyor $(platform)\$(configuration)\unittest1.dll
+    vstest.console /logger:Appveyor $(PLATFORM)\$(CONFIGURATION)\unittest1.dll
