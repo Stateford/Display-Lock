@@ -23,7 +23,7 @@ void setSettingsDlg(HWND hDlg, SETTINGS settings)
 void defaultSettings(SETTINGS *settings)
 {
     wchar_t buff[4];
-    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
+    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 3);
     strcpy(settings->header, "DLOCK");
     settings->version = 0;
     for (unsigned int i = 0; i < wcslen(buff); i++)
@@ -45,7 +45,7 @@ BOOL checkVersion(SETTINGS *settings)
         return FALSE;
 
     wchar_t buff[4];
-    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
+    LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 3);
 
     int version = 0;
     for (unsigned int i = 0; i < wcslen(buff); i++)
@@ -61,8 +61,9 @@ BOOL readSettings(SETTINGS *settings)
 {
     PWSTR path;
 
+    HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
-    if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
+    if (SUCCEEDED(hr))
     {
         PathAppend(path, TEXT("DisplayLock\\settings.DLOCK"));
         FILE *file = _wfopen(path, TEXT("rb"));
