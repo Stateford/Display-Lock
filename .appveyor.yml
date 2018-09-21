@@ -23,8 +23,8 @@ for:
     only:
       - develop
 
-    environment:
-      type: develop
+  environment:
+    type: develop
 
 
 before_build:
