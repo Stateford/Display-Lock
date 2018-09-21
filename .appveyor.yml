@@ -8,8 +8,8 @@ platform:
 configuration:
   - Release
 
-install:
-  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %CONFIGURATION% %version% {build}
+before_build:
+  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %CONFIGURATION% %version% %APPVEYOR_BUILD_NUMBER%
 
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
