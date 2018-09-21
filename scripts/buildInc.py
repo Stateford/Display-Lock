@@ -25,7 +25,7 @@ def main():
     if(len(sys.argv) < 3):
         raise BaseException("Something went wrong with build")
     
-    writeHeader(os.path.abspath("../Display-Lock/resources/version.h"), sys.argv[1], sys.argv[2], sys.argv[3])
+    writeHeader(os.path.abspath("./Display-Lock/resources/version.h"), sys.argv[1], sys.argv[2], sys.argv[3])
 
 
 main()
