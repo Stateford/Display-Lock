@@ -5,6 +5,7 @@ automatically increments build number and configuration
 """
 
 import sys
+import os
 
 def writeHeader(filePath, config, version, build):
     file = open(filePath, 'w+')
@@ -24,7 +25,7 @@ def main():
     if(len(sys.argv) < 3):
         raise BaseException("Something went wrong with build")
     
-    writeHeader("../Display-Lock/resources/version.h", sys.argv[1], sys.argv[2], sys.argv[3])
+    writeHeader(os.path.abspath("../Display-Lock/resources/version.h"), sys.argv[1], sys.argv[2], sys.argv[3])
 
 
 main()
