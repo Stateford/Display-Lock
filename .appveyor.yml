@@ -8,7 +8,7 @@ platform:
 configuration:
   - Release
 for:
-#
+# for master branch
 -
   branches:
     only:
@@ -25,6 +25,10 @@ for:
 
   environment:
     type: develop
+    
+  artifacts:
+  - path: displayLock.exe
+    name: develop/displayLock
 
 
 before_build:
