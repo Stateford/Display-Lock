@@ -20,6 +20,7 @@ def writeHeader(filePath, config, version, build):
     pass
 
 def main():
+    print(sys.argv)
     if(len(sys.argv) < 3):
         raise BaseException("Something went wrong with build")
     
