@@ -7,9 +7,28 @@ platform:
 
 configuration:
   - Release
+for:
+#
+-
+  branches:
+    only:
+      - master
+  
+  enviornement:
+    type: release
+
+# for develop branch
+-
+  branches:
+    only:
+      - develop
+
+    enviornement:
+      type: develop
+
 
 before_build:
-  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %CONFIGURATION% %version% %APPVEYOR_BUILD_NUMBER%
+  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %TYPE% %version% %APPVEYOR_BUILD_NUMBER%
 
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
