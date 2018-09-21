@@ -27,7 +27,7 @@ for:
     type: develop
     
   artifacts:
-  - path: $(APPVEYOR_BUILD_FOLDER)\$(platform)\$(CONFIGURATION)\Display-Lock.exe
+  - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
     name: develop/displayLock
 
 
