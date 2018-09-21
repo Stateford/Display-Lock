@@ -14,7 +14,7 @@ for:
     only:
       - master
   
-  enviornement:
+  environment:
     type: release
 
 # for develop branch
@@ -23,7 +23,7 @@ for:
     only:
       - develop
 
-    enviornement:
+    environment:
       type: develop
 
 
