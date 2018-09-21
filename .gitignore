@@ -12,3 +12,4 @@ makefile
 .gitattributes
 */x64/
 */Debug/
+*/.vscode/

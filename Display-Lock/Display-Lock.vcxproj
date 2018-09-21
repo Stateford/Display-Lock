@@ -144,6 +144,8 @@
     <Manifest Include="resources\DisplayLock.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resources\version.h" />
+    <ClInclude Include="resources\versionRC.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="resources\targetver.h" />
   </ItemGroup>
@@ -158,6 +160,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
     </ResourceCompile>
+    <ResourceCompile Include="resources\version.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayLock.c" />

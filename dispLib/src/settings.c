@@ -104,7 +104,7 @@ BOOL writeSettings(SETTINGS settings)
 {
     // if loadstring could not be read, do not write the file
     if (settings.version <= 0)
-        return;
+        return FALSE;
 
     PWSTR path;
 

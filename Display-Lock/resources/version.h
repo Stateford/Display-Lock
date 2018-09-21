@@ -1,0 +1,5 @@
+#pragma once
+
+#define CONFIGURATION ""
+#define VERSION_BUILD 0
+#define FILE_VERSION "GENERATED.AUTOMATICALLY"
