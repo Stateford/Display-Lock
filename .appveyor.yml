@@ -16,6 +16,11 @@ for:
   
   environment:
     type: release
+    
+  artifacts:
+  - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
+    name: master/displayLock
+  
 
 # for develop branch
 -
