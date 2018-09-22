@@ -260,7 +260,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             break;
 
         case IDC_BUTTON_WINDOWS_STOP:
-            windowsButtonStop(menu, windowControls, &running);
+            windowsButtonStop(menu, &windowControls);
             break;
 
         case IDC_BUTTON_WINDOWS_START:

@@ -136,12 +136,12 @@ void windowsButtonStart(MENU *menu, WINDOW_VIEW_CONTROLS *windowControls, ARGS *
     EnableWindow(windowControls->stopButton, TRUE);
 }
 
-void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS windowControls, volatile BOOL *running)
+void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls)
 {
-    *running = FALSE;
-    EnableWindow(windowControls.startButton, TRUE);
-    EnableWindow(windowControls.stopButton, FALSE);
-    menu.closeThread(windowControls.clipThread, running);
+    *windowControls->runningClip = FALSE;
+    EnableWindow(windowControls->startButton, TRUE);
+    EnableWindow(windowControls->stopButton, FALSE);
+    menu.closeThread(windowControls->clipThread, windowControls->runningClip);
 }
 
 void invokeReadSettings(SETTINGS *settings)
