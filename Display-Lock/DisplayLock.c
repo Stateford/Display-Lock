@@ -287,17 +287,16 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 {
     static SETTINGS_VIEW_CONTROLS settingsControls;
     static SETTINGS previousSettings;
-    
 
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_SHOWWINDOW:
+        EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
+        settingsShowWindow(settingsControls, &settings, &previousSettings, running);
 
-       settingsShowWindow(settingsControls, &settings, &previousSettings, running);
-
-       // when the window is being hidden, reset settings
-       // when the window is being shown, copy the previous settings
+        // when the window is being hidden, reset settings
+        // when the window is being shown, copy the previous settings
         if ((BOOL)wParam == FALSE)
             settings = previousSettings;
         else if ((BOOL)wParam == TRUE)
@@ -312,18 +311,22 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         switch (LOWORD(wParam))
         {
         case IDC_CHECK_SETTINGS_BORDERLESS:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.borderless = (BOOL)SendMessage(settingsControls.borderless, BM_GETCHECK, 0, 0);
             break;
         case IDC_CHECK_SETTINGS_FOREGROUND:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
             break;
         case IDC_CHECK_SETTINGS_FULL_SCREEN:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
             break;
         case IDC_CHECK_SETTINGS_MINIMIZE:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
             break;
@@ -334,6 +337,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
         case IDC_BUTTON_SETTINGS_CANCEL:
             settingsCancel(settingsControls, &settings, previousSettings);
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
             break;
         default:
             break;
