@@ -121,7 +121,7 @@ BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
 BOOL writeSettings(SETTINGS settings, wchar_t *path)
 {
     // if loadstring could not be read, do not write the file
-    if (settings.version <= 0)
+    if (settings.version <= 0 || strcmp(settings.header, "DLOCK") != 0)
         return FALSE;
 
 
