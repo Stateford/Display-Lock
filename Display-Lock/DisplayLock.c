@@ -4,6 +4,7 @@
 #include "resources\resource.h"
 #include "header.h"
 #include "common.h"
+#include "ui.h"
 #include <stdio.h>
 
 #define MAX_LOADSTRING 100
@@ -137,20 +138,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_CREATE:
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
-        // TODO: make this a function
-        // if this fails, an error stating config could not read/write
-        // program will continue without saving a config
-        wchar_t buff[4];
-        int strSize = LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 3);
-        
-        if (strSize != 0)
-        {
-            wchar_t path[MAX_PATH];
-            findPath(path);
-            readSettings(&settings, buff, path);
-        }
-        else
-            defaultSettings(&settings, L"0");
+        invokeReadSettings(&settings);
         break;
     case WM_COMMAND:
         {
@@ -163,9 +151,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case IDM_EXIT:
             {
-                wchar_t path[MAX_PATH];
-                createDirectory(path);;
-                writeSettings(settings, path);
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
                 break;
             }
@@ -183,13 +168,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_CLOSE:
-    {
-        wchar_t path[MAX_PATH];
-        createDirectory(path);
-        writeSettings(settings, path);
+        shutDown(settings);
         DestroyWindow(hWnd);
         break;
-    }
+
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -208,21 +190,7 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     switch (message)
     {
     case WM_INITDIALOG:
-        // initalize the tab controls
-        mainWindowControls.tabCtrl = GetDlgItem(hDlg, IDC_TAB_CONTROL);
-        TCITEM tci = { 0 };
-        tci.mask = TCIF_TEXT;
-        tci.pszText = L"Window";
-        TabCtrl_InsertItem(mainWindowControls.tabCtrl, WINDOW_VIEW, &tci);
-        
-        /*
-        Currently disabled
-        tci.pszText = L"Monitor";
-        TabCtrl_InsertItem(tabCtrl, 1, &tci);
-        */
-
-        tci.pszText = L"Settings";
-        TabCtrl_InsertItem(mainWindowControls.tabCtrl, SETTINGS_VIEW, &tci);
+        mainWindowInit(hDlg, &mainWindowControls);
 
         // initalize the tab views
         mainWindowControls.windowView = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_WINDOWS_VIEW), mainWindowControls.tabCtrl, windowViewProc);
@@ -273,21 +241,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
     switch (message)
     {
     case WM_INITDIALOG:
-        initMenuObj(&menu);
-        running = FALSE;
-        // initalize controls
-        windowControls.runningClip = &running;
-        windowControls.clipThread = NULL;
-        windowControls.comboBox = GetDlgItem(hDlg, IDC_COMBO_WINDOW);
-        windowControls.stopButton = GetDlgItem(hDlg, IDC_BUTTON_WINDOWS_STOP);
-        windowControls.startButton = GetDlgItem(hDlg, IDC_BUTTON_WINDOWS_START);
-
-        args.settings = &settings;
-        args.clipRunning = &running;
-
-        // populate the combobox with fields
-        menu.updateComboBox(windowControls.comboBox, &windowControls.windows, openWindows);
-        //SendMessage(windowControls.comboBox, CB_SETCURSEL, 0, 0);
+        initalizeWindowView(hDlg, &menu, &settings, &running, &windowControls, &args);
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -306,22 +260,13 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             break;
 
         case IDC_BUTTON_WINDOWS_STOP:
-            running = FALSE;
-            EnableWindow(windowControls.startButton, TRUE);
-            EnableWindow(windowControls.stopButton, FALSE);
-            menu.closeThread(windowControls.clipThread, &running);
+            windowsButtonStop(menu, windowControls, &running);
             break;
 
         case IDC_BUTTON_WINDOWS_START:
-        {
-            running = TRUE;
-            int windowSelection = (int)SendMessage(windowControls.comboBox, CB_GETCURSEL, 0, 0);
-            args.selectedWindow = windowControls.windows.windows[windowSelection];
-            menu.startThread(&windowControls.clipThread, cursorLock, (void*)&args);
-            EnableWindow(windowControls.startButton, FALSE);
-            EnableWindow(windowControls.stopButton, TRUE);
+            windowsButtonStart(&menu, &windowControls, &args, &running);
             break;
-        }
+
         default:
             break;
         }
@@ -349,28 +294,10 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
     {
     case WM_SHOWWINDOW:
 
-        SendMessage(settingsControls.borderless, BM_SETCHECK, settings.borderless, 0);
-        SendMessage(settingsControls.foreground, BM_SETCHECK, settings.foreground, 0);
-        SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings.fullScreen, 0);
-        SendMessage(settingsControls.minimize, BM_SETCHECK, settings.minimize, 0);
+       settingsShowWindow(settingsControls, &settings, &previousSettings, running);
 
-        if (running)
-        {
-            EnableWindow(settingsControls.borderless, FALSE);
-            EnableWindow(settingsControls.foreground, FALSE);
-            EnableWindow(settingsControls.fullScreen, FALSE);
-            EnableWindow(settingsControls.minimize, FALSE);
-        }
-        else
-        {
-            EnableWindow(settingsControls.borderless, TRUE);
-            EnableWindow(settingsControls.foreground, TRUE);
-            EnableWindow(settingsControls.fullScreen, TRUE);
-            EnableWindow(settingsControls.minimize, TRUE);
-        }
-        
-        // when the window is being hidden, reset settings
-        // when the window is being shown, copy the previous settings
+       // when the window is being hidden, reset settings
+       // when the window is being shown, copy the previous settings
         if ((BOOL)wParam == FALSE)
             settings = previousSettings;
         else if ((BOOL)wParam == TRUE)
@@ -402,19 +329,11 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             break;
 
         case IDC_BUTTON_SETTINGS_SAVE:
-            settings.borderless = (BOOL)SendMessage(settingsControls.borderless, BM_GETCHECK, 0, 0);
-            settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
-            settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
-            settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
-            previousSettings = settings;
+            settingsSave(settingsControls, settings, &previousSettings);
             break;
 
         case IDC_BUTTON_SETTINGS_CANCEL:
-            settings = previousSettings;
-            SendMessage(settingsControls.borderless, BM_SETCHECK, settings.borderless, 0);
-            SendMessage(settingsControls.foreground, BM_SETCHECK, settings.foreground, 0);
-            SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings.fullScreen, 0);
-            SendMessage(settingsControls.minimize, BM_SETCHECK, settings.minimize, 0);
+            settingsCancel(settingsControls, &settings, previousSettings);
             break;
         default:
             break;
@@ -437,27 +356,10 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_INITDIALOG:
     {
-        wchar_t version[2048];
-        wchar_t fileName[MAX_PATH];
-        GetModuleFileName(NULL, fileName, MAX_PATH);
+        wchar_t version[40];
+        if(getVersionString(version, 40))
+            SetDlgItemText(hDlg, IDC_STATIC_VERSION, version);
 
-        DWORD bufferSize = GetFileVersionInfoSizeW(fileName, NULL);
-        BOOL result = GetFileVersionInfoW(fileName, 0, bufferSize, (LPVOID)version);
-        if (result)
-        {
-            UINT size;
-            VS_FIXEDFILEINFO *verInfo = NULL;
-            VerQueryValue(version, L"\\", (LPVOID)&verInfo, &size);
-            int major = HIWORD(verInfo->dwFileVersionMS);
-            int minor = LOWORD(verInfo->dwFileVersionMS);
-            int build = HIWORD(verInfo->dwFileVersionLS);
-            int revision = LOWORD(verInfo->dwFileVersionLS);
-
-            wchar_t buff[40];
-
-            swprintf(buff, 40, L"Version: %d.%d.%d.%d", major, minor, build, revision);
-            SetDlgItemText(hDlg, IDC_STATIC_VERSION, buff);
-        }
     }
     return (INT_PTR)TRUE;
 
