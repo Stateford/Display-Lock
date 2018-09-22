@@ -273,7 +273,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
 
         break;
 
-    case WM_CLOSE:
+    case WM_DESTROY:
         menu.closeThread(windowControls.clipThread, &running);
         break;
     default:
