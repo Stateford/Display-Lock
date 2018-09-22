@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.0.1]
+### Fixed
+- Fixed an issue where the save button was not being disabled when something was saved
+
 # [2.0.0]
 ### Fixed
 - Fixed an issue where the program wouls sometimes crash when reading / writing a file
