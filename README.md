@@ -1,7 +1,7 @@
 # Display Lock
 [![Build status](https://ci.appveyor.com/api/projects/status/4nqt7c0a51umdm7c/branch/master?svg=true)](https://ci.appveyor.com/project/idietmoran/display-lock/branch/master)
 
-
+![](res/dl_logo_ZEB_icon.ico)
 
 Lightweight program that locks cursor in selected window, designed with performance in mind.
 
@@ -14,10 +14,10 @@ Lightweight program that locks cursor in selected window, designed with performa
 
 ### EXAMPLE
 ---------------
-![](https://idietmoran.github.io/Display-Lock/res/displayLock-preview.png)
+![](res/displayLock-preview.png)
 
-![](https://idietmoran.github.io/Display-Lock/res/borderless_example.gif)
+![](res/borderless_example.gif)
 
-![](https://idietmoran.github.io/Display-Lock/res/example.gif)
+![](res/example.gif)
 
 # ![Download](https://github.com/idietmoran/Display-Lock/releases/)

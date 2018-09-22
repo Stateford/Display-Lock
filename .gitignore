@@ -3,7 +3,6 @@
 /x64/
 *.vcxproj.*
 .vs/
-*.DLOCK
 notes.MD
 *.cmake
 *.txt
@@ -11,5 +10,6 @@ makefile
 /CMakeFiles/
 .gitattributes
 */x64/
+*/release/
 */Debug/
 */.vscode/

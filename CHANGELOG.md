@@ -3,11 +3,14 @@ All notable changes to this project will be documented in this file
 
 # [2.0.0]
 ### Fixed
-- Fixed a crash cause by a buffer overflow
+- Fixed an issue where the program wouls sometimes crash when reading / writing a file
 - Fixed an issue where minimizing the window would cause the dropdown list to become empty
 
 ### Added
 - Tests for build
+- Added CI with appveyor
+    - Checks builds and run tests
+    - Automatically increments build / version number inside the application
 
 ### Removed
 - Removed a thread made for constantly polling active windows
