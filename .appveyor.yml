@@ -1,7 +1,4 @@
-environment:
-  version: 2.0.1
-
-version: '{branch}/{version}.{build}'
+version: '{branch}/2.0.1.{build}'
 
 branches:
   only:
