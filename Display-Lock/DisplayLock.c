@@ -23,6 +23,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 
 
@@ -157,6 +158,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
+            case IDM_ABOUT:
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
+                break;
             case IDM_EXIT:
             {
                 wchar_t path[MAX_PATH];
@@ -426,3 +430,52 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 }
 
 
+INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        wchar_t version[2048];
+        wchar_t fileName[MAX_PATH];
+        GetModuleFileName(NULL, fileName, MAX_PATH);
+
+        DWORD bufferSize = GetFileVersionInfoSizeW(fileName, NULL);
+        BOOL result = GetFileVersionInfoW(fileName, 0, bufferSize, (LPVOID)version);
+        if (result)
+        {
+            UINT size;
+            VS_FIXEDFILEINFO *verInfo = NULL;
+            VerQueryValue(version, L"\\", (LPVOID)&verInfo, &size);
+            int major = HIWORD(verInfo->dwFileVersionMS);
+            int minor = LOWORD(verInfo->dwFileVersionMS);
+            int build = HIWORD(verInfo->dwFileVersionLS);
+            int revision = LOWORD(verInfo->dwFileVersionLS);
+
+            wchar_t buff[40];
+
+            swprintf(buff, 40, L"Version: %d.%d.%d.%d", major, minor, build, revision);
+            SetDlgItemText(hDlg, IDC_STATIC_VERSION, buff);
+        }
+    }
+    return (INT_PTR)TRUE;
+
+    case WM_NOTIFY:
+        //if (((LPNMHDR)lParam)->code == NM_CLICK)
+            //ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
+        break;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+
+        break;
+    default:
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
