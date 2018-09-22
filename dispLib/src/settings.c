@@ -53,6 +53,24 @@ BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
     return settings->version == version;
 }
 
+BOOL findPath(wchar_t *outPath)
+{
+    PWSTR path;
+
+    HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
+
+    if (SUCCEEDED(hr))
+    {
+        wcscpy(outPath, path);
+        LPCWSTR x = L"DisplayLock\\settings.DLOCK";
+        PathAppend(outPath, x);
+    }
+    else
+        return FALSE;
+
+    CoTaskMemFree(path);
+    return TRUE;
+}
 
 BOOL readSettings(SETTINGS *settings, wchar_t *versionStr)
 {

@@ -10,3 +10,4 @@ BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr);
 BOOL writeSettings(SETTINGS settings);
 BOOL readSettings(SETTINGS *settings, wchar_t *versionStr);
 
+BOOL findPath(wchar_t *path);
