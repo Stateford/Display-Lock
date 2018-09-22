@@ -7,13 +7,19 @@ branches:
 
 image: Visual Studio 2017
 
+branches:
+  only:
+    - master
+    - develop
+
+
 platform:
   - x64
 
 configuration:
   - Release
 for:
-#
+# for master branch
 -
   branches:
     only:
@@ -21,6 +27,11 @@ for:
   
   environment:
     type: release
+    
+  artifacts:
+  - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
+    name: master/displayLock
+  
 
 # for develop branch
 -
@@ -30,6 +41,10 @@ for:
 
   environment:
     type: develop
+    
+  artifacts:
+  - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
+    name: develop/displayLock
 
 
 before_build:
