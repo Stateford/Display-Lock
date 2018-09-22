@@ -332,6 +332,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             break;
 
         case IDC_BUTTON_SETTINGS_SAVE:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
             settingsSave(settingsControls, settings, &previousSettings);
             break;
 
