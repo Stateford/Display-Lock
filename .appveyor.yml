@@ -2,6 +2,12 @@ version: '{branch}/2.0.0{build}'
 
 image: Visual Studio 2017
 
+branches:
+  only:
+    - master
+    - develop
+
+
 platform:
   - x64
 
