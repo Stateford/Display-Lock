@@ -10,7 +10,7 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
 void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, volatile BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args);
 
 void windowsButtonStart(MENU *menu, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, volatile BOOL *running);
-void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS windowControls, volatile BOOL *running);
+void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls);
 
 void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls);
 
