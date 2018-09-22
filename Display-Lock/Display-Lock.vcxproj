@@ -148,6 +148,7 @@
     <ClInclude Include="resources\versionRC.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="resources\targetver.h" />
+    <ClInclude Include="ui.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\resource.rc">
@@ -164,6 +165,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DisplayLock.c" />
+    <ClCompile Include="ui.c" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\dispLib\dispLib.vcxproj">

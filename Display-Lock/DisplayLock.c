@@ -4,6 +4,7 @@
 #include "resources\resource.h"
 #include "header.h"
 #include "common.h"
+#include "ui.h"
 #include <stdio.h>
 
 #define MAX_LOADSTRING 100
@@ -437,27 +438,10 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_INITDIALOG:
     {
-        wchar_t version[2048];
-        wchar_t fileName[MAX_PATH];
-        GetModuleFileName(NULL, fileName, MAX_PATH);
+        wchar_t version[40];
+        if(getVersionString(version, 40))
+            SetDlgItemText(hDlg, IDC_STATIC_VERSION, version);
 
-        DWORD bufferSize = GetFileVersionInfoSizeW(fileName, NULL);
-        BOOL result = GetFileVersionInfoW(fileName, 0, bufferSize, (LPVOID)version);
-        if (result)
-        {
-            UINT size;
-            VS_FIXEDFILEINFO *verInfo = NULL;
-            VerQueryValue(version, L"\\", (LPVOID)&verInfo, &size);
-            int major = HIWORD(verInfo->dwFileVersionMS);
-            int minor = LOWORD(verInfo->dwFileVersionMS);
-            int build = HIWORD(verInfo->dwFileVersionLS);
-            int revision = LOWORD(verInfo->dwFileVersionLS);
-
-            wchar_t buff[40];
-
-            swprintf(buff, 40, L"Version: %d.%d.%d.%d", major, minor, build, revision);
-            SetDlgItemText(hDlg, IDC_STATIC_VERSION, buff);
-        }
     }
     return (INT_PTR)TRUE;
 
