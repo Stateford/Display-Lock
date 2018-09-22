@@ -10,5 +10,6 @@ makefile
 /CMakeFiles/
 .gitattributes
 */x64/
+*/release/
 */Debug/
 */.vscode/
