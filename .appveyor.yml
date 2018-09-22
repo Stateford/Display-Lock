@@ -1,4 +1,7 @@
-version: '{branch}/2.0.0.{build}'
+environment:
+  version: 2.0.1
+
+version: '{branch}/{version}.{build}'
 
 branches:
   only:
@@ -24,7 +27,7 @@ for:
     
   artifacts:
   - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
-    name: master/displayLock
+    name: master/
   
 
 # for develop branch
@@ -37,8 +40,8 @@ for:
     type: develop
     
   artifacts:
-  - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
-    name: develop/displayLock
+  - path: Display-Lock.exe
+    name: develop/
 
 
 before_build:
