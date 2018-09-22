@@ -53,8 +53,7 @@ BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
     return settings->version == version;
 }
 
-
-BOOL readSettings(SETTINGS *settings, wchar_t *versionStr)
+BOOL findPath(wchar_t *outPath)
 {
     PWSTR path;
 
@@ -62,79 +61,78 @@ BOOL readSettings(SETTINGS *settings, wchar_t *versionStr)
 
     if (SUCCEEDED(hr))
     {
-        wchar_t fullPath[MAX_PATH];
-        wcscpy(fullPath, path);
-
+        wcscpy(outPath, path);
         LPCWSTR x = L"DisplayLock\\settings.DLOCK";
-        PathAppend(fullPath, x);
-
-        FILE *file = _wfopen(fullPath, TEXT("rb"));
-
-        // if if opening file is succcessful read into struct
-        // otherwise use default settings
-        if (file == NULL)
-        {
-            defaultSettings(settings, versionStr);
-            CoTaskMemFree(path);
-            return FALSE;
-        }
-
-        fread(settings, sizeof(*settings), 1, file);
-        
-
-        fclose(file);
-        _fcloseall();
+        PathAppend(outPath, x);
     }
     else
-    {
-        defaultSettings(settings, versionStr);
-        CoTaskMemFree(path);
         return FALSE;
-    }
 
-    if (!checkVersion(settings, versionStr))
-        defaultSettings(settings, versionStr);
-
-    // free memory allocated by SHGetKnownFolderPath
     CoTaskMemFree(path);
     return TRUE;
 }
 
-BOOL writeSettings(SETTINGS settings)
+BOOL createDirectory(wchar_t *outPath)
+{
+    PWSTR path;
+
+    if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
+    {
+        wcscpy(outPath, path);
+
+        // create directory
+        PathAppend(outPath, TEXT("DisplayLock"));
+        // TODO: check if directory was created
+        CreateDirectory(outPath, NULL);
+        // create file
+        PathAppend(outPath, TEXT("\\settings.DLOCK"));
+    }
+    else
+        return FALSE;
+
+    CoTaskMemFree(path);
+    return TRUE;
+}
+
+BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
+{
+    FILE *file = _wfopen(path, TEXT("rb"));
+
+    // if if opening file is succcessful read into struct
+    // otherwise use default settings
+    if (file == NULL)
+    {
+        defaultSettings(settings, versionStr);
+        return FALSE;
+    }
+
+    fread(settings, sizeof(SETTINGS), 1, file);
+
+
+    fclose(file);
+    _fcloseall();
+
+    if (!checkVersion(settings, versionStr))
+        defaultSettings(settings, versionStr);
+
+    return TRUE;
+}
+
+BOOL writeSettings(SETTINGS settings, wchar_t *path)
 {
     // if loadstring could not be read, do not write the file
     if (settings.version <= 0)
         return FALSE;
 
-    PWSTR path;
 
-    if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
-    {
-        wchar_t fullPath[MAX_PATH];
-        wcscpy(fullPath, path);
+    FILE *file = _wfopen(path, TEXT("wb"));
 
-        // create directory
-        PathAppend(fullPath, TEXT("DisplayLock"));
-        // TODO: check if directory was created
-        CreateDirectory(fullPath, NULL);
-        // create file
-        PathAppend(fullPath, TEXT("\\settings.DLOCK"));
-        FILE *file = _wfopen(fullPath, TEXT("wb"));
-
-        if (file == NULL)
-        {
-            CoTaskMemFree(path);
-            return FALSE;
-        }
-
-        fwrite(&settings, sizeof(settings), 1, file);
-        fclose(file);
-        _fcloseall();
-    }
-    else
+    if (file == NULL)
         return FALSE;
 
-    // free memory allocated by SHGetKnownFolderPath
-    CoTaskMemFree(path);
+    fwrite(&settings, sizeof(settings), 1, file);
+    fclose(file);
+    _fcloseall();
+
     return TRUE;
 }

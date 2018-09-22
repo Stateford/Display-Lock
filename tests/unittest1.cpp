@@ -51,6 +51,17 @@ namespace Tests
 
         }
 
+        TEST_METHOD(FindPath)
+        {
+            Logger::WriteMessage("findPath()...");
+
+            wchar_t path[MAX_PATH];
+            BOOL res = findPath(path);
+
+            Assert::AreEqual(res, TRUE);
+            Logger::WriteMessage(path);
+        }
+
 		TEST_METHOD(ReadSettings)
 		{
             Logger::WriteMessage("readSettings()...");
