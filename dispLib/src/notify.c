@@ -15,7 +15,6 @@ void notifyInit(HWND hWnd, NOTIFYICONDATA * notify)
 
 void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
 {
-    Shell_NotifyIcon(NIM_DELETE, notify);
     ShowWindow(hWnd, SW_RESTORE);
     SetForegroundWindow(hWnd);
 }

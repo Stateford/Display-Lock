@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.1.0]
+### Added
+- Added a system tray icon
+    - Display Lock will now minimize to the system tray
+
 # [2.0.1]
 ### Fixed
 - Fixed an issue where the save button was not being disabled when something was saved
