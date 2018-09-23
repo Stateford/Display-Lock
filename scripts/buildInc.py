@@ -8,17 +8,13 @@ import sys
 import os
 
 def writeHeader(filePath, config, version, build):
+    print("Writing to path: %s\n" % filePath)
     file = open(filePath, 'w+')
     file.write("#pragma once\n\n")
     file.write("#define CONFIGURATION \"%s\"\n" % config)
     file.write("#define VERSION_BUILD %s\n" % build)
-    if(config.lower() == "release"):
-        file.write("#define FILE_VERSION \"%s.%s\"\n" % (version, build))
-    else:
-        file.write("#define FILE_VERSION \"%s.%s-RC\"\n" % (version, build))
-
+    file.write("#define FILE_VERSION \"%s.%s\"\n" % (version, build))
     file.close()
-    pass
 
 def main():
     print(sys.argv)

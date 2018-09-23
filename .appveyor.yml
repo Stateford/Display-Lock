@@ -1,5 +1,5 @@
 environment:
-  vers: 2.1.0
+  vers: "2.1.0"
 
 version: '{branch}/2.1.0.{build}'
 
