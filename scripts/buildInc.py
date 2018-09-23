@@ -8,6 +8,7 @@ import sys
 import os
 
 def writeHeader(filePath, config, version, build):
+    print("Writing to path: %s\n" % filePath)
     file = open(filePath, 'w+')
     file.write("#pragma once\n\n")
     file.write("#define CONFIGURATION \"%s\"\n" % config)
