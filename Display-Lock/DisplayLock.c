@@ -136,6 +136,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static NOTIFYICONDATA sysTray = {0};
+    static HMENU menu;
 
     switch (message)
     {
@@ -144,6 +145,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
+        menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
         break;
@@ -151,15 +153,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case NOTIFY_MSG:
         switch (lParam)
         {
-        case WM_LBUTTONDOWN:
-            break;
         case WM_LBUTTONDBLCLK:
             showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
-            showContext(hWnd);
+            showContext(hWnd, menu);
             break;
-
         default:
             break;
         }
@@ -183,6 +182,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
+            case ID_CONTEXTMENU_START:
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START);
+                break;
+            case ID_CONTEXTMENU_STOP:
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
+                break;
             case ID_CONTEXTMENU_SHOWWINDOW:
                 ShowWindow(hWnd, TRUE);
                 break;
