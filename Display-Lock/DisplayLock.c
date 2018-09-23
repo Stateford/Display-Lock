@@ -7,6 +7,7 @@
 #include "ui.h"
 #include <stdio.h>
 
+
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -134,18 +135,60 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    static NOTIFYICONDATA sysTray = {0};
+
     switch (message)
     {
+
     case WM_CREATE:
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
         invokeReadSettings(&settings);
+        notifyInit(hWnd, &sysTray);
+        Shell_NotifyIcon(NIM_ADD, &sysTray);
+        Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
         break;
+
+    case NOTIFY_MSG:
+        switch (lParam)
+        {
+        case WM_LBUTTONDOWN:
+            break;
+        case WM_LBUTTONDBLCLK:
+            showMainWindow(hWnd, &sysTray);
+            break;
+        case WM_RBUTTONDOWN:
+            showContext(hWnd);
+            break;
+
+        default:
+            break;
+        }
+        break;
+
+    case WM_SIZE:
+        switch (wParam)
+        {
+        case SIZE_MINIMIZED:
+            
+            ShowWindow(hWnd, FALSE);
+            break;
+        default:
+            break;
+        }
+        break;
+        
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
             // Parse the menu selections:
             switch (wmId)
             {
+            case ID_CONTEXTMENU_SHOWWINDOW:
+                ShowWindow(hWnd, TRUE);
+                break;
+            case ID_CONTEXTMENU_EXIT:
+                SendMessage(hWnd, WM_CLOSE, 0, 0);
+                break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
                 break;
@@ -168,6 +211,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_CLOSE:
+        Shell_NotifyIcon(NIM_DELETE, &sysTray);
         shutDown(settings);
         DestroyWindow(hWnd);
         break;
