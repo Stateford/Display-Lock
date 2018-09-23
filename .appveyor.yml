@@ -1,3 +1,6 @@
+environment:
+  vers: 2.1.0
+
 version: '{branch}/2.1.0.{build}'
 
 branches:
@@ -42,7 +45,7 @@ for:
 
 
 before_build:
-  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %TYPE% %version% %APPVEYOR_BUILD_NUMBER%
+  - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %TYPE% %vers% %APPVEYOR_BUILD_NUMBER%
 
 build:
   project: $(APPVEYOR_BUILD_FOLDER)\$(APPVEYOR_PROJECT_NAME).sln
