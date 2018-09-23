@@ -19,12 +19,25 @@ void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
     SetForegroundWindow(hWnd);
 }
 
-void showContext(HWND hWnd)
+void showContext(HWND hWnd, HMENU menu)
 {
     POINT cursor;
     GetCursorPos(&cursor);
-    HMENU menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
+    
     SetForegroundWindow(hWnd);
     TrackPopupMenu(GetSubMenu(menu, 0), TPM_LEFTALIGN | TPM_LEFTBUTTON, cursor.x, cursor.y, 0, hWnd, 0);
+}
+
+void notifyChildWindows(HWND hWnd, UINT msg)
+{
+    EnumChildWindows(hWnd, EnumChildProc, (LPARAM)msg);
+}
+
+BOOL EnumChildProc(HWND hWnd, LPARAM lParam)
+{
+    UINT msg = (UINT)lParam;
+    SendMessage(hWnd, WM_COMMAND, msg, 0);
+
+    return TRUE;
 }
 
