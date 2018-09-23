@@ -146,9 +146,11 @@
     <ClInclude Include="include\menu.h" />
     <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\win.h" />
+    <ClInclude Include="include\notify.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\menu.c" />
+    <ClCompile Include="src\notify.c" />
     <ClCompile Include="src\settings.c" />
     <ClCompile Include="src\win.c" />
   </ItemGroup>
