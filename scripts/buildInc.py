@@ -7,7 +7,8 @@ automatically increments build number and configuration
 import sys
 import os
 
-def writeHeader(filePath, config, version, build):
+
+def writeHeader(filePath: str, config: str, version: str, build: str) -> None:
     print("Writing to path: %s\n" % filePath)
     versSplit = version.split('.')
     
