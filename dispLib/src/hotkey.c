@@ -49,7 +49,7 @@ BOOL removeHotkey(HWND hWnd, SETTINGS *settings, int index)
 
 void cleanupHotkeys(HWND hWnd, SETTINGS *settings)
 {
-    for (unsigned int i = 0; i < settings->numOfHotkeys; i++)
+    for (int i = 0; i < settings->numOfHotkeys; i++)
     {
         UnregisterHotKey(hWnd, settings->hotkeys[i].id);
     }
