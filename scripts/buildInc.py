@@ -8,7 +8,7 @@ import sys
 import os
 
 
-def writeHeader(filePath: str, config: str, version: str, build: str) -> None:
+def writeHeader(filePath, config, version, build):
     print("Writing to path: %s\n" % filePath)
     versSplit = version.split('.')
     
