@@ -134,11 +134,16 @@ int CALLBACK cursorLock(void* arguments)
     if (settings->fullScreen)
         enableFullScreen(selectedWindow, &previousRect);
 
+    if (settings->minimize)
+        ShowWindow(args->hWnd, SW_MINIMIZE);
+
     if (settings->foreground)
     {
         SetForegroundWindow(selectedWindow.hWnd);
         SetActiveWindow(selectedWindow.hWnd);
     }
+
+    
 
     
     if (checkResizeStyle(selectedWindow.hWnd))

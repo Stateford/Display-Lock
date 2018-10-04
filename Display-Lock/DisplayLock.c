@@ -302,14 +302,15 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
     static WINDOW_VIEW_CONTROLS windowControls;
     static MENU menu;
     static ARGS args;
- 
+    static HWND parent;
 
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
         initalizeWindowView(hDlg, &menu, &settings, &running, &windowControls, &args);
-        
+        parent = GetParent(GetParent(GetParent(hDlg)));
+        args.hWnd = parent;
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
