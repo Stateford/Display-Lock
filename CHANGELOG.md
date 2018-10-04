@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file
 ### Added
 - Added a system tray icon
     - Display Lock will now minimize to the system tray
+- Added support for hotkeys
+
+### Fixed
+- Fixed an issue where the minimize setting would not function properly
 
 # [2.0.1]
 ### Fixed
