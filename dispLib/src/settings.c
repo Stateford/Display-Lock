@@ -10,6 +10,7 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
     settingsControls->foreground = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FOREGROUND);
     settingsControls->borderless = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_BORDERLESS);
     settingsControls->fullScreen = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FULL_SCREEN);
+    settingsControls->hotkey = GetDlgItem(hDlg, IDC_HOTKEY);
     settingsControls->settingsChanged = FALSE;
 }
 
@@ -34,6 +35,9 @@ void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
     settings->foreground = FALSE;
     settings->fullScreen = FALSE;
     settings->minimize = TRUE;
+    settings->numOfHotkeys = 0;
+    settings->hotkeys[0] = (HOTKEY){ 0 };
+    settings->hotkeys[1] = (HOTKEY){ 0 };
 }
 
 BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)

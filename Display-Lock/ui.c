@@ -4,6 +4,7 @@
 #include "win.h"
 #include "menu.h"
 #include "settings.h"
+#include "hotkey.h"
 
 BOOL getVersionString(wchar_t * buffer, int bufferSize)
 {
@@ -49,31 +50,27 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
 
-    if (running)
-    {
-        EnableWindow(settingsControls.borderless, FALSE);
-        EnableWindow(settingsControls.foreground, FALSE);
-        EnableWindow(settingsControls.fullScreen, FALSE);
-        EnableWindow(settingsControls.minimize, FALSE);
-    }
-    else
-    {
-        EnableWindow(settingsControls.borderless, TRUE);
-        EnableWindow(settingsControls.foreground, TRUE);
-        EnableWindow(settingsControls.fullScreen, TRUE);
-        EnableWindow(settingsControls.minimize, TRUE);
-    }
+    EnableWindow(settingsControls.borderless, !running);
+    EnableWindow(settingsControls.foreground, !running);
+    EnableWindow(settingsControls.fullScreen, !running);
+    EnableWindow(settingsControls.minimize, !running);
+    EnableWindow(settingsControls.hotkey, !running);
 
    
 }
 
 
-void settingsSave(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
+void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
 {
     settings.borderless = (BOOL)SendMessage(settingsControls.borderless, BM_GETCHECK, 0, 0);
     settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
+    
+    WORD hotkey = (WORD)SendMessage(settingsControls.hotkey, HKM_GETHOTKEY, 0, 0);
+    
+    addHotkey(hWnd, &settings, START_STOP, HIBYTE(hotkey), LOBYTE(hotkey));
+
     *previousSettings = settings;
 }
 
@@ -84,6 +81,7 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
+    SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 
 void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, volatile BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)

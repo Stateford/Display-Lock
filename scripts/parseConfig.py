@@ -3,11 +3,12 @@
 # Reads binary from a DLOCK config file and prints it in a human readable format
 
 import struct
+import sys
 
 # config for config version 5
 class ConfigV5:
     # constructor, takes a string path as an argument
-    def __init__(self, path):
+    def __init__(self, path: str):
         self.path = path
         self.header = None
         self.version = None
@@ -52,3 +53,12 @@ class ConfigV5:
         self.parse()
         self.printResults()
         
+def main():
+    print(sys.argv)
+    if(len(sys.argv) < 2):
+        raise Exception("Pass an argument in")
+    output = ConfigV5(sys.argv[1])
+    output.start()
+    
+
+main()
