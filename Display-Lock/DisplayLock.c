@@ -157,9 +157,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // id of hotkey
         case START_STOP:
             if (running)
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP, 0, 0);
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
             else
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START, 0, 0);
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START);
             break;
         default:
             break;
