@@ -145,9 +145,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
+        initHotkey(hWnd, &settings);
+
         menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
+        break;
+
+    case WM_HOTKEY:
+        switch (wParam) {
+        // id of hotkey
+        case START_STOP:
+            if (running)
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
+            else
+                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START);
+            break;
+        default:
+            break;
+        }
         break;
 
     case NOTIFY_MSG:
@@ -217,6 +233,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CLOSE:
         Shell_NotifyIcon(NIM_DELETE, &sysTray);
+        cleanupHotkeys(hWnd, &settings);
         shutDown(settings);
         DestroyWindow(hWnd);
         break;
@@ -285,12 +302,14 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
     static WINDOW_VIEW_CONTROLS windowControls;
     static MENU menu;
     static ARGS args;
+ 
 
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
         initalizeWindowView(hDlg, &menu, &settings, &running, &windowControls, &args);
+        
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -336,6 +355,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 {
     static SETTINGS_VIEW_CONTROLS settingsControls;
     static SETTINGS previousSettings;
+    static HWND parent;
 
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
@@ -354,6 +374,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         break;
     case WM_INITDIALOG:
         initalizeSettings(hDlg, &settingsControls);
+        parent = GetParent(GetParent(GetParent(hDlg)));
         return (INT_PTR)TRUE;
     case WM_COMMAND:
     {
@@ -380,9 +401,14 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
             break;
 
+        case IDC_HOTKEY:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
+            settingsControls.settingsChanged = TRUE;
+            break;
+
         case IDC_BUTTON_SETTINGS_SAVE:
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
-            settingsSave(settingsControls, settings, &previousSettings);
+            settingsSave(parent, settingsControls, settings, &previousSettings);
             break;
 
         case IDC_BUTTON_SETTINGS_CANCEL:
