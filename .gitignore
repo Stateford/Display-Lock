@@ -12,4 +12,5 @@ makefile
 */x64/
 */release/
 */Debug/
+/.vscode/
 */.vscode/

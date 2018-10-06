@@ -21,14 +21,13 @@ for:
   branches:
     only:
       - master
-  
+
   environment:
     type: release
-    
+
   artifacts:
   - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
     name: master/
-  
 
 # for develop branch
 -
@@ -38,11 +37,10 @@ for:
 
   environment:
     type: develop
-    
+
   artifacts:
   - path: $(platform)\$(CONFIGURATION)\Display-Lock.exe
     name: develop/
-
 
 before_build:
   - cmd: python %APPVEYOR_BUILD_FOLDER%\scripts\buildInc.py %TYPE% %vers% %APPVEYOR_BUILD_NUMBER%

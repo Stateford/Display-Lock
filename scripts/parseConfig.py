@@ -6,7 +6,7 @@ import struct
 import sys
 
 # config for config version 5
-class ConfigV5:
+class Config:
     # constructor, takes a string path as an argument
     def __init__(self, path: str):
         self.path = path
@@ -19,6 +19,9 @@ class ConfigV5:
         self.index = 0
         self.file = None
         self.contents = None
+        self.numOfHotkeys = None
+        self.hotkey = None
+        self.hotkeyMod = None
 
     # opens a file and stores it's contents in self.contents
     def openFile(self):
@@ -34,6 +37,10 @@ class ConfigV5:
         self.foreground = struct.unpack('>i', self.contents[13:17])[0]
         self.borderless = struct.unpack('>i', self.contents[17:21])[0]
         self.fullScreen = struct.unpack('>i', self.contents[21:25])[0]
+        if(self.version > 5):
+            self.numOfHotkeys = struct.unpack('>i', self.contents[25:29])[0]
+            self.hotkeyMod = struct.unpack('>i', self.contents[29:33])[0]
+            self.hotkey = struct.unpack('>i', self.contents[33:37])[0]
 
     # prints results
     def printResults(self):
@@ -46,6 +53,11 @@ class ConfigV5:
         print(self.foreground == '1')
         print(self.borderless == '1')
         print(self.fullScreen == '1')
+        if(self.version > 5):
+            print(self.numOfHotkeys)
+            #TODO: convert vk to keyboard key
+            print(self.hotkeyMod)
+            print(self.hotkey)
 
     # start parsing config file
     def start(self):
@@ -54,10 +66,10 @@ class ConfigV5:
         self.printResults()
         
 def main():
-    print(sys.argv)
     if(len(sys.argv) < 2):
         raise Exception("Pass an argument in")
-    output = ConfigV5(sys.argv[1])
+
+    output = Config(sys.argv[1])
     output.start()
     
 
