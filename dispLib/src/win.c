@@ -1,6 +1,5 @@
 #include "win.h"
 #include <process.h>
-#include <Psapi.h>
 
 // Get open windows
 void openWindows(WINDOWLIST *windows)
