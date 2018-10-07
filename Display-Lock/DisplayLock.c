@@ -14,7 +14,9 @@
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+WINDOW_VIEW_CONTROLS windowControls = { 0 };
 SETTINGS settings = { 0 };                              // application settings
+ARGS args = {0};
 volatile BOOL running = FALSE;
 
 // Forward declarations of functions included in this code module:
@@ -173,7 +175,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
-            showContext(hWnd, menu);
+            showContext(hWnd, menu, &windowControls.windows);
             break;
         default:
             break;
@@ -196,6 +198,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             int wmId = LOWORD(wParam);
             // Parse the menu selections:
+
+            // item from submenu in notifications
+            if (wParam >= 100 && wParam <= 200)
+                windowsButtonStart(&windowControls, &args, &running, ((int)wParam - 100));
+
             switch (wmId)
             {
             case ID_CONTEXTMENU_START:
@@ -299,9 +306,7 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     // struct that contains controls
-    static WINDOW_VIEW_CONTROLS windowControls;
     static MENU menu;
-    static ARGS args;
     static HWND parent;
 
     UNREFERENCED_PARAMETER(lParam);
@@ -333,8 +338,11 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             break;
 
         case IDC_BUTTON_WINDOWS_START:
-            windowsButtonStart(&menu, &windowControls, &args, &running);
+        {
+            int windowSelection = (int)SendMessage(windowControls.comboBox, CB_GETCURSEL, 0, 0);
+            windowsButtonStart(&windowControls, &args, &running, windowSelection);
             break;
+        }
 
         default:
             break;
