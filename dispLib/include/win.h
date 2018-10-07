@@ -4,7 +4,7 @@
 #include "common.h"
 
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
-BOOL CALLBACK EnumChildProc(HWND, LPARAM);
+BOOL CALLBACK EnumChildProcUWP(HWND, LPARAM);
 
 BOOL checkWindowTaskbar(HWND);
 
