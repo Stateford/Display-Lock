@@ -20,13 +20,13 @@ void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
     SetForegroundWindow(hWnd);
 }
 
-void showContext(HWND hWnd, HMENU menu)
+void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows)
 {
     HMENU contextMenu = GetSubMenu(menu, 0);
     // create new windowmenu
     HMENU windowMenu = CreatePopupMenu();
     // populate window list
-    updateContextMenu(&windowMenu);
+    updateContextMenu(&windowMenu, windows);
     // modify the popup with the new window list
     ModifyMenu(contextMenu, 3, MF_BYPOSITION | MF_POPUP, (UINT)windowMenu, TEXT("Windows"));
 
@@ -42,15 +42,12 @@ void notifyChildWindows(HWND hWnd, UINT msg)
     EnumChildWindows(hWnd, EnumChildProc, (LPARAM)msg);
 }
 
-void updateContextMenu(HMENU *submenu)
+void updateContextMenu(HMENU *submenu, WINDOWLIST *windows)
 {
-    WINDOWLIST windows;
-    openWindows(&windows);
+    openWindows(windows);
 
-    for (int i = 0; i < windows.count; i++)
-    {
-        AppendMenuA(*submenu, MF_STRING, (100 + i), windows.windows[i].title);
-    }
+    for (int i = 0; i < windows->count; i++)
+        AppendMenuA(*submenu, MF_STRING, (100 + i), windows->windows[i].title);
 
 }
 
