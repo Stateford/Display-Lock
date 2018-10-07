@@ -4,20 +4,9 @@
 #include <shellapi.h>
 #include "common.h"
 
-typedef struct msgData msgData;
-
-struct msgData
-{
-    UINT msg;
-    MENU *menu;
-};
-
 void notifyInit(HWND hWnd, NOTIFYICONDATA *notify);
-
 void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify);
-
-void showContext(HWND hWnd, HMENU menu);
-
+void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows);
 void notifyChildWindows(HWND hWnd, UINT msg);
-
+void updateContextMenu(HMENU *submenu, WINDOWLIST *windows);
 BOOL CALLBACK EnumChildProc(HWND hWnd, LPARAM lParam);

@@ -124,12 +124,11 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
 }
 
 
-void windowsButtonStart(MENU *menu, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, volatile BOOL *running)
+void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, volatile BOOL *running, int windowSelection)
 {
     *running = TRUE;
-    int windowSelection = (int)SendMessage(windowControls->comboBox, CB_GETCURSEL, 0, 0);
     args->selectedWindow = windowControls->windows.windows[windowSelection];
-    menu->startThread(&windowControls->clipThread, cursorLock, (void*)args);
+    startThread(&windowControls->clipThread, cursorLock, (void*)args);
     EnableWindow(windowControls->startButton, FALSE);
     EnableWindow(windowControls->stopButton, TRUE);
 }
