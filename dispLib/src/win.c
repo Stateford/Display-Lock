@@ -18,6 +18,40 @@ BOOL checkWindowTaskbar(HWND hwnd)
     return ((GetWindowLongPtr(hwnd, GWL_EXSTYLE) & WS_EX_WINDOWEDGE) > 0) || ((GetWindowLongPtr(hwnd, GWL_STYLE) & WS_POPUP) > 0);
 }
 
+// checks if window has borders and hides false-positives among UWP instances.
+BOOL checkUWP(HWND hwnd) 
+{
+	char className[500];
+	GetClassNameA(hwnd, className, sizeof(className));
+
+	WINDOWINFO wInfo;
+	ZeroMemory(&wInfo, sizeof(WINDOWINFO));
+	if (GetWindowInfo(hwnd, &wInfo))
+	{
+		// If the size of the borders is 0, hide the window in the drop-down. (it seems that windows without border-property defined are not shown)
+		if (wInfo.cxWindowBorders == 0 && wInfo.cyWindowBorders == 0)
+		{
+			return FALSE;
+		}
+
+		if (!strcmp(className, "ApplicationFrameWindow")) 
+		{
+			// If the EnumChildWindows returns false, that means a core window has been found, therefore do not hide (return true).
+			return !(EnumChildWindows(hwnd, &EnumChildProcUWP, (LPARAM)NULL));
+		}
+	}
+	return TRUE;
+}
+
+// Enumerates child windows of UWP application and checks if there is an actual window open.
+BOOL CALLBACK EnumChildProcUWP(HWND hwnd, LPARAM lParam) 
+{
+	char className[500];
+	GetClassNameA(hwnd, className, 500);
+
+	// Checks if the child window is a CoreWindow (this seems to signify whether there is a window open)
+	return !(!strcmp(className, "Windows.UI.Core.CoreWindow")); 
+}
 
 // enumerate windows and get current window list
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
@@ -35,7 +69,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
         GetWindowTextA(hwnd, title, sizeof(title));
 
         // if title contains more than 1 character
-        if (strlen(title) != 0 && strcmp(title, "Display Lock") != 0 && checkWindowTaskbar(hwnd))
+        if (strlen(title) != 0 && strcmp(title, "Display Lock") != 0 && checkWindowTaskbar(hwnd) && checkUWP(hwnd))
         {
             // get handle
             win->windows[win->count].hWnd = hwnd;
