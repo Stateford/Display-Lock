@@ -50,11 +50,7 @@ BOOL CALLBACK EnumChildProcUWP(HWND hwnd, LPARAM lParam)
 	GetClassNameA(hwnd, className, 500);
 
 	// Checks if the child window is a CoreWindow (this seems to signify whether there is a window open)
-	if (!strcmp(className, "Windows.UI.Core.CoreWindow")) 
-	{
-		return FALSE;
-	}
-	return TRUE;
+	return !(!strcmp(className, "Windows.UI.Core.CoreWindow")); 
 }
 
 // enumerate windows and get current window list
