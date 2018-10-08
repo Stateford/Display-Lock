@@ -16,10 +16,8 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
 
 void setSettingsDlg(HWND hDlg, SETTINGS settings)
 {
-
     return;
 }
-
 
 void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
 {

@@ -7,7 +7,6 @@
 #include "ui.h"
 #include <stdio.h>
 
-
 #define MAX_LOADSTRING 100
 
 // Global Variables:
@@ -28,8 +27,6 @@ INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -200,10 +197,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             int wmId = LOWORD(wParam);
             // Parse the menu selections:
-
             // item from submenu in notifications
-            if (wParam >= 100 && wParam <= 200)
-                windowsButtonStart(&windowControls, &args, &running, ((int)wParam - 100));
+            if (wParam >= SUBMENU_ITEM_BASE && wParam <= (SUBMENU_ITEM_BASE + 100) )
+                windowsButtonStart(&windowControls, &args, &running, ((int)wParam - SUBMENU_ITEM_BASE));
 
             switch (wmId)
             {
@@ -361,7 +357,6 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
     return (INT_PTR)FALSE;
 }
 
-
 INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static SETTINGS_VIEW_CONTROLS settingsControls;
@@ -438,7 +433,6 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
     }
     return (INT_PTR)FALSE;
 }
-
 
 INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {

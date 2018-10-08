@@ -123,7 +123,6 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
 
 }
 
-
 void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, volatile BOOL *running, int windowSelection)
 {
     *running = TRUE;

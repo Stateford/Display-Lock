@@ -47,7 +47,7 @@ void updateContextMenu(HMENU *submenu, WINDOWLIST *windows)
     openWindows(windows);
 
     for (int i = 0; i < windows->count; i++)
-        AppendMenuA(*submenu, MF_STRING, (100 + i), windows->windows[i].title);
+        AppendMenuA(*submenu, MF_STRING, (SUBMENU_ITEM_BASE + i), windows->windows[i].title);
 
 }
 
@@ -58,4 +58,3 @@ BOOL EnumChildProc(HWND hWnd, LPARAM lParam)
 
     return TRUE;
 }
-
