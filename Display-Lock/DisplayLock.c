@@ -175,6 +175,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
+            if (!running) EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_GRAYED);
+            else EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_ENABLED);
             showContext(hWnd, menu, &windowControls.windows);
             break;
         default:
