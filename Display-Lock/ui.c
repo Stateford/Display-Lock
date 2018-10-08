@@ -55,8 +55,6 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
     EnableWindow(settingsControls.fullScreen, !running);
     EnableWindow(settingsControls.minimize, !running);
     EnableWindow(settingsControls.hotkey, !running);
-
-   
 }
 
 
