@@ -172,9 +172,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
-            if (!running) EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_GRAYED);
-            else EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_ENABLED);
-            showContext(hWnd, menu, &windowControls.windows);
+            if (!running) 
+                EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_GRAYED);
+            else 
+                EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_ENABLED);
+            showContext(hWnd, menu, &windowControls.windows, settings);
             break;
         default:
             break;
@@ -185,7 +187,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case SIZE_MINIMIZED:
-            
             ShowWindow(hWnd, FALSE);
             break;
         default:
@@ -214,6 +215,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case ID_CONTEXTMENU_EXIT:
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
+                break;
+            case ID_CONTEXTMENU_SETTINGS_MINIMIZE:
+                settings.minimize = !settings.minimize;
+                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+                break;
+            case ID_CONTEXTMENU_SETTINGS_FOREGROUND:
+                settings.foreground = !settings.foreground;
+                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+                break;
+            case ID_CONTEXTMENU_SETTINGS_BORDERLESS:
+                settings.borderless = !settings.borderless;
+                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+                break;
+            case ID_CONTEXTMENU_SETTINGS_FULLSCREEN:
+                settings.fullScreen = !settings.fullScreen;
+                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
                 break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
@@ -315,7 +332,6 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
         parent = GetParent(GetParent(GetParent(hDlg)));
         args.hWnd = parent;
         return (INT_PTR)TRUE;
-
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
@@ -341,13 +357,10 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
             windowsButtonStart(&windowControls, &args, &running, windowSelection);
             break;
         }
-
         default:
             break;
         }
-
         break;
-
     case WM_DESTROY:
         menu.closeThread(windowControls.clipThread, &running);
         break;
@@ -376,8 +389,10 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             settings = previousSettings;
         else if ((BOOL)wParam == TRUE)
             previousSettings = settings;
-
         break;
+
+
+
     case WM_INITDIALOG:
         initalizeSettings(hDlg, &settingsControls);
         parent = GetParent(GetParent(GetParent(hDlg)));
@@ -386,6 +401,11 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
     {
         switch (LOWORD(wParam))
         {
+        case NOTIFY_SETTINGS_CHANGED:
+            previousSettings = settings;
+            settingsControls.settingsChanged = TRUE;
+            settingsShowWindow(settingsControls, &settings, &previousSettings, running);
+            break;
         case IDC_CHECK_SETTINGS_BORDERLESS:
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
