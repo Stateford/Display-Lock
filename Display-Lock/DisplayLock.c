@@ -174,7 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case WM_RBUTTONDOWN:
             if (!running) EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_GRAYED);
             else EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_ENABLED);
-            showContext(hWnd, menu, &windowControls.windows);
+            showContext(hWnd, menu, &windowControls.windows, settings);
             break;
         default:
             break;
@@ -185,7 +185,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (wParam)
         {
         case SIZE_MINIMIZED:
-            
             ShowWindow(hWnd, FALSE);
             break;
         default:
@@ -214,6 +213,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 break;
             case ID_CONTEXTMENU_EXIT:
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
+                break;
+            case ID_CONTEXTMENU_SETTINGS_MINIMIZE:
+                settings.minimize = !settings.minimize;
+                break;
+            case ID_CONTEXTMENU_SETTINGS_FOREGROUND:
+                settings.foreground = !settings.foreground;
+                break;
+            case ID_CONTEXTMENU_SETTINGS_BORDERLESS:
+                settings.borderless = !settings.borderless;
+                break;
+            case ID_CONTEXTMENU_SETTINGS_FULLSCREEN:
+                settings.fullScreen = !settings.fullScreen;
                 break;
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);

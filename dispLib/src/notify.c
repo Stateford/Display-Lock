@@ -11,7 +11,6 @@ void notifyInit(HWND hWnd, NOTIFYICONDATA * notify)
     notify->uID = 1;
     notify->uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
     notify->uCallbackMessage = NOTIFY_MSG;
-
 }
 
 void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
@@ -20,7 +19,15 @@ void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
     SetForegroundWindow(hWnd);
 }
 
-void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows)
+void drawMenuSettings(HMENU menu, SETTINGS settings)
+{
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_MINIMIZE, (settings.minimize * 8));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FOREGROUND, (settings.foreground * 8));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_BORDERLESS, (settings.borderless * 8));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, (settings.fullScreen * 8));
+}
+
+void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows, SETTINGS settings)
 {
     HMENU contextMenu = GetSubMenu(menu, 0);
     // create new windowmenu
@@ -28,7 +35,9 @@ void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows)
     // populate window list
     updateContextMenu(&windowMenu, windows);
     // modify the popup with the new window list
-    ModifyMenu(contextMenu, 3, MF_BYPOSITION | MF_POPUP, (UINT)windowMenu, TEXT("Windows"));
+    ModifyMenu(contextMenu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_POPUP, (UINT)windowMenu, TEXT("Windows"));
+
+    drawMenuSettings(menu, settings);
 
     POINT cursor;
     GetCursorPos(&cursor);
