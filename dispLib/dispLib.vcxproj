@@ -143,14 +143,12 @@
   <ItemGroup>
     <ClInclude Include="include\common.h" />
     <ClInclude Include="include\header.h" />
-    <ClInclude Include="include\hotkey.h" />
     <ClInclude Include="include\menu.h" />
     <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\win.h" />
     <ClInclude Include="include\notify.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\hotkey.c" />
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\notify.c" />
     <ClCompile Include="src\settings.c" />

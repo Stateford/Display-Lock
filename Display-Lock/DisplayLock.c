@@ -143,23 +143,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
-        initHotkey(hWnd, &settings);
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
-        break;
-
-    case WM_HOTKEY:
-        switch (wParam) {
-        // id of hotkey
-        case START_STOP:
-            if (running)
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
-            else
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START);
-            break;
-        default:
-            break;
-        }
         break;
 
     case NOTIFY_MSG:
@@ -248,7 +233,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_CLOSE:
         Shell_NotifyIcon(NIM_DELETE, &sysTray);
-        cleanupHotkeys(hWnd, &settings);
         shutDown(settings);
         DestroyWindow(hWnd);
         break;

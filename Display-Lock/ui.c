@@ -4,7 +4,6 @@
 #include "win.h"
 #include "menu.h"
 #include "settings.h"
-#include "hotkey.h"
 
 BOOL getVersionString(wchar_t * buffer, int bufferSize)
 {
@@ -65,10 +64,6 @@ void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS se
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
     
-    WORD hotkey = (WORD)SendMessage(settingsControls.hotkey, HKM_GETHOTKEY, 0, 0);
-    
-    addHotkey(hWnd, &settings, START_STOP, HIBYTE(hotkey), LOBYTE(hotkey));
-
     *previousSettings = settings;
 }
 
