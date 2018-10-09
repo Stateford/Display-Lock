@@ -47,8 +47,6 @@ namespace Tests
             Assert::AreEqual(checkVersion(&settings, L"5"), FALSE);
             strcpy_s(settings.header, 6, "");
             Assert::AreEqual(checkVersion(&settings, L"5"), FALSE);
-
-
         }
 
         TEST_METHOD(FindPath)
@@ -66,20 +64,16 @@ namespace Tests
 		{
             Logger::WriteMessage("readSettings()...");
 
-
             SETTINGS settings = { 0 };
             BOOL result;
             result = readSettings(&settings, L"5", L"..\\..\\tests\\readTests\\test1.DLOCK");
             Assert::AreEqual(result, TRUE, L"readSettings boolean, expected TRUE");
-
             Assert::AreEqual(strcmp(settings.header, "DLOCK"), 0, L"settings header, expected DLOCK");
             Assert::AreEqual(settings.version, 5, L"settings version, expected 5");
             Assert::AreEqual(settings.minimize, FALSE, L"settings minimize, expected FALSE");
             Assert::AreEqual(settings.foreground, FALSE, L"settings foreground, expected FALSE");
             Assert::AreEqual(settings.borderless, FALSE, L"settings borderless, expected FALSE");
             Assert::AreEqual(settings.fullScreen, FALSE, L"settings fullScreen, expected FALSE");
-
-
 		}
 
         TEST_METHOD(WriteSettings)
@@ -87,7 +81,6 @@ namespace Tests
             Logger::WriteMessage("writeSettings()...");
             
             BOOL result;
-
 
             SETTINGS settings = {"DLOCK", 5, TRUE, TRUE, FALSE, FALSE};
 
@@ -107,8 +100,6 @@ namespace Tests
             Assert::AreEqual(result, FALSE, L"third test...");
 
             DeleteFile(L"output.DLOCK");
-            
         }
-
 	};
 }
