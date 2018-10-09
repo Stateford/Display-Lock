@@ -135,7 +135,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static NOTIFYICONDATA sysTray = {0};
-    static HMENU menu;
 
     switch (message)
     {
@@ -145,8 +144,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
         initHotkey(hWnd, &settings);
-
-        menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
         break;
@@ -172,11 +169,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
-            if (!running) 
-                EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_GRAYED);
-            else 
-                EnableMenuItem(menu, ID_CONTEXTMENU_STOP, MF_ENABLED);
-            showContext(hWnd, menu, &windowControls.windows, settings);
+            showContext(hWnd, &windowControls.windows, settings, running);
             break;
         default:
             break;
@@ -390,8 +383,6 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         else if ((BOOL)wParam == TRUE)
             previousSettings = settings;
         break;
-
-
 
     case WM_INITDIALOG:
         initalizeSettings(hDlg, &settingsControls);

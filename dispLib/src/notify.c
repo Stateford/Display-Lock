@@ -27,15 +27,25 @@ void drawMenuSettings(HMENU menu, SETTINGS settings)
     CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, (settings.fullScreen * 8));
 }
 
-void showContext(HWND hWnd, HMENU menu, WINDOWLIST *windows, SETTINGS settings)
+void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running)
 {
+    HMENU menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
     HMENU contextMenu = GetSubMenu(menu, 0);
+    EnableMenuItem(menu, ID_CONTEXTMENU_STOP, !running);
     // create new windowmenu
-    HMENU windowMenu = CreatePopupMenu();
-    // populate window list
-    updateContextMenu(&windowMenu, windows);
-    // modify the popup with the new window list
-    ModifyMenu(contextMenu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_POPUP, (UINT)windowMenu, TEXT("Windows"));
+    if (!running)
+    {
+        HMENU windowMenu = CreatePopupMenu();
+        // populate window list
+        updateContextMenu(&windowMenu, windows);
+        // modify the popup with the new window list
+        ModifyMenu(contextMenu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)windowMenu, TEXT("Windows"));
+    }
+    else
+    {
+        //HMENU foo = GetSubMenu(contextMenu, 3);
+        EnableMenuItem(menu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_GRAYED);
+    }
 
     drawMenuSettings(menu, settings);
 
