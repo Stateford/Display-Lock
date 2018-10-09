@@ -27,7 +27,7 @@ void drawMenuSettings(HMENU menu, SETTINGS settings)
     CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, (settings.fullScreen * 8));
 }
 
-HMENU showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running)
+void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running)
 {
     HMENU menu = LoadMenu(NULL, MAKEINTRESOURCE(IDR_NOTIFY_MENU));
     HMENU contextMenu = GetSubMenu(menu, 0);
@@ -39,7 +39,7 @@ HMENU showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL runnin
         // populate window list
         updateContextMenu(&windowMenu, windows);
         // modify the popup with the new window list
-        ModifyMenu(contextMenu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_POPUP, (UINT)windowMenu, TEXT("Windows"));
+        ModifyMenu(contextMenu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_POPUP, (UINT_PTR)windowMenu, TEXT("Windows"));
     }
     else
     {
@@ -54,7 +54,6 @@ HMENU showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL runnin
     SetForegroundWindow(hWnd);
     // open the popup menu
     TrackPopupMenu(contextMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON, cursor.x, cursor.y, 0, hWnd, 0);
-    return menu;
 }
 
 void notifyChildWindows(HWND hWnd, UINT msg)
