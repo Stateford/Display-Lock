@@ -177,8 +177,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int wmId = LOWORD(wParam);
             // Parse the menu selections:
             // item from submenu in notifications
-            if (wParam >= SUBMENU_ITEM_BASE && wParam <= (SUBMENU_ITEM_BASE + 100) )
+            if (wParam >= SUBMENU_ITEM_BASE && wParam <= (SUBMENU_ITEM_BASE + 100))
+            {
+                settings.foreground = TRUE;
                 windowsButtonStart(&windowControls, &args, &running, ((int)wParam - SUBMENU_ITEM_BASE));
+                settings.foreground = FALSE;
+            }
 
             switch (wmId)
             {
