@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file
 # [2.0.0]
 ### Fixed
 - Fixed an issue where the program wouls sometimes crash when reading / writing a file
-- Fixed an issue where minimizing the window would cause the dropdown list to become empty
+- Fixed an issue where minimizing the window would cause the dropdown list to become empty//hai
 
 ### Added
 - Tests for build
