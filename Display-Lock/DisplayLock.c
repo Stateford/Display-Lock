@@ -182,9 +182,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             switch (wmId)
             {
-            case ID_CONTEXTMENU_START:
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_START);
-                break;
             case ID_CONTEXTMENU_STOP:
                 notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
                 break;
