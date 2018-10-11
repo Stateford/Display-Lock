@@ -121,8 +121,6 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
 
     tci.pszText = L"Settings";
     TabCtrl_InsertItem(mainWindowControls->tabCtrl, SETTINGS_VIEW, &tci);
-
-
 }
 
 
@@ -134,6 +132,7 @@ void windowsButtonStart(MENU *menu, WINDOW_VIEW_CONTROLS *windowControls, ARGS *
     menu->startThread(&windowControls->clipThread, cursorLock, (void*)args);
     EnableWindow(windowControls->startButton, FALSE);
     EnableWindow(windowControls->stopButton, TRUE);
+    EnableWindow(windowControls->comboBox, FALSE);
 }
 
 void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls)
@@ -141,6 +140,7 @@ void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls)
     *windowControls->runningClip = FALSE;
     EnableWindow(windowControls->startButton, TRUE);
     EnableWindow(windowControls->stopButton, FALSE);
+    EnableWindow(windowControls->comboBox, TRUE);
     menu.closeThread(windowControls->clipThread, windowControls->runningClip);
 }
 
