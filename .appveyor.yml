@@ -48,7 +48,7 @@ test_script:
     vstest.console /logger:Appveyor %platform%\%CONFIGURATION%\tests.dll
 
 deploy:
-  release: $(APPVEYOR_REPO_TAG)
+  release: $(vers)
   description: 'CHANGELOG.md'
   provider: GitHub
   auth_token:
