@@ -51,3 +51,16 @@ build:
 test_script:
 - cmd: >-
     vstest.console /logger:Appveyor %platform%\%CONFIGURATION%\tests.dll
+
+deploy:
+  release: $(APPVEYOR_REPO_TAG)
+  description: 'CHANGELOG.md'
+  provider: GitHub
+  auth_token:
+    secure: vbPb3hILx+iWo3VB+iv9e31ERIu15MweDa+3VOIvwr3wqdeeu+O5NWB5Dqawug6i # your encrypted token from GitHub
+  artifact: $(platform)\$(CONFIGURATION)\Display-Lock.exe            # upload all NuGet packages to release assets
+  draft: false
+  prerelease: false
+  on:
+    branch: master                 # release from master branch only
+    appveyor_repo_tag: true        # deploy on tag push only
