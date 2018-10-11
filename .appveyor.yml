@@ -1,7 +1,7 @@
 environment:
-  vers: "2.1.0"
+  vers: "2.1.1"
 
-version: '{branch}/2.1.0.{build}'
+version: '{branch}/2.1.1.{build}'
 
 branches:
   only:
