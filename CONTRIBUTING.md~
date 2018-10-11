@@ -14,7 +14,7 @@ When contributing to this repository, please first discuss the change you wish t
 ## Pull Request Process
 
 1. Coordinate work being done via issues or PR before work is done.
-2. All work must be done on the develop branch or a branch checked out from develop. If the issue is a hotfix for a bug, work off of the master branch.
+2. All work must be done on the develop branch or a branch checked out from develop.
 3. Update the [CHANGELOG](CHANGELOG.md) with details of changes made. 
 4. If tests can be added, consider adding them.
 5. All builds must actually build, pass pre-scripts, and all tests before being merged.
