@@ -25,8 +25,18 @@ class FileWriter:
         self.file.close()
 
 class License:
-    extensions = ['.h', '.c', '.cpp', '.py']
-    excludedFiles = ['versionRC.h', 'resource.h', 'targetver.h', 'header.h', 'common.h']
+    extensions = ['.h',
+        '.c',
+        '.cpp',
+        '.py'
+        ]
+    excludedFiles = [
+        'versionRC.h',
+        'resource.h',
+        'targetver.h',
+        'header.h',
+        'common.h'
+        ]
 
 
     def __init__(self):
@@ -51,9 +61,9 @@ class License:
                 
 
             elif(os.path.isfile(newPath)):
-                _, file_extension = os.path.splitext(newPath)
+                file_path, file_extension = os.path.splitext(newPath)
                 if file_extension in self.extensions:
-                    filewriter = FileWriter(newPath)
+                    filewriter = FileWriter(file_path)
                     filewriter.write()
 
     def _check_excluded(self):
