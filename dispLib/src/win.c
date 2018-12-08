@@ -28,12 +28,6 @@ BOOL checkUWP(HWND hwnd)
 	ZeroMemory(&wInfo, sizeof(WINDOWINFO));
 	if (GetWindowInfo(hwnd, &wInfo))
 	{
-		// If the size of the borders is 0, hide the window in the drop-down. (it seems that windows without border-property defined are not shown)
-		if (wInfo.cxWindowBorders == 0 && wInfo.cyWindowBorders == 0)
-		{
-			return FALSE;
-		}
-
 		if (!strcmp(className, "ApplicationFrameWindow")) 
 		{
 			// If the EnumChildWindows returns false, that means a core window has been found, therefore do not hide (return true).
