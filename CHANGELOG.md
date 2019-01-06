@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.1.4]
+- Fixed an issue where when an outside source (including the game) would change the windows style, the program would not force the style back
+
 # [2.1.3]
 - Fixed an issue where the UI would not revert to correct state when locked application is closed without explicitly closing the program
 
