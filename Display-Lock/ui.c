@@ -77,7 +77,7 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 
-void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, volatile BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)
+void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)
 {
     initMenuObj(menu);
     *running = FALSE;
@@ -114,7 +114,7 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
     TabCtrl_InsertItem(mainWindowControls->tabCtrl, SETTINGS_VIEW, &tci);
 }
 
-void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, volatile BOOL *running, int windowSelection)
+void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, BOOL *running, int windowSelection)
 {
     *running = TRUE;
     args->selectedWindow = windowControls->windows.windows[windowSelection];

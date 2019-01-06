@@ -1,6 +1,16 @@
 #include "win.h"
 #include <process.h>
 
+struct PREVIOUSRECT
+{
+    int width;
+    int height;
+    int x;
+    int y;
+    LONG_PTR previousStyle;
+    LONG_PTR currentStyle;
+};
+
 // Get open windows
 void openWindows(WINDOWLIST *windows)
 {
@@ -58,7 +68,6 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
     // check if window is visible
     if (IsWindowVisible(hwnd))
     {
-
         // get text and store to title
         GetWindowTextA(hwnd, title, sizeof(title));
 
@@ -147,10 +156,12 @@ int CALLBACK cursorLock(void* arguments)
     ARGS *args = (ARGS*)arguments;
     SETTINGS *settings = args->settings;
     WINDOW selectedWindow = args->selectedWindow;
-    volatile BOOL *isRunning = args->clipRunning;
+    BOOL *isRunning = args->clipRunning;
     POINT cursorPos;
     BOOL styleChanged = FALSE;
     PREVIOUSRECT previousRect;
+
+    previousRect.previousStyle = GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE);
 
     if (settings->borderless)
     {
@@ -178,29 +189,38 @@ int CALLBACK cursorLock(void* arguments)
         styleChanged = TRUE;
     }
 
+    previousRect.currentStyle = GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE);
+
     while (*isRunning)
     {
-        // check if window is closed
-
-        // check for settings
-
-        // check for active window
-            // clip cursor to screen
-
+        // Get client area
         GetClientRect(selectedWindow.hWnd, &selectedWindow.size);
         ClientToScreen(selectedWindow.hWnd, (LPPOINT)&selectedWindow.size.left);
         ClientToScreen(selectedWindow.hWnd, (LPPOINT)&selectedWindow.size.right);
 
+        // get the active window
         HWND active = GetForegroundWindow();
 
         GetCursorPos(&cursorPos);
 
+        // Check if the window is closed
         if (!checkProcess(selectedWindow))
         {
             *args->clipRunning = FALSE;
 
             PostMessage(args->controls.windowView, WM_COMMAND, MAKEWPARAM(IDC_BUTTON_WINDOWS_STOP, 0), 0);
             break;
+        }
+
+        // check fi the window style has changed
+        if (previousRect.currentStyle != GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE))
+        {
+            SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, previousRect.currentStyle);
+
+            if (settings->borderless && !settings->fullScreen)
+                resizeBorderless(selectedWindow, &previousRect);
+            else if (settings->fullScreen)
+                enableFullScreen(selectedWindow, &previousRect);
         }
 
         // if the window is active and the cursor is in the client area clip the cursor to the window
@@ -217,9 +237,9 @@ int CALLBACK cursorLock(void* arguments)
         Sleep(1);
     }
 
-    // if window style was changed, change it back using the OR (|)
+    // if window style was changed, change it back
     if (styleChanged)
-        SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE) | WS_SIZEBOX);
+        SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, previousRect.previousStyle);
 
     if (settings->borderless)
     {
