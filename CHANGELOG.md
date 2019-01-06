@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.1.3]
+- Fixed an issue where the UI would not revert to correct state when locked application is closed without explicitly closing the program
+
 # [2.1.0]
 ### Added
 - Added a system tray icon
