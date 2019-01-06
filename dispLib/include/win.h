@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include "common.h"
 
+typedef struct PREVIOUSRECT PREVIOUSRECT;
+
 BOOL CALLBACK EnumWindowsProc(HWND, LPARAM);
 BOOL CALLBACK EnumChildProcUWP(HWND, LPARAM);
 

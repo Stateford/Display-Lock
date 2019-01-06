@@ -1,6 +1,14 @@
 #include "win.h"
 #include <process.h>
 
+struct PREVIOUSRECT
+{
+    int width;
+    int height;
+    int x;
+    int y;
+};
+
 // Get open windows
 void openWindows(WINDOWLIST *windows)
 {
@@ -147,7 +155,7 @@ int CALLBACK cursorLock(void* arguments)
     ARGS *args = (ARGS*)arguments;
     SETTINGS *settings = args->settings;
     WINDOW selectedWindow = args->selectedWindow;
-    volatile BOOL *isRunning = args->clipRunning;
+    BOOL *isRunning = args->clipRunning;
     POINT cursorPos;
     BOOL styleChanged = FALSE;
     PREVIOUSRECT previousRect;
