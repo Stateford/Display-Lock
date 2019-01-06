@@ -170,9 +170,6 @@ int CALLBACK cursorLock(void* arguments)
         SetForegroundWindow(selectedWindow.hWnd);
         SetActiveWindow(selectedWindow.hWnd);
     }
-
-    
-
     
     if (checkResizeStyle(selectedWindow.hWnd))
     {
@@ -180,7 +177,6 @@ int CALLBACK cursorLock(void* arguments)
         SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE) ^ WS_SIZEBOX);
         styleChanged = TRUE;
     }
-
 
     while (*isRunning)
     {
@@ -202,6 +198,8 @@ int CALLBACK cursorLock(void* arguments)
         if (!checkProcess(selectedWindow))
         {
             *args->clipRunning = FALSE;
+
+            PostMessage(args->controls.windowView, WM_COMMAND, MAKEWPARAM(IDC_BUTTON_WINDOWS_STOP, 0), 0);
             break;
         }
 
@@ -216,10 +214,8 @@ int CALLBACK cursorLock(void* arguments)
         else if (selectedWindow.hWnd == active && GetAsyncKeyState(VK_LBUTTON) == 0)
             ClipCursor(&selectedWindow.size);
 
-
         Sleep(1);
     }
-
 
     // if window style was changed, change it back using the OR (|)
     if (styleChanged)
@@ -234,8 +230,6 @@ int CALLBACK cursorLock(void* arguments)
 
     if (settings->fullScreen)
         disableFullScreen(selectedWindow, &previousRect);
-
-
 
     ClipCursor(NULL);	// release the cursor clip
     _endthreadex(1);	// end the thread

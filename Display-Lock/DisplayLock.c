@@ -16,7 +16,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 WINDOW_VIEW_CONTROLS windowControls = { 0 };
 SETTINGS settings = { 0 };                              // application settings
 ARGS args = {0};
-volatile BOOL running = FALSE;
+BOOL running = FALSE;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -264,6 +264,7 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
 
         // show the default window
         ShowWindow(mainWindowControls.windowView, SW_SHOW);
+        args.controls = mainWindowControls;
         return (INT_PTR)TRUE;
 
     case WM_NOTIFY:
@@ -310,6 +311,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
         parent = GetParent(GetParent(GetParent(hDlg)));
         args.hWnd = parent;
         return (INT_PTR)TRUE;
+
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
