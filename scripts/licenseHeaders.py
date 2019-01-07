@@ -1,7 +1,8 @@
 import os
+import sys
 
 class FileWriter:
-
+    header = ""
     def __init__(self, path):
         self.path = path
 
@@ -12,13 +13,15 @@ class FileWriter:
         self.file.close()
 
     def write(self):
-        self.file.write("test")
+        self.file.write(self.header)
 
 class License:
     extensions = ['.h', '.c', '.cpp']
+    file_paths = []
 
     def __init__(self):
         self.cwd = os.getcwd()
+        self.ignored_files = None
 
     def __enter__(self):
         os.chdir("..")
@@ -30,7 +33,6 @@ class License:
     def parse(self, path, directory):
         for it in directory:
             newPath = "%s\\%s" % (path, it)
-            #print(newPath)
 
             if(os.path.isdir(newPath)):
                 dirs = os.listdir(newPath)
@@ -38,16 +40,32 @@ class License:
                 
 
             elif(os.path.isfile(newPath)):
-                _, file_extension = os.path.splitext(newPath)
-                if file_extension in self.extensions:
-                    print(it)
+                file_path, file_extension = os.path.splitext(newPath)
+                if file_extension in self.extensions and not it in self.ignored_files:
+                    self.file_paths.append(file_path)
 
     def start(self):
         self.parse(os.getcwd(), self.parentDir)
-        
+
 def main():
     x = License()
+    x.ignored_files = [
+        "version.h",
+        "versionRC.h",
+        "targetver.h",
+        "resource.h",
+        "unittest1.cpp"
+    ]
     with x:
         x.start()
-    
-main()
+    print(x.file_paths)
+
+    with open("license.txt", "r") as file_reader:
+        FileWriter.header = file_reader.read()
+
+    for item in x.file_paths:
+        with FileWriter(item) as file_writer:
+            file_writer.write()
+
+if __name__ == "__main__":
+    main()
