@@ -1,24 +1,6 @@
 import os
 import sys
 
-class FileWriter:
-    header = ""
-    def __init__(self, path):
-        self.path = path
-
-    def __enter__(self):
-        self.file = open(self.path, "r+")
-
-    def __exit__(self, a, b, c):
-        self.file.close()
-
-    def write(self):
-        body = self.file.read()
-        self.file.seek(0)
-        self.file.write(self.header)
-        self.file.write(body)
-        self.file.truncate()
-
 class License:
     extensions = ['.h', '.c', '.cpp']
     file_paths = []
@@ -64,11 +46,15 @@ def main():
         x.start()
 
     with open("license.txt", "r") as file_reader:
-        FileWriter.header = file_reader.read()
+        header = file_reader.read()
 
     for item in x.file_paths:
-        with FileWriter(item) as file_writer:
-            file_writer.write()
+        with open(item, "r+") as file_writer:
+            body = file_writer.read()
+            file_writer.seek(0)
+            file_writer.write(header)
+            file_writer.write(body)
+            file_writer.truncate()
 
 if __name__ == "__main__":
     main()
