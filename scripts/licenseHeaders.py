@@ -7,13 +7,17 @@ class FileWriter:
         self.path = path
 
     def __enter__(self):
-        self.file = open(self.path, "w")
+        self.file = open(self.path, "r+")
 
     def __exit__(self, a, b, c):
         self.file.close()
 
     def write(self):
+        body = self.file.read()
+        self.file.seek(0)
         self.file.write(self.header)
+        self.file.write(body)
+        self.file.truncate()
 
 class License:
     extensions = ['.h', '.c', '.cpp']
@@ -42,7 +46,7 @@ class License:
             elif(os.path.isfile(newPath)):
                 file_path, file_extension = os.path.splitext(newPath)
                 if file_extension in self.extensions and not it in self.ignored_files:
-                    self.file_paths.append(file_path)
+                    self.file_paths.append(f"{file_path}{file_extension}")
 
     def start(self):
         self.parse(os.getcwd(), self.parentDir)
@@ -58,7 +62,6 @@ def main():
     ]
     with x:
         x.start()
-    print(x.file_paths)
 
     with open("license.txt", "r") as file_reader:
         FileWriter.header = file_reader.read()
