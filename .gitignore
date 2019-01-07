@@ -5,7 +5,6 @@
 .vs/
 notes.MD
 *.cmake
-*.txt
 makefile
 /CMakeFiles/
 .gitattributes
