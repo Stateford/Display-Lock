@@ -55,23 +55,12 @@ BOOL checkUWP(HWND hwnd)
 	ZeroMemory(&wInfo, sizeof(WINDOWINFO));
 	if (GetWindowInfo(hwnd, &wInfo))
 	{
-		if (!strcmp(className, "ApplicationFrameWindow")) 
+		if (strcmp(className, "Windows.UI.Core.CoreWindow") == 0 || strcmp(className, "ApplicationFrameWindow") == 0)
 		{
-			// If the EnumChildWindows returns false, that means a core window has been found, therefore do not hide (return true).
-			return !(EnumChildWindows(hwnd, &EnumChildProcUWP, (LPARAM)NULL));
+            return FALSE;
 		}
 	}
-	return TRUE;
-}
-
-// Enumerates child windows of UWP application and checks if there is an actual window open.
-BOOL CALLBACK EnumChildProcUWP(HWND hwnd, LPARAM lParam) 
-{
-	char className[500];
-	GetClassNameA(hwnd, className, 500);
-
-	// Checks if the child window is a CoreWindow (this seems to signify whether there is a window open)
-	return strcmp(className, "Windows.UI.Core.CoreWindow"); 
+    return TRUE;
 }
 
 // enumerate windows and get current window list
