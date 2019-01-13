@@ -36,12 +36,17 @@ void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
     SetForegroundWindow(hWnd);
 }
 
-void drawMenuSettings(HMENU menu, SETTINGS settings)
+void drawMenuSettings(HMENU menu, SETTINGS settings, BOOL running)
 {
-    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_MINIMIZE, (settings.minimize * 8));
-    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FOREGROUND, (settings.foreground * 8));
-    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_BORDERLESS, (settings.borderless * 8));
-    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, (settings.fullScreen * 8));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_MINIMIZE, (settings.minimize * MF_CHECKED));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FOREGROUND, (settings.foreground * MF_CHECKED));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_BORDERLESS, (settings.borderless * MF_CHECKED));
+    CheckMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, (settings.fullScreen * MF_CHECKED));
+
+    EnableMenuItem(menu, ID_CONTEXTMENU_SETTINGS_MINIMIZE, running);
+    EnableMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FOREGROUND, running);
+    EnableMenuItem(menu, ID_CONTEXTMENU_SETTINGS_BORDERLESS, running);
+    EnableMenuItem(menu, ID_CONTEXTMENU_SETTINGS_FULLSCREEN, running);
 }
 
 void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running)
@@ -64,7 +69,7 @@ void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running
         EnableMenuItem(menu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_GRAYED);
     }
 
-    drawMenuSettings(menu, settings);
+    drawMenuSettings(menu, settings, running);
 
     POINT cursor;
     GetCursorPos(&cursor);
