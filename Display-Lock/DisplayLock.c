@@ -34,6 +34,7 @@ WINDOW_VIEW_CONTROLS windowControls = { 0 };
 SETTINGS settings = { 0 };                              // application settings
 ARGS args = {0};
 BOOL running = FALSE;
+VERSION gVersion;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -44,6 +45,7 @@ INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -231,6 +233,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
                 break;
+            case ID_HELP_CHECKFORUPDATES:
+            {
+                getVersion(&gVersion);
+                BOOL result = compareVersion(&gVersion);
+                if(!result)
+                    DialogBox(hInst, MAKEINTRESOURCE(IDD_UPDATE), hWnd, updateProc);
+                break;
+            }
             case IDM_EXIT:
             {
                 SendMessage(hWnd, WM_CLOSE, 0, 0);
@@ -466,6 +476,59 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_NOTIFY:
         //if (((LPNMHDR)lParam)->code == NM_CLICK)
             //ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
+        break;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+
+        break;
+    default:
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        break;
+    }
+    return (INT_PTR)TRUE;
+
+    case WM_NOTIFY:
+
+        switch (((NMHDR*)lParam)->code)
+        {
+        case NM_CLICK:
+        {
+            if (wParam == IDC_UPDATE_LINK) {
+                NMLINK* pNMLink = (NMLINK*)lParam;
+                LITEM iItem = pNMLink->item;
+                ShellExecuteW(
+                    NULL,
+                    TEXT("open"),
+                    iItem.szUrl,
+                    NULL,
+                    NULL,
+                    SW_HIDE
+                );
+                EndDialog(hDlg, LOWORD(wParam));
+                return (INT_PTR)TRUE;
+            }
+            break;
+        }
+        default:
+            break;
+        }
         break;
 
     case WM_COMMAND:
