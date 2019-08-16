@@ -1,8 +1,8 @@
 environment:
-  vers: "2.1.4"
+  vers: "2.1.6"
   type: "develop"
 
-version: '{branch}/2.1.4.{build}'
+version: '{branch}/2.1.6.{build}'
 
 image: Visual Studio 2017
 
