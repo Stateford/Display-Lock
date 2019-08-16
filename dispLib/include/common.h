@@ -40,6 +40,7 @@ typedef struct SETTINGS SETTINGS;
 typedef struct ARGS ARGS;
 typedef struct HOTKEY HOTKEY;
 typedef struct WINDOW WINDOW;
+typedef struct VERSION VERSION;
 
 struct MAIN_WINDOW_CONTROLS
 {
@@ -110,4 +111,11 @@ struct ARGS
     WINDOW selectedWindow;
     HWND hWnd;
     MAIN_WINDOW_CONTROLS controls;
+};
+
+struct VERSION
+{
+    unsigned int major;
+    unsigned int minor;
+    unsigned int patch;
 };
