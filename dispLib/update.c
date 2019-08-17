@@ -34,7 +34,6 @@ void resizeString(STRING* string, int size) {
 
 void parseVersionString(VERSION* version, STRING* response)
 {
-    int count = 0;
     char major[5] = "";
     char minor[5] = "";
     char patch[10] = "";
@@ -43,50 +42,17 @@ void parseVersionString(VERSION* version, STRING* response)
     memset(minor, 0, sizeof(minor));
     memset(patch, 0, sizeof(patch));
 
-    int position = 0;
+    char *result;
 
-    for (unsigned int i = 0; i <= response->size; i++) {
-        if (count == 0)
-        {
-            if (response->data[i] == '.')
-            {
-                count++;
-                major[position] = '\0';
-                position = 0;
-                continue;
-            }
-            major[position] = response->data[i];
-            position++;
-        }
-        else if (count == 1)
-        {
-            if (response->data[i] == '.')
-            {
-                count++;
-                minor[position] = '\0';
-                position = 0;
-                continue;
-            }
-            minor[position] = response->data[i];
-            position++;
-        }
-        else
-        {
-            if (i == response->size)
-            {
-                patch[position] = '\0';
-                break;
-            }
-            else
-            {
-                patch[position] = response->data[i];
-                position++;
-            }
-        }
+    result = strtok(response->data, ".");
+
+    int count = 0;
+    while (result)
+    {
+        version->verArr[count] = atoi(result);
+        result = strtok(NULL, ".");
+        count++;
     }
-    version->major = atoi(major);
-    version->minor = atoi(minor);
-    version->patch = atoi(patch);
 }
 
 void getLatestVersion(VERSION* version)
@@ -216,11 +182,11 @@ BOOL compareVersion(const VERSION* current)
 
     getLatestVersion(&latest);
 
-    if (current->major < latest.major)
+    if (current->version.major < latest.version.major)
         return FALSE;
-    else if (current->minor < latest.minor)
+    else if (current->version.minor < latest.version.minor)
         return FALSE;
-    else if (current->patch < latest.patch)
+    else if (current->version.patch < latest.version.patch)
         return FALSE;
 
     return TRUE;

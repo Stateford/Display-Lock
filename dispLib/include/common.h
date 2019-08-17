@@ -40,7 +40,7 @@ typedef struct SETTINGS SETTINGS;
 typedef struct ARGS ARGS;
 typedef struct HOTKEY HOTKEY;
 typedef struct WINDOW WINDOW;
-typedef struct VERSION VERSION;
+typedef union VERSION VERSION;
 
 struct MAIN_WINDOW_CONTROLS
 {
@@ -113,9 +113,12 @@ struct ARGS
     MAIN_WINDOW_CONTROLS controls;
 };
 
-struct VERSION
-{
-    unsigned int major;
-    unsigned int minor;
-    unsigned int patch;
+union VERSION {
+    struct _version {
+        unsigned int major;
+        unsigned int minor;
+        unsigned int patch;
+    } version;
+
+    unsigned int verArr[3];
 };

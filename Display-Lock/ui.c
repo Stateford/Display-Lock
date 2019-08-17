@@ -89,9 +89,9 @@ BOOL getVersion(VERSION* gVersion)
     int build = HIWORD(verInfo->dwFileVersionLS);
     int revision = LOWORD(verInfo->dwFileVersionLS);
 
-    gVersion->major = major;
-    gVersion->minor = minor;
-    gVersion->patch = build;
+    gVersion->version.major = major;
+    gVersion->version.minor = minor;
+    gVersion->version.patch = build;
 
     return TRUE;
 }
