@@ -28,7 +28,9 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
     settingsControls->borderless = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_BORDERLESS);
     settingsControls->fullScreen = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FULL_SCREEN);
     settingsControls->hotkey = GetDlgItem(hDlg, IDC_HOTKEY);
+    settingsControls->checkForUpdatesStartup = GetDlgItem(hDlg, IDC_CHECK_STARTUP_UPDATES);
     settingsControls->settingsChanged = FALSE;
+    
 }
 
 void setSettingsDlg(HWND hDlg, SETTINGS settings)
@@ -50,6 +52,7 @@ void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
     settings->foreground = FALSE;
     settings->fullScreen = FALSE;
     settings->minimize = TRUE;
+    settings->checkUpdateStartup = TRUE;
 }
 
 BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
@@ -75,14 +78,12 @@ BOOL findPath(wchar_t *outPath)
 
     HRESULT hr = SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path);
 
-    if (SUCCEEDED(hr))
-    {
+    if (!SUCCEEDED(hr))
+        return FALSE;
+
         wcscpy(outPath, path);
         LPCWSTR x = L"DisplayLock\\settings.DLOCK";
         PathAppend(outPath, x);
-    }
-    else
-        return FALSE;
 
     CoTaskMemFree(path);
     return TRUE;
@@ -92,19 +93,17 @@ BOOL createDirectory(wchar_t *outPath)
 {
     PWSTR path;
 
-    if (SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
-    {
-        wcscpy(outPath, path);
-
-        // create directory
-        PathAppend(outPath, TEXT("DisplayLock"));
-        // TODO: check if directory was created
-        CreateDirectory(outPath, NULL);
-        // create file
-        PathAppend(outPath, TEXT("\\settings.DLOCK"));
-    }
-    else
+    if (!SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
         return FALSE;
+
+    wcscpy(outPath, path);
+
+    // create directory
+    PathAppend(outPath, TEXT("DisplayLock"));
+    // TODO: check if directory was created
+    CreateDirectory(outPath, NULL);
+    // create file
+    PathAppend(outPath, TEXT("\\settings.DLOCK"));
 
     CoTaskMemFree(path);
     return TRUE;

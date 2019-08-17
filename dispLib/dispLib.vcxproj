@@ -145,16 +145,16 @@
     <ClInclude Include="include\header.h" />
     <ClInclude Include="include\menu.h" />
     <ClInclude Include="include\settings.h" />
+    <ClInclude Include="include\update.h" />
     <ClInclude Include="include\win.h" />
     <ClInclude Include="include\notify.h" />
-    <ClInclude Include="update.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\menu.c" />
     <ClCompile Include="src\notify.c" />
     <ClCompile Include="src\settings.c" />
+    <ClCompile Include="src\update.c" />
     <ClCompile Include="src\win.c" />
-    <ClCompile Include="update.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

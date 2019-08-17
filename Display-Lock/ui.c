@@ -102,12 +102,14 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
+    SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
 
     EnableWindow(settingsControls.borderless, !running);
     EnableWindow(settingsControls.foreground, !running);
     EnableWindow(settingsControls.fullScreen, !running);
     EnableWindow(settingsControls.minimize, !running);
     EnableWindow(settingsControls.hotkey, !running);
+    EnableWindow(settingsControls.checkForUpdatesStartup, !running);
 }
 
 
@@ -117,6 +119,7 @@ void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS se
     settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
+    settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
     
     *previousSettings = settings;
 }
@@ -128,7 +131,8 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
-    SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
+    SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
+    //SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 
 void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)
