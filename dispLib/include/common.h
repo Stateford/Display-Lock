@@ -40,6 +40,7 @@ typedef struct SETTINGS SETTINGS;
 typedef struct ARGS ARGS;
 typedef struct HOTKEY HOTKEY;
 typedef struct WINDOW WINDOW;
+typedef union VERSION VERSION;
 
 struct MAIN_WINDOW_CONTROLS
 {
@@ -84,6 +85,7 @@ struct SETTINGS_VIEW_CONTROLS
     HWND borderless;
     HWND fullScreen;
     HWND hotkey;
+    HWND checkForUpdatesStartup;
 };
 
 struct MENU
@@ -101,6 +103,7 @@ struct SETTINGS
     BOOL foreground;
     BOOL borderless;
     BOOL fullScreen;
+    BOOL checkUpdateStartup;
 };
 
 struct ARGS
@@ -110,4 +113,14 @@ struct ARGS
     WINDOW selectedWindow;
     HWND hWnd;
     MAIN_WINDOW_CONTROLS controls;
+};
+
+union VERSION {
+    struct _version {
+        unsigned int major;
+        unsigned int minor;
+        unsigned int patch;
+    } version;
+
+    unsigned int verArr[3];
 };

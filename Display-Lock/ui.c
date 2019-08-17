@@ -20,9 +20,11 @@
 #include <CommCtrl.h>
 #include "win.h"
 #include "menu.h"
+#include "common.h"
 #include "settings.h"
 
-BOOL getVersionString(wchar_t * buffer, int bufferSize)
+
+BOOL getVersionString(wchar_t *buffer, int bufferSize)
 {
     wchar_t version[2048];
     wchar_t fileName[MAX_PATH];
@@ -40,7 +42,6 @@ BOOL getVersionString(wchar_t * buffer, int bufferSize)
     if (!result)
         return FALSE;
 
- 
     UINT size;
     VS_FIXEDFILEINFO *verInfo = NULL;
     result = VerQueryValue(version, L"\\", (LPVOID)&verInfo, &size);
@@ -53,8 +54,44 @@ BOOL getVersionString(wchar_t * buffer, int bufferSize)
     int build = HIWORD(verInfo->dwFileVersionLS);
     int revision = LOWORD(verInfo->dwFileVersionLS);
 
-    
     swprintf(buffer, bufferSize, L"Version: %d.%d.%d.%d", major, minor, build, revision);
+
+    return TRUE;
+}
+
+BOOL getVersion(VERSION* gVersion)
+{
+    wchar_t version[2048];
+    wchar_t fileName[MAX_PATH];
+    BOOL result;
+    UINT size;
+    VS_FIXEDFILEINFO* verInfo = NULL;
+    DWORD dwVersionBufferSize;
+
+    result = GetModuleFileName(NULL, fileName, MAX_PATH);
+
+    if (!result)
+        return FALSE;
+
+    dwVersionBufferSize = GetFileVersionInfoSizeW(fileName, NULL);
+    result = GetFileVersionInfo(fileName, 0, dwVersionBufferSize, (LPVOID)version);
+
+    if (!result)
+        return FALSE;
+
+    result = VerQueryValue(version, L"\\", (LPVOID)& verInfo, &size);
+
+    if (!result)
+        return FALSE;
+
+    int major = HIWORD(verInfo->dwFileVersionMS);
+    int minor = LOWORD(verInfo->dwFileVersionMS);
+    int build = HIWORD(verInfo->dwFileVersionLS);
+    int revision = LOWORD(verInfo->dwFileVersionLS);
+
+    gVersion->version.major = major;
+    gVersion->version.minor = minor;
+    gVersion->version.patch = build;
 
     return TRUE;
 }
@@ -65,12 +102,14 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
+    SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
 
     EnableWindow(settingsControls.borderless, !running);
     EnableWindow(settingsControls.foreground, !running);
     EnableWindow(settingsControls.fullScreen, !running);
     EnableWindow(settingsControls.minimize, !running);
     EnableWindow(settingsControls.hotkey, !running);
+    EnableWindow(settingsControls.checkForUpdatesStartup, !running);
 }
 
 
@@ -80,6 +119,7 @@ void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS se
     settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
+    settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
     
     *previousSettings = settings;
 }
@@ -91,7 +131,8 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
-    SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
+    SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
+    //SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 
 void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)

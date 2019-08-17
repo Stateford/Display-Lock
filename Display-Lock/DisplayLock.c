@@ -34,6 +34,8 @@ WINDOW_VIEW_CONTROLS windowControls = { 0 };
 SETTINGS settings = { 0 };                              // application settings
 ARGS args = {0};
 BOOL running = FALSE;
+VERSION gVersion = { 0 };
+BOOL initalUpdate = FALSE;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -44,6 +46,7 @@ INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lP
 INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -157,11 +160,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 
     case WM_CREATE:
+        if (settings.checkUpdateStartup) {
+            getVersion(&gVersion);
+            initalUpdate = !compareVersion(&gVersion);
+        }
+
         CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
+
         break;
 
     case NOTIFY_MSG:
@@ -190,56 +199,66 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
         
     case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        // Parse the menu selections:
+        // item from submenu in notifications
+        if (wParam >= SUBMENU_ITEM_BASE && wParam <= (SUBMENU_ITEM_BASE + 100))
         {
-            int wmId = LOWORD(wParam);
-            // Parse the menu selections:
-            // item from submenu in notifications
-            if (wParam >= SUBMENU_ITEM_BASE && wParam <= (SUBMENU_ITEM_BASE + 100))
-            {
-                settings.foreground = TRUE;
-                windowsButtonStart(&windowControls, &args, &running, ((int)wParam - SUBMENU_ITEM_BASE));
-                settings.foreground = FALSE;
-            }
-
-            switch (wmId)
-            {
-            case ID_CONTEXTMENU_STOP:
-                notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
-                break;
-            case ID_CONTEXTMENU_SHOWWINDOW:
-                ShowWindow(hWnd, TRUE);
-                break;
-            case ID_CONTEXTMENU_EXIT:
-                SendMessage(hWnd, WM_CLOSE, 0, 0);
-                break;
-            case ID_CONTEXTMENU_SETTINGS_MINIMIZE:
-                settings.minimize = !settings.minimize;
-                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
-                break;
-            case ID_CONTEXTMENU_SETTINGS_FOREGROUND:
-                settings.foreground = !settings.foreground;
-                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
-                break;
-            case ID_CONTEXTMENU_SETTINGS_BORDERLESS:
-                settings.borderless = !settings.borderless;
-                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
-                break;
-            case ID_CONTEXTMENU_SETTINGS_FULLSCREEN:
-                settings.fullScreen = !settings.fullScreen;
-                notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
-                break;
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
-                break;
-            case IDM_EXIT:
-            {
-                SendMessage(hWnd, WM_CLOSE, 0, 0);
-                break;
-            }
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
+            settings.foreground = TRUE;
+            windowsButtonStart(&windowControls, &args, &running, ((int)wParam - SUBMENU_ITEM_BASE));
+            settings.foreground = FALSE;
         }
+
+        switch (wmId)
+        {
+        case ID_CONTEXTMENU_STOP:
+            notifyChildWindows(hWnd, IDC_BUTTON_WINDOWS_STOP);
+            break;
+        case ID_CONTEXTMENU_SHOWWINDOW:
+            ShowWindow(hWnd, TRUE);
+            break;
+        case ID_CONTEXTMENU_EXIT:
+            SendMessage(hWnd, WM_CLOSE, 0, 0);
+            break;
+        case ID_CONTEXTMENU_SETTINGS_MINIMIZE:
+            settings.minimize = !settings.minimize;
+            notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+            break;
+        case ID_CONTEXTMENU_SETTINGS_FOREGROUND:
+            settings.foreground = !settings.foreground;
+            notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+            break;
+        case ID_CONTEXTMENU_SETTINGS_BORDERLESS:
+            settings.borderless = !settings.borderless;
+            notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+            break;
+        case ID_CONTEXTMENU_SETTINGS_FULLSCREEN:
+            settings.fullScreen = !settings.fullScreen;
+            notifyChildWindows(hWnd, NOTIFY_SETTINGS_CHANGED);
+            break;
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUT), hWnd, about);
+            break;
+        case ID_HELP_CHECKFORUPDATES:
+        {
+            if (gVersion.verArr[0] == 0)
+                getVersion(&gVersion);
+
+            if(!compareVersion(&gVersion))
+                DialogBox(hInst, MAKEINTRESOURCE(IDD_UPDATE), hWnd, updateProc);
+
+            break;
+        }
+        case IDM_EXIT:
+        {
+            SendMessage(hWnd, WM_CLOSE, 0, 0);
+            break;
+        }
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+    }
         break;
     case WM_PAINT:
         {
@@ -247,6 +266,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
             EndPaint(hWnd, &ps);
+
+            if (initalUpdate)
+            {
+                SendMessage(hWnd, WM_COMMAND, LOWORD(ID_HELP_CHECKFORUPDATES), 0);
+                initalUpdate = FALSE;
+            }
         }
         break;
     case WM_CLOSE:
@@ -282,6 +307,7 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
         // show the default window
         ShowWindow(mainWindowControls.windowView, SW_SHOW);
         args.controls = mainWindowControls;
+
         return (INT_PTR)TRUE;
 
     case WM_NOTIFY:
@@ -327,6 +353,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
         initalizeWindowView(hDlg, &menu, &settings, &running, &windowControls, &args);
         parent = GetParent(GetParent(GetParent(hDlg)));
         args.hWnd = parent;
+
         return (INT_PTR)TRUE;
 
     case WM_COMMAND:
@@ -386,6 +413,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             settings = previousSettings;
         else if ((BOOL)wParam == TRUE)
             previousSettings = settings;
+
         break;
 
     case WM_INITDIALOG:
@@ -420,6 +448,12 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
+            break;
+
+        case IDC_CHECK_STARTUP_UPDATES:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
+            settingsControls.settingsChanged = TRUE;
+            settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
             break;
 
         case IDC_HOTKEY:
@@ -466,6 +500,59 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_NOTIFY:
         //if (((LPNMHDR)lParam)->code == NM_CLICK)
             //ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
+        break;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+
+        break;
+    default:
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        break;
+    }
+    return (INT_PTR)TRUE;
+
+    case WM_NOTIFY:
+
+        switch (((NMHDR*)lParam)->code)
+        {
+        case NM_CLICK:
+        {
+            if (wParam == IDC_UPDATE_LINK) {
+                NMLINK* pNMLink = (NMLINK*)lParam;
+                LITEM iItem = pNMLink->item;
+                ShellExecuteW(
+                    NULL,
+                    TEXT("open"),
+                    iItem.szUrl,
+                    NULL,
+                    NULL,
+                    SW_HIDE
+                );
+                EndDialog(hDlg, LOWORD(wParam));
+                return (INT_PTR)TRUE;
+            }
+            break;
+        }
+        default:
+            break;
+        }
         break;
 
     case WM_COMMAND:
