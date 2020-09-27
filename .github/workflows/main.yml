@@ -26,8 +26,9 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: ls
+      - name: Build project
+        run: |
+          msbuild ./display-lock.sln
+          ls
         
-      #TODO: add msbuild
-
+        
