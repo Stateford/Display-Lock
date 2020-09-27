@@ -30,5 +30,8 @@ jobs:
         run: |
           msbuild ./display-lock.sln
           ls
-        
-        
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.1.4
+        with:
+          name: Display-Lock.exe
+          path: x64
