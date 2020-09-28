@@ -1,5 +1,5 @@
 # Display Lock
-[![Build status](https://ci.appveyor.com/api/projects/status/4nqt7c0a51umdm7c/branch/master?svg=true)](https://ci.appveyor.com/project/idietmoran/display-lock/branch/master) [![CodeFactor](https://www.codefactor.io/repository/github/stateford/display-lock/badge)](https://www.codefactor.io/repository/github/stateford/display-lock)
+![CI](https://github.com/Stateford/Display-Lock/workflows/CI/badge.svg) [![CodeFactor](https://www.codefactor.io/repository/github/stateford/display-lock/badge)](https://www.codefactor.io/repository/github/stateford/display-lock)
 
 ![](res/dl_logo_ZEB_icon.ico)
 
@@ -25,5 +25,3 @@ Contributions are always welcome, but please check [Contributing](CONTRIBUTING.m
 ![](res/example.gif)
 
 # ![Download](https://github.com/idietmoran/Display-Lock/releases/)
-
-[Beta builds can be found from appveyor artifacts](https://ci.appveyor.com/project/idietmoran/display-lock/history)
