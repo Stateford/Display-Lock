@@ -26,12 +26,12 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.1
 
       # Runs a single command using the runners shell
-      - name: Build project
+      - name: Build release
         run: |
-          msbuild ./display-lock.sln
+          msbuild /p:Configuration=Release ./display-lock.sln
           ls
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.1.4
         with:
           name: Display-Lock.exe
-          path: x64
+          path: x64/Release
