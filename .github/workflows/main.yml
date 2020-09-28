@@ -24,12 +24,18 @@ jobs:
 
       - name: setup-msbuild
         uses: microsoft/setup-msbuild@v1.0.1
+        
+      - name: Setup VSTest.console.exe
+        uses: darenm/Setup-VSTest@v1
 
-      # Runs a single command using the runners shell
       - name: Build release
         run: |
           msbuild /p:Configuration=Release ./display-lock.sln
           ls
+
+      - name: Run Tests
+        run: vstest.console.exe /Platform:x64 x64/Release/tests.dll
+         
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.1.4
         with:
