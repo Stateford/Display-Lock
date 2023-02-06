@@ -13,3 +13,5 @@ makefile
 */Debug/
 /.vscode/
 */.vscode/
+build/
+out/
