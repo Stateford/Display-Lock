@@ -64,5 +64,3 @@ void closeThread(HANDLE thread, BOOL *status)
         thread = NULL;
     }
 }
-
-

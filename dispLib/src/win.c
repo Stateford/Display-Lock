@@ -46,20 +46,20 @@ BOOL checkWindowTaskbar(HWND hwnd)
 }
 
 // checks if window has borders and hides false-positives among UWP instances.
-BOOL checkUWP(HWND hwnd) 
+BOOL checkUWP(HWND hwnd)
 {
-	char className[500];
-	GetClassNameA(hwnd, className, sizeof(className));
+    char className[500];
+    GetClassNameA(hwnd, className, sizeof(className));
 
-	WINDOWINFO wInfo;
-	ZeroMemory(&wInfo, sizeof(WINDOWINFO));
-	if (GetWindowInfo(hwnd, &wInfo))
-	{
-		if (strcmp(className, "Windows.UI.Core.CoreWindow") == 0 || strcmp(className, "ApplicationFrameWindow") == 0)
-		{
+    WINDOWINFO wInfo;
+    ZeroMemory(&wInfo, sizeof(WINDOWINFO));
+    if (GetWindowInfo(hwnd, &wInfo))
+    {
+        if (strcmp(className, "Windows.UI.Core.CoreWindow") == 0 || strcmp(className, "ApplicationFrameWindow") == 0)
+        {
             return FALSE;
-		}
-	}
+        }
+    }
     return TRUE;
 }
 
@@ -67,7 +67,7 @@ BOOL checkUWP(HWND hwnd)
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
     // cast lParam to windowList
-    WINDOWLIST* win = (WINDOWLIST*)lParam;
+    WINDOWLIST *win = (WINDOWLIST *)lParam;
 
     // temp char title
     char title[500];
@@ -92,7 +92,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
     return TRUE;
 }
 // checks if the cursor is within the client area of specified windows RECT object
-inline BOOL checkClientArea(POINT* cursorPos, RECT* rect)
+inline BOOL checkClientArea(POINT *cursorPos, RECT *rect)
 {
     return (cursorPos->y <= rect->bottom && cursorPos->y >= rect->top) && (cursorPos->x >= rect->left && cursorPos->x <= rect->right);
 }
@@ -100,21 +100,21 @@ inline BOOL checkClientArea(POINT* cursorPos, RECT* rect)
 // checks if resize is allowed
 inline BOOL checkResizeStyle(HWND activeWindow)
 {
-    return (GetWindowLongPtr(activeWindow, GWL_STYLE)&WS_SIZEBOX);
+    return (GetWindowLongPtr(activeWindow, GWL_STYLE) & WS_SIZEBOX);
 }
 
 // toggles borderlessWindow
 inline void toggleBorderlessWindow(HWND activeWindow)
 {
     // XOR WS_OVERLAPPED, WS_THICKFRAME, WS_SYSMENU, WS_CAPTION
-    SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE) ^ WS_OVERLAPPED^WS_THICKFRAME^WS_SYSMENU^WS_CAPTION);
+    SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE) ^ WS_OVERLAPPED ^ WS_THICKFRAME ^ WS_SYSMENU ^ WS_CAPTION);
     // XOR WS_EX_WINDOWEDGE
     SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE) ^ WS_EX_WINDOWEDGE);
 }
 
 // resizes borderless window
 // This prevents a window that has windows styles removed from having incorrect cursor placements by resizing the window the current size
-void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT* prev)
+void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
     GetClientRect(activeWindow.hWnd, &activeWindow.size);
     ClientToScreen(activeWindow.hWnd, (LPPOINT)&activeWindow.size.left);
@@ -156,10 +156,10 @@ inline BOOL checkProcess(WINDOW activeWindow)
 }
 
 // threaded function to lock the cursor to specified window
-int CALLBACK cursorLock(void* arguments)
+int CALLBACK cursorLock(void *arguments)
 {
     // TODO: reimplement the cursor lock
-    ARGS *args = (ARGS*)arguments;
+    ARGS *args = (ARGS *)arguments;
     SETTINGS *settings = args->settings;
     WINDOW selectedWindow = args->selectedWindow;
     BOOL *isRunning = args->clipRunning;
@@ -187,7 +187,7 @@ int CALLBACK cursorLock(void* arguments)
         SetForegroundWindow(selectedWindow.hWnd);
         SetActiveWindow(selectedWindow.hWnd);
     }
-    
+
     if (checkResizeStyle(selectedWindow.hWnd))
     {
         // TODO: might want to get error message here and check if elevated permissions are required
@@ -257,7 +257,7 @@ int CALLBACK cursorLock(void* arguments)
     if (settings->fullScreen)
         disableFullScreen(selectedWindow, &previousRect);
 
-    ClipCursor(NULL);	// release the cursor clip
-    _endthreadex(1);	// end the thread
+    ClipCursor(NULL); // release the cursor clip
+    _endthreadex(1);  // end the thread
     return 1;
 }
