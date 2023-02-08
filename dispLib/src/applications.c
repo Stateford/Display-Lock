@@ -222,6 +222,7 @@ int CALLBACK cursorLockApplications(void* parameters)
 
             if(application.enabled)
             {
+                // TODO: find using CreatToolHelp32Snapshot
                 HWND window = FindWindow(NULL, application.application_name);
 
                 if(window != NULL)

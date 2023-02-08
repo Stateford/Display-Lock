@@ -28,6 +28,8 @@
 // custom messages
 
 #define NOTIFY_MSG (WM_USER + 0x1)
+#define APP_SETTINGS_INIT (WM_USER + 0x2)
+
 #define NOTIFY_SETTINGS_CHANGED (NOTIFY_MSG + 0x1)
 
 // RESERVED MESSAGES 2000-2100

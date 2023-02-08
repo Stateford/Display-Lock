@@ -51,6 +51,7 @@ INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPA
 INT_PTR CALLBACK    applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -682,7 +683,6 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
             break;
         case IDC_BTN_APP_SETTINGS:
         {
-
             int current_selected = 0;
             int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
 
@@ -696,7 +696,8 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     // TODO handle settings
                     // TODO: show window
                     // TODO: get results
-
+                    APPLICATION_SETTINGS *settings = &applicationList.applications[current_selected];
+                    DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)settings);
                 }
                 ReleaseMutex(mutex);
                 CloseHandle(mutex);
@@ -710,7 +711,7 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     }
     case WM_DESTROY:
     {
-        closeApplicationThread(&controls.clipThread, args.clipRunning);
+        closeApplicationThread(controls.clipThread, args.clipRunning);
         closeApplicationList(&applicationList);
 
         HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
@@ -724,6 +725,69 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     }
     default:
         return DefWindowProc(hDlg, message, wParam, lParam);
+    }
+    return (INT_PTR)FALSE;
+}
+
+
+INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    static HWND enabled = NULL;
+    static HWND borderless = NULL;
+    static HWND fullscreen = NULL;
+    static APPLICATION_SETTINGS* settings = NULL;
+
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        enabled = GetDlgItem(hDlg, IDC_CHK_APP_ENABLED);
+        borderless = GetDlgItem(hDlg, IDC_CHK_APP_BORDERLESS);
+        fullscreen = GetDlgItem(hDlg, IDC_CHK_APP_FULLSCREEN);
+        settings = (APPLICATION_SETTINGS*)lParam;
+        SendMessage(enabled, BM_SETCHECK, settings->enabled, 0);
+        SendMessage(borderless, BM_SETCHECK, settings->borderless, 0);
+        SendMessage(fullscreen, BM_SETCHECK, settings->fullscreen, 0);
+
+        return (INT_PTR)TRUE;
+    }
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDC_BTN_APP_SETTINGS_OK:
+        {
+            if(settings != NULL)
+            {
+                int is_enabled = SendMessage(enabled, BM_GETCHECK, 0, 0);
+                int is_borderless = SendMessage(borderless, BM_GETCHECK, 0, 0);
+                int is_fullscreen = SendMessage(fullscreen, BM_GETCHECK, 0, 0);
+
+                settings->enabled = (is_enabled == BST_CHECKED);
+                settings->borderless = (is_borderless == BST_CHECKED);
+                settings->fullscreen = (is_fullscreen == BST_CHECKED);
+            }
+
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        case IDC_BTN_APP_SETTINGS_CANCEL:
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        default:
+            break;
+        }
+        break;
+    }
+
+    case WM_CLOSE:
+    {
+        EndDialog(hDlg, LOWORD(wParam));
+        return (INT_PTR)TRUE;
+    }
+    default:
+        break;
     }
     return (INT_PTR)FALSE;
 }
