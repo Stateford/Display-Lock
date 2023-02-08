@@ -615,6 +615,9 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
         startApplicationThread(&controls.clipThread, cursorLockApplications, (void*)&args);
 
+        EnableWindow(controls.settingsButton, FALSE);
+        EnableWindow(controls.removeButton, FALSE);
+
         for(int i = 0; i < applicationList.count; i++)
             SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)applicationList.applications[i].application_name);
 
@@ -624,6 +627,17 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         switch (LOWORD(wParam))
         {
         case IDC_LIST_PROGRAMS:
+            int result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+            if(result != LB_ERR)
+            {
+                EnableWindow(controls.settingsButton, TRUE);
+                EnableWindow(controls.removeButton, TRUE);
+            }
+            else
+            {
+                EnableWindow(controls.settingsButton, FALSE);
+                EnableWindow(controls.removeButton, FALSE);
+            }
             break;
         case IDC_BTN_APP_ADD:
             wchar_t filename[MAX_PATH];
@@ -679,6 +693,18 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 ReleaseMutex(mutex);
                 CloseHandle(mutex);
             }
+
+            result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+            if(result != LB_ERR)
+            {
+                EnableWindow(controls.settingsButton, TRUE);
+                EnableWindow(controls.removeButton, TRUE);
+            }
+            else
+            {
+                EnableWindow(controls.settingsButton, FALSE);
+                EnableWindow(controls.removeButton, FALSE);
+            }
         }
             break;
         case IDC_BTN_APP_SETTINGS:
@@ -693,9 +719,6 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
                 if((result == 0) || (result == WAIT_ABANDONED))
                 {
-                    // TODO handle settings
-                    // TODO: show window
-                    // TODO: get results
                     APPLICATION_SETTINGS *settings = &applicationList.applications[current_selected];
                     DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)settings);
                 }

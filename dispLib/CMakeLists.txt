@@ -9,5 +9,5 @@ add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_LIST_DIR}/src/applications.c
 )
 target_include_directories(${PROJECT_NAME} PUBLIC include)
-target_link_libraries(${PROJECT_NAME} PUBLIC Shlwapi winhttp)
+target_link_libraries(${PROJECT_NAME} PUBLIC Shlwapi winhttp iphlpapi)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DUNICODE)

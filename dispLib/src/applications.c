@@ -4,6 +4,8 @@
 #include <ShlObj.h>
 #include <shtypes.h>
 #include "Shlwapi.h"
+#include <iphlpapi.h>
+#include <TlHelp32.h>
 
 
 BOOL initApplicationView(HWND hDlg, APPLICATION_VIEW_CONTROLS *applicationControls)
@@ -185,7 +187,7 @@ BOOL startApplicationThread(HANDLE *thread, int(*callback)(void* parameters), vo
 {
     // TODO: check better error checking
     *thread = (HANDLE)_beginthreadex(NULL, 0, callback, args, 0, NULL);
-    
+
     if (*thread == NULL)
         return FALSE;
 
@@ -205,6 +207,44 @@ void closeApplicationThread(HANDLE thread, BOOL *status)
     }
 }
 
+BOOL CALLBACK EnumWindowsProcPID(HWND hwnd, LPARAM lParam)
+{
+    DWORD pid;
+    EnumWindowsProcPIDArgs* proc = (EnumWindowsProcPIDArgs*)lParam;
+    GetWindowThreadProcessId(hwnd, &pid);
+
+    if (pid == proc->pid)
+    {
+        proc->hwnd = hwnd;
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+DWORD getPidFromName(const wchar_t* name)
+{
+    PROCESSENTRY32 entry;
+    entry.dwSize = sizeof(PROCESSENTRY32);
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+
+    if (Process32First(snapshot, &entry) == TRUE)
+    {
+        while (Process32Next(snapshot, &entry) == TRUE)
+        {
+            if (wcsicmp(entry.szExeFile, name) == 0)
+            {
+                CloseHandle(snapshot);
+                return entry.th32ProcessID;
+            }
+        }
+    }
+
+    CloseHandle(snapshot);
+    return 0;
+}
+
 
 int CALLBACK cursorLockApplications(void* parameters)
 {
@@ -213,71 +253,69 @@ int CALLBACK cursorLockApplications(void* parameters)
 
     while(*(args->clipRunning))
     {
-        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-        WaitForSingleObject(mutex, INFINITE);
-
         for(int i = 0; i < args->applicationList->count; i++)
         {
             APPLICATION_SETTINGS application = args->applicationList->applications[i];
 
             if(application.enabled)
             {
-                // TODO: find using CreatToolHelp32Snapshot
-                HWND window = FindWindow(NULL, application.application_name);
+                EnumWindowsProcPIDArgs args;
+                args.pid = getPidFromName(application.application_name);
+                args.hwnd = NULL;
 
-                if(window != NULL)
+                if(args.pid != 0)
+                    EnumWindows(EnumWindowsProcPID, (LPARAM)&args);
+
+                if(args.hwnd != NULL)
                 {
                     RECT rect;
-                    GetWindowRect(window, &rect);
+                    GetWindowRect(args.hwnd, &rect);
 
                     if(application.borderless)
                     {
-                        const long long borderlessStyle = GetWindowLongPtr(window, GWL_STYLE);
-                        const long long borderlessStyleEx = GetWindowLongPtr(window, GWL_EXSTYLE);
+                        const long long borderlessStyle = GetWindowLongPtr(args.hwnd, GWL_STYLE);
+                        const long long borderlessStyleEx = GetWindowLongPtr(args.hwnd, GWL_EXSTYLE);
 
                         const long long mask = WS_OVERLAPPED | WS_THICKFRAME | WS_SYSMENU | WS_CAPTION;
                         const long long exMask = WS_EX_WINDOWEDGE;
 
                         if((borderlessStyle & mask) != 0)
-                            SetWindowLongPtr(window, GWL_STYLE, borderlessStyle &~ mask);
+                            SetWindowLongPtr(args.hwnd, GWL_STYLE, borderlessStyle &~ mask);
 
                         if((borderlessStyleEx & exMask) != 0)
-                            SetWindowLongPtr(window, GWL_EXSTYLE, borderlessStyleEx &~ exMask);
+                            SetWindowLongPtr(args.hwnd, GWL_EXSTYLE, borderlessStyleEx &~ exMask);
                     }
                     else if(application.fullscreen)
                     {
                         RECT rect = {0};
-                        GetClientRect(window, &rect);
-                        ClientToScreen(window, (LPPOINT)&rect.left);
-                        ClientToScreen(window, (LPPOINT)&rect.right);
+                        GetClientRect(args.hwnd, &rect);
+                        ClientToScreen(args.hwnd, (LPPOINT)&rect.left);
+                        ClientToScreen(args.hwnd, (LPPOINT)&rect.right);
 
                         if(rect.left != 0 || rect.top != 0 || rect.right != GetSystemMetrics(SM_CXSCREEN) || rect.bottom != GetSystemMetrics(SM_CYSCREEN))
-                            SetWindowPos(window, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
+                            SetWindowPos(args.hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
                     }
 
                     // TODO: lock cursor
                     HWND active = GetForegroundWindow();
-                    GetCursorPos(&cursorPosition);
-                    RECT windowRect = {0};
-                    GetClientRect(window, &windowRect);
-                    ClientToScreen(window, (LPPOINT)&rect.left);
-                    ClientToScreen(window, (LPPOINT)&rect.right);
 
-                    if(window == active)
+                    if(args.hwnd == active)
                     {
+                        GetCursorPos(&cursorPosition);
+                        RECT windowRect = {0};
+                        GetClientRect(args.hwnd, &windowRect);
+                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.left);
+                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.right);
+
                         if((cursorPosition.y <= windowRect.bottom && cursorPosition.y >= windowRect.top) && (cursorPosition.x >= windowRect.left && cursorPosition.x <= windowRect.right))
                             ClipCursor(&windowRect);
-
-                        if(GetAsyncKeyState(VK_LBUTTON) == 0)
+                        else if(GetAsyncKeyState(VK_LBUTTON) == 0)
                             ClipCursor(&windowRect);
                     }
-
                 }
             }
             Sleep(1);
         }
-        ReleaseMutex(mutex);
-        CloseHandle(mutex);
     }
 
     ClipCursor(NULL);

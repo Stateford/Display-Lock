@@ -4,6 +4,11 @@
 #include "common.h"
 
 
+typedef struct EnumWindowsProcPIDArgs {
+    DWORD pid;
+    HWND hwnd;
+} EnumWindowsProcPIDArgs;
+
 BOOL initApplicationView(HWND hDlg, APPLICATION_VIEW_CONTROLS *applicationControls);
 BOOL readApplicationList(APPLICATION_LIST* applicationList, const wchar_t* path);
 BOOL writeApplicationList(APPLICATION_LIST* applicationList, const wchar_t* path);
@@ -16,5 +21,8 @@ BOOL createApplicationSettings(const wchar_t* appPath, APPLICATION_SETTINGS* app
 
 BOOL startApplicationThread(HANDLE *thread, int(*callback)(void* parameters), void *args);
 void closeApplicationThread(HANDLE thread, BOOL *status);
+DWORD getPidFromName(const wchar_t* name);
+
+BOOL CALLBACK EnumWindowsProcPID(HWND hwnd, LPARAM lParam);
 
 int CALLBACK cursorLockApplications(void* parameters);
