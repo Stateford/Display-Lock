@@ -22,7 +22,9 @@
 
 #define WINDOW_VIEW 0
 #define SETTINGS_VIEW 1
+#define APPLICATION_VIEW 2
 
+#define APPLICATION_MUTEX_NAME L"DLockApplicationMutex"
 // custom messages
 
 #define NOTIFY_MSG (WM_USER + 0x1)
@@ -41,12 +43,44 @@ typedef struct ARGS ARGS;
 typedef struct HOTKEY HOTKEY;
 typedef struct WINDOW WINDOW;
 typedef union VERSION VERSION;
+typedef struct APPLICATION_VIEW_CONTROLS APPLICATION_VIEW_CONTROLS;
+typedef struct APPLICATION_SETTINGS APPLICATION_SETTINGS;
+typedef struct APPLICATION_LIST APPLICATION_LIST;
+typedef struct APPLICATION_ARGS APPLICATION_ARGS;
+
+
+struct APPLICATION_VIEW_CONTROLS
+{
+    HWND addButton;
+    HWND removeButton;
+    HWND settingsButton;
+    HWND listView;
+
+    BOOL *runningClip;
+    HANDLE clipThread;
+};
+
+struct APPLICATION_SETTINGS
+{
+    wchar_t application_name[MAX_PATH];
+    wchar_t application_path[MAX_PATH];
+    BOOL fullscreen;
+    BOOL borderless;
+    BOOL enabled;
+};
+
+struct APPLICATION_LIST
+{
+    int count;
+    APPLICATION_SETTINGS *applications;
+};
 
 struct MAIN_WINDOW_CONTROLS
 {
     HWND tabCtrl;
     HWND windowView;
     HWND settingsView;
+    HWND applicationView;
 };
 
 struct WINDOW
@@ -113,6 +147,12 @@ struct ARGS
     WINDOW selectedWindow;
     HWND hWnd;
     MAIN_WINDOW_CONTROLS controls;
+};
+
+struct APPLICATION_ARGS
+{
+    APPLICATION_LIST *applicationList;
+    BOOL *clipRunning;
 };
 
 union VERSION {

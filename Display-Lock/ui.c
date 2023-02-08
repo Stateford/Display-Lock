@@ -22,6 +22,7 @@
 #include "menu.h"
 #include "common.h"
 #include "settings.h"
+#include "applications.h"
 
 
 BOOL getVersionString(wchar_t *buffer, int bufferSize)
@@ -162,14 +163,11 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
     tci.pszText = L"Window";
     TabCtrl_InsertItem(mainWindowControls->tabCtrl, WINDOW_VIEW, &tci);
 
-    /*
-    Currently disabled
-    tci.pszText = L"Monitor";
-    TabCtrl_InsertItem(tabCtrl, 1, &tci);
-    */
-
     tci.pszText = L"Settings";
     TabCtrl_InsertItem(mainWindowControls->tabCtrl, SETTINGS_VIEW, &tci);
+
+    tci.pszText = L"Applications";
+    TabCtrl_InsertItem(mainWindowControls->tabCtrl, APPLICATION_VIEW, &tci);
 }
 
 void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, BOOL *running, int windowSelection)

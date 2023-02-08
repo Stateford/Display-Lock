@@ -20,7 +20,9 @@
 
 #include "resources\resource.h"
 #include "header.h"
+#include "applications.h"
 #include "common.h"
+#include <commdlg.h>
 #include "ui.h"
 #include <stdio.h>
 
@@ -34,6 +36,7 @@ WINDOW_VIEW_CONTROLS windowControls = { 0 };
 SETTINGS settings = { 0 };                              // application settings
 ARGS args = {0};
 BOOL running = FALSE;
+BOOL applicationRunning = TRUE;
 VERSION gVersion = { 0 };
 BOOL initalUpdate = FALSE;
 
@@ -45,6 +48,7 @@ INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK    applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK    updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -170,6 +174,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         notifyInit(hWnd, &sysTray);
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
+
+        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+        ReleaseMutex(mutex);
+        CloseHandle(mutex);
 
         break;
 
@@ -303,9 +311,12 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
         // initalize the tab views
         mainWindowControls.windowView = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_WINDOWS_VIEW), mainWindowControls.tabCtrl, windowViewProc);
         mainWindowControls.settingsView = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SETTINGS_VIEW), mainWindowControls.tabCtrl, settingsViewProc);
+        mainWindowControls.applicationView = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_APPLICATIONS_VIEW), mainWindowControls.tabCtrl, applicationsViewProc);
 
         // show the default window
         ShowWindow(mainWindowControls.windowView, SW_SHOW);
+        ShowWindow(mainWindowControls.settingsView, SW_HIDE);
+        ShowWindow(mainWindowControls.applicationView, SW_HIDE);
         args.controls = mainWindowControls;
 
         return (INT_PTR)TRUE;
@@ -321,10 +332,17 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
             case WINDOW_VIEW: // change this to a const or define
                 ShowWindow(mainWindowControls.windowView, SW_SHOW);
                 ShowWindow(mainWindowControls.settingsView, SW_HIDE);
+                ShowWindow(mainWindowControls.applicationView, SW_HIDE);
                 break;
             case SETTINGS_VIEW:
                 ShowWindow(mainWindowControls.windowView, SW_HIDE);
                 ShowWindow(mainWindowControls.settingsView, SW_SHOW);
+                ShowWindow(mainWindowControls.applicationView, SW_HIDE);
+                break;
+            case APPLICATION_VIEW:
+                ShowWindow(mainWindowControls.windowView, SW_HIDE);
+                ShowWindow(mainWindowControls.settingsView, SW_HIDE);
+                ShowWindow(mainWindowControls.applicationView, SW_SHOW);
                 break;
             }
             break;
@@ -565,6 +583,147 @@ INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
         break;
     default:
         break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    static HWND parent;
+    static APPLICATION_VIEW_CONTROLS controls;
+    static APPLICATION_SETTINGS settings;
+    static APPLICATION_LIST applicationList;
+    static APPLICATION_ARGS args;
+
+
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_SHOWWINDOW:
+        break;
+
+    case WM_INITDIALOG:
+        parent = GetParent(GetParent(GetParent(hDlg)));
+        initApplicationView(hDlg, &controls);
+        controls.runningClip = &applicationRunning;
+        applicationRunning = TRUE;
+        initApplicationList(&applicationList);
+
+        args.applicationList = &applicationList;
+        args.clipRunning = &applicationRunning;
+
+        startApplicationThread(&controls.clipThread, cursorLockApplications, (void*)&args);
+
+        for(int i = 0; i < applicationList.count; i++)
+            SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)applicationList.applications[i].application_name);
+
+        return (INT_PTR)TRUE;
+    case WM_COMMAND:
+    {
+        switch (LOWORD(wParam))
+        {
+        case IDC_LIST_PROGRAMS:
+            break;
+        case IDC_BTN_APP_ADD:
+            wchar_t filename[MAX_PATH];
+
+            OPENFILENAMEW ofn;
+            ZeroMemory(&filename, sizeof(filename));
+            ZeroMemory(&ofn, sizeof(ofn));
+
+            ofn.lStructSize = sizeof(ofn);
+            ofn.hwndOwner = NULL;
+            ofn.lpstrFilter = L"Executable\0*.exe\0";
+            ofn.lpstrFile = filename;
+            ofn.nMaxFile = sizeof(filename);
+            ofn.lpstrTitle = L"Select an application";
+            ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+
+            if (GetOpenFileName(&ofn))
+            {
+
+                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                DWORD result = WaitForSingleObject(mutex, INFINITE);
+
+                if((result == 0) || (result == WAIT_ABANDONED))
+                {
+
+                    APPLICATION_SETTINGS application;
+                    ZeroMemory(&application, sizeof(application));
+                    createApplicationSettings(ofn.lpstrFile, &application);
+
+                    if(addApplication(&applicationList, application))
+                        SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)application.application_name);
+                }
+                ReleaseMutex(mutex);
+                CloseHandle(mutex);
+            }
+
+            break;
+        case IDC_BTN_APP_RMV:
+        {
+
+            int current_selected = 0;
+            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
+            if (result != LB_ERR) {
+
+                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                DWORD result = WaitForSingleObject(mutex, INFINITE);
+
+                if((result == 0) || (result == WAIT_ABANDONED))
+                {
+                    SendMessage(controls.listView, LB_DELETESTRING, current_selected, 0);
+                    removeApplication(&applicationList, current_selected);
+                }
+                ReleaseMutex(mutex);
+                CloseHandle(mutex);
+            }
+        }
+            break;
+        case IDC_BTN_APP_SETTINGS:
+        {
+
+            int current_selected = 0;
+            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
+
+            if (result != LB_ERR) {
+
+                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                DWORD result = WaitForSingleObject(mutex, INFINITE);
+
+                if((result == 0) || (result == WAIT_ABANDONED))
+                {
+                    // TODO handle settings
+                    // TODO: show window
+                    // TODO: get results
+
+                }
+                ReleaseMutex(mutex);
+                CloseHandle(mutex);
+            }
+        }
+            break;
+        default:
+            break;
+        }
+        break;
+    }
+    case WM_DESTROY:
+    {
+        closeApplicationThread(&controls.clipThread, args.clipRunning);
+        closeApplicationList(&applicationList);
+
+        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+        if(mutex != NULL)
+        {
+            ReleaseMutex(mutex);
+            CloseHandle(mutex);
+        }
+        EndDialog(hDlg, LOWORD(wParam));
+        return (INT_PTR)TRUE;
+    }
+    default:
+        return DefWindowProc(hDlg, message, wParam, lParam);
     }
     return (INT_PTR)FALSE;
 }
