@@ -11,3 +11,4 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PROJECT_NAME} PUBLIC Shlwapi winhttp iphlpapi)
 target_compile_definitions(${PROJECT_NAME} PUBLIC -DUNICODE)
+target_compile_options(${PROJECT_NAME} PUBLIC /W4 /WX)

@@ -20,8 +20,6 @@
 
 #include "resources\resource.h"
 #include "header.h"
-#include "applications.h"
-#include "common.h"
 #include <commdlg.h>
 #include "ui.h"
 #include <stdio.h>
@@ -272,7 +270,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
+            // HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
             EndPaint(hWnd, &ps);
 
@@ -542,10 +540,7 @@ INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     switch (message)
     {
     case WM_INITDIALOG:
-    {
-        break;
-    }
-    return (INT_PTR)TRUE;
+        return (INT_PTR)TRUE;
 
     case WM_NOTIFY:
 
@@ -592,9 +587,9 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 {
     static HWND parent;
     static APPLICATION_VIEW_CONTROLS controls;
-    static APPLICATION_SETTINGS settings;
+    static APPLICATION_SETTINGS application_settings;
     static APPLICATION_LIST applicationList;
-    static APPLICATION_ARGS args;
+    static APPLICATION_ARGS application_args;
 
 
     UNREFERENCED_PARAMETER(lParam);
@@ -610,10 +605,10 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         applicationRunning = TRUE;
         initApplicationList(&applicationList);
 
-        args.applicationList = &applicationList;
-        args.clipRunning = &applicationRunning;
+        application_args.applicationList = &applicationList;
+        application_args.clipRunning = &applicationRunning;
 
-        startApplicationThread(&controls.clipThread, cursorLockApplications, (void*)&args);
+        startApplicationThread(&controls.clipThread, cursorLockApplications, (void*)&application_args);
 
         EnableWindow(controls.settingsButton, FALSE);
         EnableWindow(controls.removeButton, FALSE);
@@ -626,115 +621,118 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     {
         switch (LOWORD(wParam))
         {
-        case IDC_LIST_PROGRAMS:
-            int result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
-            if(result != LB_ERR)
+            case IDC_LIST_PROGRAMS:
             {
-                EnableWindow(controls.settingsButton, TRUE);
-                EnableWindow(controls.removeButton, TRUE);
+                LRESULT result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+                if(result != LB_ERR)
+                {
+                    EnableWindow(controls.settingsButton, TRUE);
+                    EnableWindow(controls.removeButton, TRUE);
+                }
+                else
+                {
+                    EnableWindow(controls.settingsButton, FALSE);
+                    EnableWindow(controls.removeButton, FALSE);
+                }
+                break;
             }
-            else
+            case IDC_BTN_APP_ADD:
             {
-                EnableWindow(controls.settingsButton, FALSE);
-                EnableWindow(controls.removeButton, FALSE);
-            }
-            break;
-        case IDC_BTN_APP_ADD:
-            wchar_t filename[MAX_PATH];
+                wchar_t filename[MAX_PATH];
 
-            OPENFILENAMEW ofn;
-            ZeroMemory(&filename, sizeof(filename));
-            ZeroMemory(&ofn, sizeof(ofn));
+                OPENFILENAMEW ofn;
+                ZeroMemory(&filename, sizeof(filename));
+                ZeroMemory(&ofn, sizeof(ofn));
 
-            ofn.lStructSize = sizeof(ofn);
-            ofn.hwndOwner = NULL;
-            ofn.lpstrFilter = L"Executable\0*.exe\0";
-            ofn.lpstrFile = filename;
-            ofn.nMaxFile = sizeof(filename);
-            ofn.lpstrTitle = L"Select an application";
-            ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
+                ofn.lStructSize = sizeof(ofn);
+                ofn.hwndOwner = NULL;
+                ofn.lpstrFilter = L"Executable\0*.exe\0";
+                ofn.lpstrFile = filename;
+                ofn.nMaxFile = sizeof(filename);
+                ofn.lpstrTitle = L"Select an application";
+                ofn.Flags = OFN_DONTADDTORECENT | OFN_FILEMUSTEXIST;
 
-            if (GetOpenFileName(&ofn))
-            {
-
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
-
-                if((result == 0) || (result == WAIT_ABANDONED))
+                if (GetOpenFileName(&ofn))
                 {
 
-                    APPLICATION_SETTINGS application;
-                    ZeroMemory(&application, sizeof(application));
-                    createApplicationSettings(ofn.lpstrFile, &application);
+                    HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                    DWORD result = WaitForSingleObject(mutex, INFINITE);
 
-                    if(addApplication(&applicationList, application))
-                        SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)application.application_name);
+                    if((result == 0) || (result == WAIT_ABANDONED))
+                    {
+
+                        APPLICATION_SETTINGS application;
+                        ZeroMemory(&application, sizeof(application));
+                        createApplicationSettings(ofn.lpstrFile, &application);
+
+                        if(addApplication(&applicationList, application))
+                            SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)application.application_name);
+                    }
+                    ReleaseMutex(mutex);
+                    CloseHandle(mutex);
                 }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
+                break;
             }
-
-            break;
-        case IDC_BTN_APP_RMV:
-        {
-
-            int current_selected = 0;
-            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
-            if (result != LB_ERR) {
-
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
-
-                if((result == 0) || (result == WAIT_ABANDONED))
-                {
-                    SendMessage(controls.listView, LB_DELETESTRING, current_selected, 0);
-                    removeApplication(&applicationList, current_selected);
-                }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
-            }
-
-            result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
-            if(result != LB_ERR)
+            case IDC_BTN_APP_RMV:
             {
-                EnableWindow(controls.settingsButton, TRUE);
-                EnableWindow(controls.removeButton, TRUE);
-            }
-            else
-            {
-                EnableWindow(controls.settingsButton, FALSE);
-                EnableWindow(controls.removeButton, FALSE);
-            }
-        }
-            break;
-        case IDC_BTN_APP_SETTINGS:
-        {
-            int current_selected = 0;
-            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
 
-            if (result != LB_ERR) {
+                int current_selected = 0;
+                LRESULT result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
+                if (result != LB_ERR) {
 
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
+                    HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                    DWORD wait_result = WaitForSingleObject(mutex, INFINITE);
 
-                if((result == 0) || (result == WAIT_ABANDONED))
-                {
-                    APPLICATION_SETTINGS *settings = &applicationList.applications[current_selected];
-                    DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)settings);
+                    if((wait_result == 0) || (wait_result == WAIT_ABANDONED))
+                    {
+                        SendMessage(controls.listView, LB_DELETESTRING, current_selected, 0);
+                        removeApplication(&applicationList, current_selected);
+                    }
+                    ReleaseMutex(mutex);
+                    CloseHandle(mutex);
                 }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
+
+                result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+                if(result != LB_ERR)
+                {
+                    EnableWindow(controls.settingsButton, TRUE);
+                    EnableWindow(controls.removeButton, TRUE);
+                }
+                else
+                {
+                    EnableWindow(controls.settingsButton, FALSE);
+                    EnableWindow(controls.removeButton, FALSE);
+                }
             }
-        }
-            break;
-        default:
-            break;
+                break;
+            case IDC_BTN_APP_SETTINGS:
+            {
+                int current_selected = 0;
+                LRESULT result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
+
+                if (result != LB_ERR) {
+
+                    HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+                    DWORD wait_result = WaitForSingleObject(mutex, INFINITE);
+
+                    if((wait_result == 0) || (wait_result == WAIT_ABANDONED))
+                    {
+                        APPLICATION_SETTINGS *app_setting = &applicationList.applications[current_selected];
+                        DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)app_setting);
+                    }
+                    ReleaseMutex(mutex);
+                    CloseHandle(mutex);
+                }
+            }
+                break;
+            default:
+                break;
         }
         break;
     }
     case WM_DESTROY:
     {
-        closeApplicationThread(controls.clipThread, args.clipRunning);
+        closeApplicationThread(controls.clipThread, application_args.clipRunning);
         closeApplicationList(&applicationList);
 
         HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
@@ -759,7 +757,7 @@ INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
     static HWND enabled = NULL;
     static HWND borderless = NULL;
     static HWND fullscreen = NULL;
-    static APPLICATION_SETTINGS* settings = NULL;
+    static APPLICATION_SETTINGS* app_settings = NULL;
 
     switch (message)
     {
@@ -768,10 +766,10 @@ INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         enabled = GetDlgItem(hDlg, IDC_CHK_APP_ENABLED);
         borderless = GetDlgItem(hDlg, IDC_CHK_APP_BORDERLESS);
         fullscreen = GetDlgItem(hDlg, IDC_CHK_APP_FULLSCREEN);
-        settings = (APPLICATION_SETTINGS*)lParam;
-        SendMessage(enabled, BM_SETCHECK, settings->enabled, 0);
-        SendMessage(borderless, BM_SETCHECK, settings->borderless, 0);
-        SendMessage(fullscreen, BM_SETCHECK, settings->fullscreen, 0);
+        app_settings = (APPLICATION_SETTINGS*)lParam;
+        SendMessage(enabled, BM_SETCHECK, app_settings->enabled, 0);
+        SendMessage(borderless, BM_SETCHECK, app_settings->borderless, 0);
+        SendMessage(fullscreen, BM_SETCHECK, app_settings->fullscreen, 0);
 
         return (INT_PTR)TRUE;
     }
@@ -781,15 +779,15 @@ INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         {
         case IDC_BTN_APP_SETTINGS_OK:
         {
-            if(settings != NULL)
+            if(app_settings != NULL)
             {
-                int is_enabled = SendMessage(enabled, BM_GETCHECK, 0, 0);
-                int is_borderless = SendMessage(borderless, BM_GETCHECK, 0, 0);
-                int is_fullscreen = SendMessage(fullscreen, BM_GETCHECK, 0, 0);
+                LRESULT is_enabled = SendMessage(enabled, BM_GETCHECK, 0, 0);
+                LRESULT is_borderless = SendMessage(borderless, BM_GETCHECK, 0, 0);
+                LRESULT is_fullscreen = SendMessage(fullscreen, BM_GETCHECK, 0, 0);
 
-                settings->enabled = (is_enabled == BST_CHECKED);
-                settings->borderless = (is_borderless == BST_CHECKED);
-                settings->fullscreen = (is_fullscreen == BST_CHECKED);
+                app_settings->enabled = (is_enabled == BST_CHECKED);
+                app_settings->borderless = (is_borderless == BST_CHECKED);
+                app_settings->fullscreen = (is_fullscreen == BST_CHECKED);
             }
 
             EndDialog(hDlg, LOWORD(wParam));
