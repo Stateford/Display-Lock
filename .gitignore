@@ -15,3 +15,6 @@ makefile
 */.vscode/
 build/
 out/
+.mypy_cache/
+*/.mypy_cache/
+*/.vs/
