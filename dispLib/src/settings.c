@@ -33,14 +33,9 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
     
 }
 
-void setSettingsDlg(HWND hDlg, SETTINGS settings)
-{
-    return;
-}
-
 void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
 {
-    strcpy(settings->header, "DLOCK");
+    strcpy_s(settings->header, sizeof(settings->header), "DLOCK");
     settings->version = 0;
     for (unsigned int i = 0; i < wcslen(versionStr); i++)
     {
@@ -72,7 +67,7 @@ BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
     return settings->version == version;
 }
 
-BOOL findPath(wchar_t *outPath)
+BOOL findPath(wchar_t *outPath, const size_t size)
 {
     PWSTR path;
 
@@ -81,7 +76,7 @@ BOOL findPath(wchar_t *outPath)
     if (!SUCCEEDED(hr))
         return FALSE;
 
-        wcscpy(outPath, path);
+        wcscpy_s(outPath, size, path);
         LPCWSTR x = L"DisplayLock\\settings.DLOCK";
         PathAppend(outPath, x);
 
@@ -89,14 +84,14 @@ BOOL findPath(wchar_t *outPath)
     return TRUE;
 }
 
-BOOL createDirectory(wchar_t *outPath)
+BOOL createDirectory(wchar_t *outPath, const size_t size)
 {
     PWSTR path;
 
     if (!SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
         return FALSE;
 
-    wcscpy(outPath, path);
+    wcscpy_s(outPath, size, path);
 
     // create directory
     PathAppend(outPath, TEXT("DisplayLock"));
@@ -111,11 +106,12 @@ BOOL createDirectory(wchar_t *outPath)
 
 BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
 {
-    FILE *file = _wfopen(path, TEXT("rb"));
+    FILE *file = NULL;
+    errno_t result = _wfopen_s(&file, path, TEXT("rb"));
 
     // if if opening file is succcessful read into struct
     // otherwise use default settings
-    if (file == NULL)
+    if (result != 0 || file == NULL)
     {
         defaultSettings(settings, versionStr);
         return FALSE;
@@ -140,9 +136,10 @@ BOOL writeSettings(SETTINGS settings, wchar_t *path)
         return FALSE;
 
 
-    FILE *file = _wfopen(path, TEXT("wb"));
+    FILE *file = NULL;
+    errno_t result = _wfopen_s(&file, path, TEXT("wb"));
 
-    if (file == NULL)
+    if (result != 0 || file == NULL)
         return FALSE;
 
     fwrite(&settings, sizeof(settings), 1, file);

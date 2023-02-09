@@ -22,7 +22,7 @@
 #include "common.h"
 
 void notifyInit(HWND hWnd, NOTIFYICONDATA *notify);
-void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify);
+void showMainWindow(HWND hWnd);
 void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running);
 void notifyChildWindows(HWND hWnd, UINT msg);
 void drawMenuSettings(HMENU menu, SETTINGS settings, BOOL running);

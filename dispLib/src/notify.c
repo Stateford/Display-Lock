@@ -30,7 +30,7 @@ void notifyInit(HWND hWnd, NOTIFYICONDATA * notify)
     notify->uCallbackMessage = NOTIFY_MSG;
 }
 
-void showMainWindow(HWND hWnd, NOTIFYICONDATA *notify)
+void showMainWindow(HWND hWnd)
 {
     ShowWindow(hWnd, SW_RESTORE);
     SetForegroundWindow(hWnd);

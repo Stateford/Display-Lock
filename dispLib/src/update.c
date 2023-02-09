@@ -43,14 +43,15 @@ void parseVersionString(VERSION* version, STRING* response)
     memset(patch, 0, sizeof(patch));
 
     char *result;
+    char *next_token;
 
-    result = strtok(response->data, ".");
+    result = strtok_s(response->data, ".", &next_token);
 
     int count = 0;
     while (result)
     {
         version->verArr[count] = atoi(result);
-        result = strtok(NULL, ".");
+        result = strtok_s(NULL, ".", &next_token);
         count++;
     }
 }
@@ -66,7 +67,6 @@ void getLatestVersion(VERSION* version)
 
     STRING response;
 
-    int count = 0;
     response.size = 0;
     response.data = (char*)calloc(1024, sizeof(char));
     response.data[0] = '\0';
