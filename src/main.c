@@ -17,7 +17,6 @@
 */
 // test.cpp : Defines the entry point for the application.
 //
-
 #include "resources\resource.h"
 #include "header.h"
 #include "applications.h"
@@ -25,6 +24,10 @@
 #include <commdlg.h>
 #include "ui.h"
 #include <stdio.h>
+#include "app_settings.h"
+#include "update_dialog.h"
+#include "about_dialog.h"
+
 
 #define MAX_LOADSTRING 100
 
@@ -498,91 +501,6 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
     return (INT_PTR)FALSE;
 }
 
-INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-    {
-        wchar_t version[40];
-        if (getVersionString(version, 40))
-            SetDlgItemText(hDlg, IDC_STATIC_VERSION, version);
-    }
-        return (INT_PTR)TRUE;
-
-    case WM_NOTIFY:
-        // if (((LPNMHDR)lParam)->code == NM_CLICK)
-        // ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
-        break;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-
-        break;
-    default:
-        break;
-    }
-    return (INT_PTR)FALSE;
-}
-
-INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-
-    UNREFERENCED_PARAMETER(lParam);
-    switch (message)
-    {
-    case WM_INITDIALOG:
-    {
-        break;
-    }
-        return (INT_PTR)TRUE;
-
-    case WM_NOTIFY:
-
-        switch (((NMHDR *)lParam)->code)
-        {
-        case NM_CLICK:
-        {
-            if (wParam == IDC_UPDATE_LINK)
-            {
-                NMLINK *pNMLink = (NMLINK *)lParam;
-                LITEM iItem = pNMLink->item;
-                ShellExecuteW(
-                    NULL,
-                    TEXT("open"),
-                    iItem.szUrl,
-                    NULL,
-                    NULL,
-                    SW_HIDE);
-                EndDialog(hDlg, LOWORD(wParam));
-                return (INT_PTR)TRUE;
-            }
-            break;
-        }
-        default:
-            break;
-        }
-        break;
-
-    case WM_COMMAND:
-        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-        {
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-
-        break;
-    default:
-        break;
-    }
-    return (INT_PTR)FALSE;
-}
-
 INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     static HWND parent;
@@ -744,68 +662,6 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     }
     default:
         return DefWindowProc(hDlg, message, wParam, lParam);
-    }
-    return (INT_PTR)FALSE;
-}
-
-INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(lParam);
-    static HWND enabled = NULL;
-    static HWND borderless = NULL;
-    static HWND fullscreen = NULL;
-    static APPLICATION_SETTINGS *settings = NULL;
-
-    switch (message)
-    {
-    case WM_INITDIALOG:
-    {
-        enabled = GetDlgItem(hDlg, IDC_CHK_APP_ENABLED);
-        borderless = GetDlgItem(hDlg, IDC_CHK_APP_BORDERLESS);
-        fullscreen = GetDlgItem(hDlg, IDC_CHK_APP_FULLSCREEN);
-        settings = (APPLICATION_SETTINGS *)lParam;
-        SendMessage(enabled, BM_SETCHECK, settings->enabled, 0);
-        SendMessage(borderless, BM_SETCHECK, settings->borderless, 0);
-        SendMessage(fullscreen, BM_SETCHECK, settings->fullscreen, 0);
-
-        return (INT_PTR)TRUE;
-    }
-    case WM_COMMAND:
-    {
-        switch (LOWORD(wParam))
-        {
-        case IDC_BTN_APP_SETTINGS_OK:
-        {
-            if (settings != NULL)
-            {
-                int is_enabled = SendMessage(enabled, BM_GETCHECK, 0, 0);
-                int is_borderless = SendMessage(borderless, BM_GETCHECK, 0, 0);
-                int is_fullscreen = SendMessage(fullscreen, BM_GETCHECK, 0, 0);
-
-                settings->enabled = (is_enabled == BST_CHECKED);
-                settings->borderless = (is_borderless == BST_CHECKED);
-                settings->fullscreen = (is_fullscreen == BST_CHECKED);
-            }
-
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        }
-        case IDC_BTN_APP_SETTINGS_CANCEL:
-            EndDialog(hDlg, LOWORD(wParam));
-            return (INT_PTR)TRUE;
-        default:
-            break;
-        }
-        break;
-    }
-
-    case WM_CLOSE:
-    {
-        EndDialog(hDlg, LOWORD(wParam));
-        return (INT_PTR)TRUE;
-    }
-    default:
-        break;
     }
     return (INT_PTR)FALSE;
 }

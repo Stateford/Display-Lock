@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.1.7]
+- Added application whitelist
+    - Users can add applications to a whitelist and locking will begin as soon as they are detected
+    - This brings a new config file in `%APPDATA%/DisplayLock/application.DLOCK`
+- Fixed a bug with thread was not closing properly
+- Fixed a bug where data where mutex was not closing properly
+
+# [2.1.6]
+- Added checking for updates
+
+# [2.1.5]
+- Fixed filtering method for hidden UWP processes
+
 # [2.1.4]
 - Fixed an issue where when an outside source (including the game) would change the windows style, the program would not force the style back
 
