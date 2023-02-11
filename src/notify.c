@@ -18,8 +18,7 @@
 #include "notify.h"
 #include "win.h"
 
-
-void notifyInit(HWND hWnd, NOTIFYICONDATA * notify)
+void notifyInit(HWND hWnd, NOTIFYICONDATA *notify)
 {
     notify->hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON));
     notify->uVersion = 5;
@@ -65,7 +64,7 @@ void showContext(HWND hWnd, WINDOWLIST *windows, SETTINGS settings, BOOL running
     }
     else
     {
-        //HMENU foo = GetSubMenu(contextMenu, 3);
+        // HMENU foo = GetSubMenu(contextMenu, 3);
         EnableMenuItem(menu, ID_CONTEXTMENU_WINDOWS, MF_BYCOMMAND | MF_GRAYED);
     }
 
@@ -89,7 +88,6 @@ void updateContextMenu(HMENU *submenu, WINDOWLIST *windows)
 
     for (int i = 0; i < windows->count; i++)
         AppendMenuA(*submenu, MF_STRING, (SUBMENU_ITEM_BASE + i), windows->windows[i].title);
-
 }
 
 BOOL EnumChildProc(HWND hWnd, LPARAM lParam)

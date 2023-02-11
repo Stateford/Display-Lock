@@ -29,34 +29,34 @@
 #define MAX_LOADSTRING 100
 
 // Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-WINDOW_VIEW_CONTROLS windowControls = { 0 };
-SETTINGS settings = { 0 };                              // application settings
+HINSTANCE hInst;                     // current instance
+WCHAR szTitle[MAX_LOADSTRING];       // The title bar text
+WCHAR szWindowClass[MAX_LOADSTRING]; // the main window class name
+WINDOW_VIEW_CONTROLS windowControls = {0};
+SETTINGS settings = {0}; // application settings
 ARGS args = {0};
 BOOL running = FALSE;
 BOOL applicationRunning = TRUE;
-VERSION gVersion = { 0 };
+VERSION gVersion = {0};
 BOOL initalUpdate = FALSE;
 
 // Forward declarations of functions included in this code module:
-ATOM                MyRegisterClass(HINSTANCE hInstance);
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
-INT_PTR CALLBACK    appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+                      _In_opt_ HINSTANCE hPrevInstance,
+                      _In_ LPWSTR lpCmdLine,
+                      _In_ int nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -69,7 +69,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // Perform application initialization:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -88,10 +88,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
-
-
 
 //
 //  FUNCTION: MyRegisterClass()
@@ -104,17 +102,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON));
-    wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_TEST);
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON));
+    wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_TEST);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ICON));
 
     return RegisterClassEx(&wcex);
 }
@@ -131,20 +129,20 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+    hInst = hInstance; // Store instance handle in our global variable
 
-   HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU,
-      CW_USEDEFAULT, 0, 300, 240, NULL, NULL, hInstance, NULL);
+    HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU,
+                             CW_USEDEFAULT, 0, 300, 240, NULL, NULL, hInstance, NULL);
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
 
-   return TRUE;
+    return TRUE;
 }
 
 //
@@ -165,7 +163,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 
     case WM_CREATE:
-        if (settings.checkUpdateStartup) {
+        if (settings.checkUpdateStartup)
+        {
             getVersion(&gVersion);
             initalUpdate = !compareVersion(&gVersion);
         }
@@ -206,7 +205,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
         }
         break;
-        
+
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -254,7 +253,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             if (gVersion.verArr[0] == 0)
                 getVersion(&gVersion);
 
-            if(!compareVersion(&gVersion))
+            if (!compareVersion(&gVersion))
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_UPDATE), hWnd, updateProc);
 
             break;
@@ -268,21 +267,21 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
     }
-        break;
+    break;
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            EndPaint(hWnd, &ps);
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        // TODO: Add any drawing code that uses hdc here...
+        EndPaint(hWnd, &ps);
 
-            if (initalUpdate)
-            {
-                SendMessage(hWnd, WM_COMMAND, LOWORD(ID_HELP_CHECKFORUPDATES), 0);
-                initalUpdate = FALSE;
-            }
+        if (initalUpdate)
+        {
+            SendMessage(hWnd, WM_COMMAND, LOWORD(ID_HELP_CHECKFORUPDATES), 0);
+            initalUpdate = FALSE;
         }
-        break;
+    }
+    break;
     case WM_CLOSE:
         Shell_NotifyIcon(NIM_DELETE, &sysTray);
         shutDown(settings);
@@ -297,7 +296,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
 
 INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -357,7 +355,6 @@ INT_PTR CALLBACK MainWindow(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     }
     return (INT_PTR)FALSE;
 }
-
 
 INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -494,7 +491,6 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         }
         break;
     }
-        
 
     default:
         return DefWindowProc(hDlg, message, wParam, lParam);
@@ -510,15 +506,14 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
     {
         wchar_t version[40];
-        if(getVersionString(version, 40))
+        if (getVersionString(version, 40))
             SetDlgItemText(hDlg, IDC_STATIC_VERSION, version);
-
     }
-    return (INT_PTR)TRUE;
+        return (INT_PTR)TRUE;
 
     case WM_NOTIFY:
-        //if (((LPNMHDR)lParam)->code == NM_CLICK)
-            //ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
+        // if (((LPNMHDR)lParam)->code == NM_CLICK)
+        // ShellExecuteW(NULL, TEXT("open"), TEXT("https://github.com/idietmoran/Display-Lock"), NULL, NULL, SW_SHOWNORMAL);
         break;
 
     case WM_COMMAND:
@@ -545,16 +540,17 @@ INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
     {
         break;
     }
-    return (INT_PTR)TRUE;
+        return (INT_PTR)TRUE;
 
     case WM_NOTIFY:
 
-        switch (((NMHDR*)lParam)->code)
+        switch (((NMHDR *)lParam)->code)
         {
         case NM_CLICK:
         {
-            if (wParam == IDC_UPDATE_LINK) {
-                NMLINK* pNMLink = (NMLINK*)lParam;
+            if (wParam == IDC_UPDATE_LINK)
+            {
+                NMLINK *pNMLink = (NMLINK *)lParam;
                 LITEM iItem = pNMLink->item;
                 ShellExecuteW(
                     NULL,
@@ -562,8 +558,7 @@ INT_PTR CALLBACK updateProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPara
                     iItem.szUrl,
                     NULL,
                     NULL,
-                    SW_HIDE
-                );
+                    SW_HIDE);
                 EndDialog(hDlg, LOWORD(wParam));
                 return (INT_PTR)TRUE;
             }
@@ -596,7 +591,6 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     static APPLICATION_LIST applicationList;
     static APPLICATION_ARGS args;
 
-
     UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
@@ -613,12 +607,12 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         args.applicationList = &applicationList;
         args.clipRunning = &applicationRunning;
 
-        startApplicationThread(&controls.clipThread, cursorLockApplications, (void*)&args);
+        startApplicationThread(&controls.clipThread, cursorLockApplications, (void *)&args);
 
         EnableWindow(controls.settingsButton, FALSE);
         EnableWindow(controls.removeButton, FALSE);
 
-        for(int i = 0; i < applicationList.count; i++)
+        for (int i = 0; i < applicationList.count; i++)
             SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)applicationList.applications[i].application_name);
 
         return (INT_PTR)TRUE;
@@ -628,7 +622,7 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         {
         case IDC_LIST_PROGRAMS:
             int result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
-            if(result != LB_ERR)
+            if (result != LB_ERR)
             {
                 EnableWindow(controls.settingsButton, TRUE);
                 EnableWindow(controls.removeButton, TRUE);
@@ -660,14 +654,14 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
                 DWORD result = WaitForSingleObject(mutex, INFINITE);
 
-                if((result == 0) || (result == WAIT_ABANDONED))
+                if ((result == 0) || (result == WAIT_ABANDONED))
                 {
 
                     APPLICATION_SETTINGS application;
                     ZeroMemory(&application, sizeof(application));
                     createApplicationSettings(ofn.lpstrFile, &application);
 
-                    if(addApplication(&applicationList, application))
+                    if (addApplication(&applicationList, application))
                         SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)application.application_name);
                 }
                 ReleaseMutex(mutex);
@@ -680,12 +674,13 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
             int current_selected = 0;
             int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
-            if (result != LB_ERR) {
+            if (result != LB_ERR)
+            {
 
                 HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
                 DWORD result = WaitForSingleObject(mutex, INFINITE);
 
-                if((result == 0) || (result == WAIT_ABANDONED))
+                if ((result == 0) || (result == WAIT_ABANDONED))
                 {
                     SendMessage(controls.listView, LB_DELETESTRING, current_selected, 0);
                     removeApplication(&applicationList, current_selected);
@@ -695,7 +690,7 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
             }
 
             result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
-            if(result != LB_ERR)
+            if (result != LB_ERR)
             {
                 EnableWindow(controls.settingsButton, TRUE);
                 EnableWindow(controls.removeButton, TRUE);
@@ -706,18 +701,19 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 EnableWindow(controls.removeButton, FALSE);
             }
         }
-            break;
+        break;
         case IDC_BTN_APP_SETTINGS:
         {
             int current_selected = 0;
             int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
 
-            if (result != LB_ERR) {
+            if (result != LB_ERR)
+            {
 
                 HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
                 DWORD result = WaitForSingleObject(mutex, INFINITE);
 
-                if((result == 0) || (result == WAIT_ABANDONED))
+                if ((result == 0) || (result == WAIT_ABANDONED))
                 {
                     APPLICATION_SETTINGS *settings = &applicationList.applications[current_selected];
                     DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)settings);
@@ -726,7 +722,7 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                 CloseHandle(mutex);
             }
         }
-            break;
+        break;
         default:
             break;
         }
@@ -738,7 +734,7 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         closeApplicationList(&applicationList);
 
         HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-        if(mutex != NULL)
+        if (mutex != NULL)
         {
             ReleaseMutex(mutex);
             CloseHandle(mutex);
@@ -752,14 +748,13 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     return (INT_PTR)FALSE;
 }
 
-
 INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     UNREFERENCED_PARAMETER(lParam);
     static HWND enabled = NULL;
     static HWND borderless = NULL;
     static HWND fullscreen = NULL;
-    static APPLICATION_SETTINGS* settings = NULL;
+    static APPLICATION_SETTINGS *settings = NULL;
 
     switch (message)
     {
@@ -768,7 +763,7 @@ INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         enabled = GetDlgItem(hDlg, IDC_CHK_APP_ENABLED);
         borderless = GetDlgItem(hDlg, IDC_CHK_APP_BORDERLESS);
         fullscreen = GetDlgItem(hDlg, IDC_CHK_APP_FULLSCREEN);
-        settings = (APPLICATION_SETTINGS*)lParam;
+        settings = (APPLICATION_SETTINGS *)lParam;
         SendMessage(enabled, BM_SETCHECK, settings->enabled, 0);
         SendMessage(borderless, BM_SETCHECK, settings->borderless, 0);
         SendMessage(fullscreen, BM_SETCHECK, settings->fullscreen, 0);
@@ -781,7 +776,7 @@ INT_PTR CALLBACK appSettingsProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM 
         {
         case IDC_BTN_APP_SETTINGS_OK:
         {
-            if(settings != NULL)
+            if (settings != NULL)
             {
                 int is_enabled = SendMessage(enabled, BM_GETCHECK, 0, 0);
                 int is_borderless = SendMessage(borderless, BM_GETCHECK, 0, 0);

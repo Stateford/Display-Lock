@@ -18,12 +18,13 @@
 #pragma once
 #include "common.h"
 
-typedef struct STRING {
+typedef struct STRING
+{
     unsigned int size;
-    char* data;
+    char *data;
 } STRING;
 
-void getLatestVersion(VERSION* version);
-void resizeString(STRING*, int);
-void parseVersionString(VERSION*, STRING*);
-BOOL compareVersion(const VERSION* current);
+void getLatestVersion(VERSION *version);
+void resizeString(STRING *, int);
+void parseVersionString(VERSION *, STRING *);
+BOOL compareVersion(const VERSION *current);

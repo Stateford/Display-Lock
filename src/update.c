@@ -20,19 +20,20 @@
 #include <Windows.h>
 #include <winhttp.h>
 
-
-void resizeString(STRING* string, int size) {
+void resizeString(STRING *string, int size)
+{
     const int newSize = string->size + size;
-    char* data = string->data;
-    if (string->data != NULL) {
-        string->data = (char*)realloc(string->data, ((size_t)newSize + 1));
+    char *data = string->data;
+    if (string->data != NULL)
+    {
+        string->data = (char *)realloc(string->data, ((size_t)newSize + 1));
         if (string->data == NULL)
             free(data);
         string->size = size;
     }
 }
 
-void parseVersionString(VERSION* version, STRING* response)
+void parseVersionString(VERSION *version, STRING *response)
 {
     char major[5] = "";
     char minor[5] = "";
@@ -55,7 +56,7 @@ void parseVersionString(VERSION* version, STRING* response)
     }
 }
 
-void getLatestVersion(VERSION* version)
+void getLatestVersion(VERSION *version)
 {
     HINTERNET hSession;
     HINTERNET hConnect;
@@ -68,7 +69,7 @@ void getLatestVersion(VERSION* version)
 
     int count = 0;
     response.size = 0;
-    response.data = (char*)calloc(1024, sizeof(char));
+    response.data = (char *)calloc(1024, sizeof(char));
     response.data[0] = '\0';
 
     memset(&hSession, 0, sizeof(HINTERNET));
@@ -80,8 +81,7 @@ void getLatestVersion(VERSION* version)
         WINHTTP_ACCESS_TYPE_DEFAULT_PROXY,
         WINHTTP_NO_PROXY_NAME,
         WINHTTP_NO_PROXY_BYPASS,
-        0
-    );
+        0);
 
     if (!hSession)
         goto CLEANUP;
@@ -90,8 +90,7 @@ void getLatestVersion(VERSION* version)
         hSession,
         TEXT("stateford.github.io"),
         INTERNET_DEFAULT_HTTPS_PORT,
-        0
-    );
+        0);
 
     if (!hConnect)
         goto CLEANUP;
@@ -103,8 +102,7 @@ void getLatestVersion(VERSION* version)
         NULL,
         WINHTTP_NO_REFERER,
         WINHTTP_DEFAULT_ACCEPT_TYPES,
-        WINHTTP_FLAG_SECURE
-    );
+        WINHTTP_FLAG_SECURE);
 
     if (!hRequest)
         goto CLEANUP;
@@ -116,8 +114,7 @@ void getLatestVersion(VERSION* version)
         0,
         0,
         0,
-        0
-    );
+        0);
 
     if (bResults)
     {
@@ -163,7 +160,6 @@ void getLatestVersion(VERSION* version)
 
     parseVersionString(version, &response);
 
-
 CLEANUP:
     if (hConnect)
         WinHttpCloseHandle(hConnect);
@@ -175,7 +171,7 @@ CLEANUP:
         free(response.data);
 }
 
-BOOL compareVersion(const VERSION* current)
+BOOL compareVersion(const VERSION *current)
 {
     VERSION latest;
     memset(&latest, 0, sizeof(latest));

@@ -30,7 +30,6 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
     settingsControls->hotkey = GetDlgItem(hDlg, IDC_HOTKEY);
     settingsControls->checkForUpdatesStartup = GetDlgItem(hDlg, IDC_CHECK_STARTUP_UPDATES);
     settingsControls->settingsChanged = FALSE;
-    
 }
 
 void setSettingsDlg(HWND hDlg, SETTINGS settings)
@@ -44,10 +43,10 @@ void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
     settings->version = 0;
     for (unsigned int i = 0; i < wcslen(versionStr); i++)
     {
-        if(versionStr[i] >= '0' && versionStr[i] <= '9')
+        if (versionStr[i] >= '0' && versionStr[i] <= '9')
             settings->version += (int)versionStr[i] - '0';
     }
-    
+
     settings->borderless = FALSE;
     settings->foreground = FALSE;
     settings->fullScreen = FALSE;
@@ -81,9 +80,9 @@ BOOL findPath(wchar_t *outPath)
     if (!SUCCEEDED(hr))
         return FALSE;
 
-        wcscpy(outPath, path);
-        LPCWSTR x = L"DisplayLock\\settings.DLOCK";
-        PathAppend(outPath, x);
+    wcscpy(outPath, path);
+    LPCWSTR x = L"DisplayLock\\settings.DLOCK";
+    PathAppend(outPath, x);
 
     CoTaskMemFree(path);
     return TRUE;
@@ -123,7 +122,6 @@ BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
 
     fread(settings, sizeof(SETTINGS), 1, file);
 
-
     fclose(file);
     _fcloseall();
 
@@ -138,7 +136,6 @@ BOOL writeSettings(SETTINGS settings, wchar_t *path)
     // if loadstring could not be read, do not write the file
     if (settings.version <= 0 || strcmp(settings.header, "DLOCK") != 0)
         return FALSE;
-
 
     FILE *file = _wfopen(path, TEXT("wb"));
 

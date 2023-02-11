@@ -50,7 +50,6 @@ typedef struct APPLICATION_SETTINGS APPLICATION_SETTINGS;
 typedef struct APPLICATION_LIST APPLICATION_LIST;
 typedef struct APPLICATION_ARGS APPLICATION_ARGS;
 
-
 struct APPLICATION_VIEW_CONTROLS
 {
     HWND addButton;
@@ -127,8 +126,9 @@ struct SETTINGS_VIEW_CONTROLS
 struct MENU
 {
     void (*closeThread)(HANDLE thread, BOOL *status);
-    void (*updateComboBox)(HWND control, WINDOWLIST *windows, void(*callback)(WINDOWLIST*));
-    BOOL(*startThread)(HANDLE *thread, int(*callback)(void* parameters), void* args);
+    void (*updateComboBox)(HWND control, WINDOWLIST *windows, void (*callback)(WINDOWLIST *));
+    BOOL (*startThread)
+    (HANDLE *thread, int (*callback)(void *parameters), void *args);
 };
 
 struct SETTINGS
@@ -157,8 +157,10 @@ struct APPLICATION_ARGS
     BOOL *clipRunning;
 };
 
-union VERSION {
-    struct _version {
+union VERSION
+{
+    struct _version
+    {
         unsigned int major;
         unsigned int minor;
         unsigned int patch;

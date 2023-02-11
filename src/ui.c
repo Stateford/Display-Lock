@@ -24,12 +24,11 @@
 #include "settings.h"
 #include "applications.h"
 
-
 BOOL getVersionString(wchar_t *buffer, int bufferSize)
 {
     wchar_t version[2048];
     wchar_t fileName[MAX_PATH];
-    
+
     BOOL result;
 
     result = GetModuleFileName(NULL, fileName, MAX_PATH);
@@ -60,13 +59,13 @@ BOOL getVersionString(wchar_t *buffer, int bufferSize)
     return TRUE;
 }
 
-BOOL getVersion(VERSION* gVersion)
+BOOL getVersion(VERSION *gVersion)
 {
     wchar_t version[2048];
     wchar_t fileName[MAX_PATH];
     BOOL result;
     UINT size;
-    VS_FIXEDFILEINFO* verInfo = NULL;
+    VS_FIXEDFILEINFO *verInfo = NULL;
     DWORD dwVersionBufferSize;
 
     result = GetModuleFileName(NULL, fileName, MAX_PATH);
@@ -80,7 +79,7 @@ BOOL getVersion(VERSION* gVersion)
     if (!result)
         return FALSE;
 
-    result = VerQueryValue(version, L"\\", (LPVOID)& verInfo, &size);
+    result = VerQueryValue(version, L"\\", (LPVOID)&verInfo, &size);
 
     if (!result)
         return FALSE;
@@ -97,7 +96,7 @@ BOOL getVersion(VERSION* gVersion)
     return TRUE;
 }
 
-void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * settings, SETTINGS * previousSettings, BOOL running)
+void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings, SETTINGS *previousSettings, BOOL running)
 {
     SendMessage(settingsControls.borderless, BM_SETCHECK, settings->borderless, 0);
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
@@ -113,15 +112,14 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
     EnableWindow(settingsControls.checkForUpdatesStartup, !running);
 }
 
-
-void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
+void settingsSave(HWND hWnd, SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
 {
     settings.borderless = (BOOL)SendMessage(settingsControls.borderless, BM_GETCHECK, 0, 0);
     settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
     settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
-    
+
     *previousSettings = settings;
 }
 
@@ -133,7 +131,7 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
     SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
-    //SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
+    // SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 
 void initalizeWindowView(HWND hDlg, MENU *menu, SETTINGS *settings, BOOL *running, WINDOW_VIEW_CONTROLS *windowControls, ARGS *args)
@@ -158,7 +156,7 @@ void mainWindowInit(HWND hDlg, MAIN_WINDOW_CONTROLS *mainWindowControls)
 {
     // initalize the tab controls
     mainWindowControls->tabCtrl = GetDlgItem(hDlg, IDC_TAB_CONTROL);
-    TCITEM tci = { 0 };
+    TCITEM tci = {0};
     tci.mask = TCIF_TEXT;
     tci.pszText = L"Window";
     TabCtrl_InsertItem(mainWindowControls->tabCtrl, WINDOW_VIEW, &tci);
@@ -174,7 +172,7 @@ void windowsButtonStart(WINDOW_VIEW_CONTROLS *windowControls, ARGS *args, BOOL *
 {
     *running = TRUE;
     args->selectedWindow = windowControls->windows.windows[windowSelection];
-    startThread(&windowControls->clipThread, cursorLock, (void*)args);
+    startThread(&windowControls->clipThread, cursorLock, (void *)args);
     EnableWindow(windowControls->startButton, FALSE);
     EnableWindow(windowControls->stopButton, TRUE);
     EnableWindow(windowControls->comboBox, FALSE);
@@ -192,7 +190,7 @@ void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls)
 void invokeReadSettings(SETTINGS *settings)
 {
     // if this fails, an error stating config could not read/write
-        // program will continue without saving a config
+    // program will continue without saving a config
     wchar_t buff[4];
     int strSize = LoadString(GetModuleHandle(NULL), IDS_BUILD, buff, 4);
 

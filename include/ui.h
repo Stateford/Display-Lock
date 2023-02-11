@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-BOOL getVersionString(wchar_t* buffer, int bufferSize);
+BOOL getVersionString(wchar_t *buffer, int bufferSize);
 BOOL getVersion(VERSION *version);
 void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings, SETTINGS *previousSettings, BOOL running);
 void settingsSave(HWND hWnd, SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings);
