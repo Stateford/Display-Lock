@@ -41,7 +41,7 @@ void updateComboBox(HWND control, WINDOWLIST *windows, void(*callback)(WINDOWLIS
     SendMessage(control, CB_SETCURSEL, 0, 0);
 }
 
-BOOL startThread(HANDLE *thread, unsigned int(_stdcall *callback)(void* parameters), void *args)
+BOOL startThread(HANDLE *thread, int(*callback)(void* parameters), void *args)
 {
     // TODO: check better error checking
     *thread = (HANDLE)_beginthreadex(NULL, 0, callback, args, 0, NULL);

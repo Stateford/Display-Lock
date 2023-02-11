@@ -54,7 +54,7 @@ namespace Tests
             Logger::WriteMessage("findPath()...");
 
             wchar_t path[MAX_PATH];
-            BOOL res = findPath(path, sizeof(path));
+            BOOL res = findPath(path);
 
             Assert::AreEqual(res, TRUE);
             Logger::WriteMessage(path);

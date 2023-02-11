@@ -156,7 +156,7 @@ inline BOOL checkProcess(WINDOW activeWindow)
 }
 
 // threaded function to lock the cursor to specified window
-unsigned int CALLBACK cursorLock(void *arguments)
+int CALLBACK cursorLock(void *arguments)
 {
     // TODO: reimplement the cursor lock
     ARGS *args = (ARGS *)arguments;

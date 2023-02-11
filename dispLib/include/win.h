@@ -39,4 +39,4 @@ void disableFullScreen(WINDOW, PREVIOUSRECT*);
 
 BOOL checkProcess(WINDOW);
 
-unsigned int CALLBACK cursorLock(void* arguments);
+int CALLBACK cursorLock(void* arguments);

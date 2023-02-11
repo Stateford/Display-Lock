@@ -6,7 +6,6 @@
 #include "Shlwapi.h"
 #include <iphlpapi.h>
 #include <TlHelp32.h>
-#include <process.h>
 
 
 BOOL initApplicationView(HWND hDlg, APPLICATION_VIEW_CONTROLS *applicationControls)
@@ -23,10 +22,9 @@ BOOL initApplicationView(HWND hDlg, APPLICATION_VIEW_CONTROLS *applicationContro
 
 BOOL readApplicationList(APPLICATION_LIST* applicationList, const wchar_t* path)
 {
-    FILE* file = NULL;
-    errno_t result = _wfopen_s(&file, path, TEXT("rb"));
+    FILE* file = _wfopen(path, TEXT("rb"));
 
-    if(result !=0 || file == NULL)
+    if(file == NULL)
     {
         applicationList->count = 0;
         applicationList->applications = NULL;
@@ -48,10 +46,9 @@ BOOL readApplicationList(APPLICATION_LIST* applicationList, const wchar_t* path)
 
 BOOL writeApplicationList(APPLICATION_LIST* applicationList, const wchar_t* path)
 {
-    FILE* file = NULL;
-    errno_t result = _wfopen_s(&file, path, TEXT("wb"));
+    FILE* file = _wfopen(path, TEXT("wb"));
 
-    if(result != 0 || file == NULL)
+    if(file == NULL)
         return FALSE;
 
     fwrite(&applicationList->count, sizeof(applicationList->count), 1, file);
@@ -132,7 +129,7 @@ BOOL removeApplication(APPLICATION_LIST* applicationList, int index)
 BOOL initApplicationList(APPLICATION_LIST* applicationList)
 {
     wchar_t path[MAX_PATH];
-    createApplicationDirectory(path, sizeof(path));
+    createApplicationDirectory(path);
     readApplicationList(applicationList, path);
     return TRUE;
 }
@@ -140,7 +137,7 @@ BOOL initApplicationList(APPLICATION_LIST* applicationList)
 BOOL closeApplicationList(APPLICATION_LIST* applicationList)
 {
     wchar_t path[MAX_PATH];
-    createApplicationDirectory(path, sizeof(path));
+    createApplicationDirectory(path);
 
     writeApplicationList(applicationList, path);
 
@@ -150,14 +147,14 @@ BOOL closeApplicationList(APPLICATION_LIST* applicationList)
     return TRUE;
 }
 
-BOOL createApplicationDirectory(wchar_t *outPath, const size_t size)
+BOOL createApplicationDirectory(wchar_t *outPath)
 {
     PWSTR path;
 
     if (!SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
         return FALSE;
 
-    wcscpy_s(outPath, size, path);
+    wcscpy(outPath, path);
 
     // create directory
     PathAppend(outPath, TEXT("DisplayLock"));
@@ -177,8 +174,8 @@ BOOL createApplicationSettings(const wchar_t* appPath, APPLICATION_SETTINGS* app
     if(basename == appPath)
         return FALSE;
 
-    wcscpy_s(application->application_path, sizeof(application->application_path), appPath);
-    wcscpy_s(application->application_name, sizeof(application->application_name), basename);
+    wcscpy(application->application_path, appPath);
+    wcscpy(application->application_name, basename);
     application->borderless = FALSE;
     application->fullscreen = FALSE;
     application->enabled = TRUE;
@@ -186,7 +183,7 @@ BOOL createApplicationSettings(const wchar_t* appPath, APPLICATION_SETTINGS* app
     return TRUE;
 }
 
-BOOL startApplicationThread(HANDLE *thread, unsigned int(_stdcall *callback)(void* parameters), void *args)
+BOOL startApplicationThread(HANDLE *thread, int(*callback)(void* parameters), void *args)
 {
     // TODO: check better error checking
     *thread = (HANDLE)_beginthreadex(NULL, 0, callback, args, 0, NULL);
@@ -236,7 +233,7 @@ DWORD getPidFromName(const wchar_t* name)
     {
         while (Process32Next(snapshot, &entry) == TRUE)
         {
-            if (_wcsicmp(entry.szExeFile, name) == 0)
+            if (wcsicmp(entry.szExeFile, name) == 0)
             {
                 CloseHandle(snapshot);
                 return entry.th32ProcessID;
@@ -249,7 +246,7 @@ DWORD getPidFromName(const wchar_t* name)
 }
 
 
-unsigned int CALLBACK cursorLockApplications(void* parameters)
+int CALLBACK cursorLockApplications(void* parameters)
 {
     APPLICATION_ARGS* args = (APPLICATION_ARGS*)parameters;
     POINT cursorPosition;
@@ -262,51 +259,53 @@ unsigned int CALLBACK cursorLockApplications(void* parameters)
 
             if(application.enabled)
             {
-                EnumWindowsProcPIDArgs proc_args;
-                proc_args.pid = getPidFromName(application.application_name);
-                proc_args.hwnd = NULL;
+                EnumWindowsProcPIDArgs args;
+                args.pid = getPidFromName(application.application_name);
+                args.hwnd = NULL;
 
-                if(proc_args.pid != 0)
-                    EnumWindows(EnumWindowsProcPID, (LPARAM)&proc_args);
+                if(args.pid != 0)
+                    EnumWindows(EnumWindowsProcPID, (LPARAM)&args);
 
-                if(proc_args.hwnd != NULL)
+                if(args.hwnd != NULL)
                 {
+                    RECT rect;
+                    GetWindowRect(args.hwnd, &rect);
 
                     if(application.borderless)
                     {
-                        const long long borderlessStyle = GetWindowLongPtr(proc_args.hwnd, GWL_STYLE);
-                        const long long borderlessStyleEx = GetWindowLongPtr(proc_args.hwnd, GWL_EXSTYLE);
+                        const long long borderlessStyle = GetWindowLongPtr(args.hwnd, GWL_STYLE);
+                        const long long borderlessStyleEx = GetWindowLongPtr(args.hwnd, GWL_EXSTYLE);
 
                         const long long mask = WS_OVERLAPPED | WS_THICKFRAME | WS_SYSMENU | WS_CAPTION;
                         const long long exMask = WS_EX_WINDOWEDGE;
 
                         if((borderlessStyle & mask) != 0)
-                            SetWindowLongPtr(proc_args.hwnd, GWL_STYLE, borderlessStyle &~ mask);
+                            SetWindowLongPtr(args.hwnd, GWL_STYLE, borderlessStyle &~ mask);
 
                         if((borderlessStyleEx & exMask) != 0)
-                            SetWindowLongPtr(proc_args.hwnd, GWL_EXSTYLE, borderlessStyleEx &~ exMask);
+                            SetWindowLongPtr(args.hwnd, GWL_EXSTYLE, borderlessStyleEx &~ exMask);
                     }
                     else if(application.fullscreen)
                     {
                         RECT rect = {0};
-                        GetClientRect(proc_args.hwnd, &rect);
-                        ClientToScreen(proc_args.hwnd, (LPPOINT)&rect.left);
-                        ClientToScreen(proc_args.hwnd, (LPPOINT)&rect.right);
+                        GetClientRect(args.hwnd, &rect);
+                        ClientToScreen(args.hwnd, (LPPOINT)&rect.left);
+                        ClientToScreen(args.hwnd, (LPPOINT)&rect.right);
 
                         if(rect.left != 0 || rect.top != 0 || rect.right != GetSystemMetrics(SM_CXSCREEN) || rect.bottom != GetSystemMetrics(SM_CYSCREEN))
-                            SetWindowPos(proc_args.hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
+                            SetWindowPos(args.hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
                     }
 
                     // TODO: lock cursor
                     HWND active = GetForegroundWindow();
 
-                    if(proc_args.hwnd == active)
+                    if(args.hwnd == active)
                     {
                         GetCursorPos(&cursorPosition);
                         RECT windowRect = {0};
-                        GetClientRect(proc_args.hwnd, &windowRect);
-                        ClientToScreen(proc_args.hwnd, (LPPOINT)&windowRect.left);
-                        ClientToScreen(proc_args.hwnd, (LPPOINT)&windowRect.right);
+                        GetClientRect(args.hwnd, &windowRect);
+                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.left);
+                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.right);
 
                         if((cursorPosition.y <= windowRect.bottom && cursorPosition.y >= windowRect.top) && (cursorPosition.x >= windowRect.left && cursorPosition.x <= windowRect.right))
                             ClipCursor(&windowRect);

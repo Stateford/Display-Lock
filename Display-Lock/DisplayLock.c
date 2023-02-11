@@ -184,7 +184,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch (lParam)
         {
         case WM_LBUTTONDBLCLK:
-            showMainWindow(hWnd);
+            showMainWindow(hWnd, &sysTray);
             break;
         case WM_RBUTTONDOWN:
             showContext(hWnd, &windowControls.windows, settings, running);
@@ -422,7 +422,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
     {
     case WM_SHOWWINDOW:
         EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
-        settingsShowWindow(settingsControls, &settings, running);
+        settingsShowWindow(settingsControls, &settings, &previousSettings, running);
 
         // when the window is being hidden, reset settings
         // when the window is being shown, copy the previous settings
@@ -444,7 +444,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
         case NOTIFY_SETTINGS_CHANGED:
             previousSettings = settings;
             settingsControls.settingsChanged = TRUE;
-            settingsShowWindow(settingsControls, &settings, running);
+            settingsShowWindow(settingsControls, &settings, &previousSettings, running);
             break;
         case IDC_CHECK_SETTINGS_BORDERLESS:
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
@@ -480,7 +480,7 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 
         case IDC_BUTTON_SETTINGS_SAVE:
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), FALSE);
-            settingsSave(settingsControls, settings, &previousSettings);
+            settingsSave(parent, settingsControls, settings, &previousSettings);
             break;
 
         case IDC_BUTTON_SETTINGS_CANCEL:

@@ -16,13 +16,13 @@ BOOL addApplication(APPLICATION_LIST* applicationList, APPLICATION_SETTINGS appl
 BOOL removeApplication(APPLICATION_LIST* applicationList, int index);
 BOOL initApplicationList(APPLICATION_LIST* applicationList);
 BOOL closeApplicationList(APPLICATION_LIST* applicationList);
-BOOL createApplicationDirectory(wchar_t *outPath, const size_t size);
+BOOL createApplicationDirectory(wchar_t *outPath);
 BOOL createApplicationSettings(const wchar_t* appPath, APPLICATION_SETTINGS* application);
 
-BOOL startApplicationThread(HANDLE *thread, unsigned int(_stdcall *callback)(void* parameters), void *args);
+BOOL startApplicationThread(HANDLE *thread, int(*callback)(void* parameters), void *args);
 void closeApplicationThread(HANDLE thread, BOOL *status);
 DWORD getPidFromName(const wchar_t* name);
 
 BOOL CALLBACK EnumWindowsProcPID(HWND hwnd, LPARAM lParam);
 
-unsigned int CALLBACK cursorLockApplications(void* parameters);
+int CALLBACK cursorLockApplications(void* parameters);

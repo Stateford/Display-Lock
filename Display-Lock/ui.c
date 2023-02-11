@@ -88,7 +88,7 @@ BOOL getVersion(VERSION* gVersion)
     int major = HIWORD(verInfo->dwFileVersionMS);
     int minor = LOWORD(verInfo->dwFileVersionMS);
     int build = HIWORD(verInfo->dwFileVersionLS);
-    // int revision = LOWORD(verInfo->dwFileVersionLS);
+    int revision = LOWORD(verInfo->dwFileVersionLS);
 
     gVersion->version.major = major;
     gVersion->version.minor = minor;
@@ -97,7 +97,7 @@ BOOL getVersion(VERSION* gVersion)
     return TRUE;
 }
 
-void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * settings, BOOL running)
+void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * settings, SETTINGS * previousSettings, BOOL running)
 {
     SendMessage(settingsControls.borderless, BM_SETCHECK, settings->borderless, 0);
     SendMessage(settingsControls.foreground, BM_SETCHECK, settings->foreground, 0);
@@ -114,7 +114,7 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS * sett
 }
 
 
-void settingsSave(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
+void settingsSave(HWND hWnd,SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
 {
     settings.borderless = (BOOL)SendMessage(settingsControls.borderless, BM_GETCHECK, 0, 0);
     settings.foreground = (BOOL)SendMessage(settingsControls.foreground, BM_GETCHECK, 0, 0);
@@ -199,7 +199,7 @@ void invokeReadSettings(SETTINGS *settings)
     if (strSize != 0)
     {
         wchar_t path[MAX_PATH];
-        findPath(path, sizeof(path));
+        findPath(path);
         readSettings(settings, buff, path);
     }
     else
@@ -209,6 +209,6 @@ void invokeReadSettings(SETTINGS *settings)
 void shutDown(SETTINGS settings)
 {
     wchar_t path[MAX_PATH];
-    createDirectory(path, sizeof(path));
+    createDirectory(path);
     writeSettings(settings, path);
 }

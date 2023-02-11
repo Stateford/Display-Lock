@@ -128,7 +128,7 @@ struct MENU
 {
     void (*closeThread)(HANDLE thread, BOOL *status);
     void (*updateComboBox)(HWND control, WINDOWLIST *windows, void(*callback)(WINDOWLIST*));
-    BOOL(*startThread)(HANDLE *thread, unsigned int(_stdcall *callback)(void* parameters), void* args);
+    BOOL(*startThread)(HANDLE *thread, int(*callback)(void* parameters), void* args);
 };
 
 struct SETTINGS
