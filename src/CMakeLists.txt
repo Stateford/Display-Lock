@@ -1,17 +1,13 @@
 
 enable_language("RC")
 
+add_subdirectory(components)
+
 add_executable(${PROJECT_NAME} WIN32
-    DisplayLock.c
+    main.c
     ui.c
-    menu.c
-    notify.c
-    settings.c
-    update.c
-    win.c
-    applications.c
 )
-target_link_libraries(${PROJECT_NAME} PRIVATE version Shlwapi winhttp iphlpapi)
-target_compile_definitions(${PROJECT_NAME} PUBLIC -DUNICODE)
+target_link_libraries(${PROJECT_NAME} PUBLIC display_lock_components)
+target_include_directories(display_lock_components PUBLIC resources)
 
 add_subdirectory(resources)

@@ -23,7 +23,7 @@
             "name": "windows",
             "displayName": "Windows Config",
             "hidden": true,
-            "description": "Sets Ninja generator, build and install directory",
+            "description": "Sets MSVC generator, build and install directory",
             "generator": "Visual Studio 17 2022",
             "condition": {
                 "type": "equals",
@@ -33,18 +33,22 @@
         },
         {
             "name": "windows-debug",
-            "inherits": ["default", "windows"],
+            "inherits": [
+                "default",
+                "windows"
+            ],
             "displayName": "Windows Debug",
-            "description": "Sets Ninja generator, build and install directory",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
             "name": "windows-release",
-            "inherits": ["default", "windows"],
+            "inherits": [
+                "default",
+                "windows"
+            ],
             "displayName": "Windows Release",
-            "description": "Sets Ninja generator, build and install directory",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release"
             }
@@ -52,12 +56,14 @@
     ],
     "buildPresets": [
         {
-            "name": "windows-debug",
-            "configurePreset": "windows-debug"
+            "name": "Debug",
+            "configurePreset": "windows-debug",
+            "configuration": "Debug"
         },
         {
-            "name": "windows-release",
-            "configurePreset": "windows-release"
+            "name": "Release",
+            "configurePreset": "windows-release",
+            "configuration": "Release"
         }
     ],
     "testPresets": [
@@ -65,8 +71,13 @@
             "name": "default",
             "hidden": true,
             "configurePreset": "default",
-            "output": {"outputOnFailure": true},
-            "execution": {"noTestsAction": "error", "stopOnFailure": true}
+            "output": {
+                "outputOnFailure": true
+            },
+            "execution": {
+                "noTestsAction": "error",
+                "stopOnFailure": true
+            }
         },
         {
             "name": "windows-debug",

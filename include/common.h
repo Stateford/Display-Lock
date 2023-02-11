@@ -18,7 +18,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "resources/resource.h"
+#include "resource.h"
 
 #define WINDOW_VIEW 0
 #define SETTINGS_VIEW 1

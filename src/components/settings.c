@@ -37,7 +37,7 @@ void setSettingsDlg(HWND hDlg, SETTINGS settings)
     return;
 }
 
-void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
+void defaultSettings(SETTINGS *settings, const wchar_t *versionStr)
 {
     strcpy(settings->header, "DLOCK");
     settings->version = 0;
@@ -54,7 +54,7 @@ void defaultSettings(SETTINGS *settings, wchar_t *versionStr)
     settings->checkUpdateStartup = TRUE;
 }
 
-BOOL checkVersion(SETTINGS *settings, wchar_t *versionStr)
+BOOL checkVersion(SETTINGS *settings, const wchar_t *versionStr)
 {
     if (strcmp(settings->header, "DLOCK") != 0 || wcslen(versionStr) == 0)
         return FALSE;
@@ -108,7 +108,7 @@ BOOL createDirectory(wchar_t *outPath)
     return TRUE;
 }
 
-BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
+BOOL readSettings(SETTINGS *settings, const wchar_t *versionStr, const wchar_t *path)
 {
     FILE *file = _wfopen(path, TEXT("rb"));
 
@@ -131,7 +131,7 @@ BOOL readSettings(SETTINGS *settings, wchar_t *versionStr, wchar_t *path)
     return TRUE;
 }
 
-BOOL writeSettings(SETTINGS settings, wchar_t *path)
+BOOL writeSettings(SETTINGS settings, const wchar_t *path)
 {
     // if loadstring could not be read, do not write the file
     if (settings.version <= 0 || strcmp(settings.header, "DLOCK") != 0)
