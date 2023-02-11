@@ -40,6 +40,3 @@
 #include "settings.h"
 #include "menu.h"
 #include "win.h"
-#include "applications.h"
-#include "update.h"
-#include "common.h"
