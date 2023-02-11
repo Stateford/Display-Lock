@@ -18,7 +18,7 @@
 #pragma once
 
 #include <Windows.h>
-#include "../../Display-Lock/resources/resource.h"
+#include "resources/resource.h"
 
 #define WINDOW_VIEW 0
 #define SETTINGS_VIEW 1
