@@ -13,3 +13,8 @@ makefile
 */Debug/
 /.vscode/
 */.vscode/
+build/
+out/
+.mypy_cache/
+*/.mypy_cache/
+*/.vs/
