@@ -10,7 +10,7 @@ INT_PTR CALLBACK about(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_INITDIALOG:
     {
         wchar_t version[40];
-        if (getVersionString(version, 40))
+        if (getVersionString(version, sizeof(version) / sizeof(wchar_t)))
             SetDlgItemText(hDlg, IDC_STATIC_VERSION, version);
     }
         return (INT_PTR)TRUE;

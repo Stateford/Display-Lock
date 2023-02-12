@@ -1,10 +1,12 @@
-name: CMake
+name: Build
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
+    tags:
+      - '*'
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "develop" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -26,7 +28,7 @@ jobs:
         python-version: 3.11
         cache: pip
         architecture: x64
-        
+
     - name: Python Depdendeicnes
       run: |
         python3 -m pip install --upgrade pip
@@ -55,4 +57,18 @@ jobs:
       with:
         # Artifact name
         name: Display Lock
-        path: ${{github.workspace}}/build/**/*.exe
+        path: ${{github.workspace}}/build/src/release/Display-Lock.exe
+
+  deploy:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+
+    - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+      name: Create release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: "${{github.workspace}}/build/src/release/Display-Lock.exe"
+        bodyFile: "${{github.workspace}}/CHANGELOG.md"

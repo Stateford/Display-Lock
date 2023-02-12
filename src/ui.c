@@ -23,6 +23,8 @@
 #include "common.h"
 #include "settings.h"
 #include "applications.h"
+#include "version.h"
+
 
 BOOL getVersionString(wchar_t *buffer, int bufferSize)
 {
@@ -51,10 +53,27 @@ BOOL getVersionString(wchar_t *buffer, int bufferSize)
 
     int major = HIWORD(verInfo->dwFileVersionMS);
     int minor = LOWORD(verInfo->dwFileVersionMS);
-    int build = HIWORD(verInfo->dwFileVersionLS);
-    int revision = LOWORD(verInfo->dwFileVersionLS);
+    int patch = HIWORD(verInfo->dwFileVersionLS);
+    int build = LOWORD(verInfo->dwFileVersionLS);
 
-    swprintf(buffer, bufferSize, L"Version: %d.%d.%d.%d", major, minor, build, revision);
+    int header_major = VERSION_MAJOR;
+    int header_minor = VERSION_MINOR;
+    int header_patch = VERSION_REVISION;
+    int header_build = VERSION_BUILD;
+
+    BOOL use_header_version = FALSE;
+
+    if (major < header_major)
+        use_header_version = TRUE;
+    else if (minor < header_minor)
+        use_header_version = TRUE;
+    else if (patch < header_patch)
+        use_header_version = TRUE;
+
+    if(use_header_version)
+        swprintf(buffer, bufferSize, L"Version: %d.%d.%d.%d", header_major, header_minor, header_patch, header_build);
+    else
+        swprintf(buffer, bufferSize, L"Version: %d.%d.%d.%d", major, minor, patch, build);
 
     return TRUE;
 }
@@ -86,12 +105,12 @@ BOOL getVersion(VERSION *gVersion)
 
     int major = HIWORD(verInfo->dwFileVersionMS);
     int minor = LOWORD(verInfo->dwFileVersionMS);
-    int build = HIWORD(verInfo->dwFileVersionLS);
+    int patch = HIWORD(verInfo->dwFileVersionLS);
     int revision = LOWORD(verInfo->dwFileVersionLS);
 
     gVersion->version.major = major;
     gVersion->version.minor = minor;
-    gVersion->version.patch = build;
+    gVersion->version.patch = patch;
 
     return TRUE;
 }
