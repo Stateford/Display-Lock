@@ -55,4 +55,4 @@ jobs:
       with:
         # Artifact name
         name: Display Lock
-        path: ${{github.workspace}}/build/**/*.exe
+        path: ${{github.workspace}}/build/src/release/Display-Lock.exe
