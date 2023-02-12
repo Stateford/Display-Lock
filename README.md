@@ -1,7 +1,7 @@
 # Display Lock
 ![CI](https://github.com/Stateford/Display-Lock/workflows/CI/badge.svg) [![CodeFactor](https://www.codefactor.io/repository/github/stateford/display-lock/badge)](https://www.codefactor.io/repository/github/stateford/display-lock)
 
-![](pages/res/dl_logo_ZEB_icon.ico)
+![](docs/res/dl_logo_ZEB_icon.ico)
 
 Lightweight program that locks cursor in selected window, designed with performance in mind.
 
@@ -18,10 +18,10 @@ Contributions are always welcome, but please check [Contributing](CONTRIBUTING.m
 
 #### EXAMPLE
 ---------------
-![](pages/res/displayLock-preview.png)
+![](docs/res/displayLock-preview.png)
 
-![](pages/res/borderless_example.gif)
+![](docs/res/borderless_example.gif)
 
-![](pages/res/example.gif)
+![](docs/res/example.gif)
 
 # ![Download](https://github.com/idietmoran/Display-Lock/releases/)
