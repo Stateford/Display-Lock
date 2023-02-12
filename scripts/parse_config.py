@@ -1,36 +1,47 @@
-# Parse Config
-# ================
-# Reads binary from a DLOCK config file and prints it in a human readable format
+"""
+Parse Config
+
+Reads binary from a DLOCK config file and prints it in a human readable format
+"""
 import struct
 import sys
+from typing import Optional
+
+
+class ParseException(Exception):
+    """parse exception"""
 
 
 # config for config version 5
-class Config:
-    # constructor, takes a string path as an argument
+class ConfigParser:
+    """config parser"""
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(self, path: str):
         self.path = path
-        self.header = None
-        self.version = None
+        self.header: Optional[str] = None
+        self.version: Optional[int] = None
         self.minimize = None
         self.foreground = None
         self.borderless = None
         self.full_screen = None
-        self.index = 0
-        self.file = None
-        self.contents = None
+        self.contents: Optional[bytes] = None
         self.num_of_hotkeys = None
         self.hotkey = None
         self.hotkey_mod = None
 
-    # opens a file and stores it's contents in self.contents
-    def openFile(self):
-        self.file = open(self.path, "rb")
-        self.contents = self.file.read()
-        self.file.close()
+    def open_file(self):
+        """opens a file and stores it's contents in self.contents"""
+        with open(self.path, "rb") as file:
+            self.contents = file.read()
+            file.close()
 
     # parses the binary string
     def parse(self):
+        """parse the binary string"""
+        if not self.contents:
+            raise ParseException("No contents")
+
         self.header = struct.unpack("@5s", self.contents[0:5])[0]
         self.version = struct.unpack(">i", self.contents[5:9])[0]
         self.minimize = struct.unpack(">i", self.contents[9:13])[0]
@@ -44,7 +55,8 @@ class Config:
             self.hotkey = struct.unpack(">i", self.contents[33:37])[0]
 
     # prints results
-    def printResults(self):
+    def print_results(self):
+        """print results"""
         print(self.header)
         print(self.version)
         # check if string is equal to 1
@@ -55,24 +67,27 @@ class Config:
         print(self.borderless == "1")
         print(self.full_screen == "1")
 
-        if self.version > 5:
+        if self.version and self.version > 5:
             print(self.num_of_hotkeys)
             print(self.hotkey_mod)
             print(self.hotkey)
 
     # start parsing config file
     def start(self):
-        self.openFile()
+        """start parsing"""
+        self.open_file()
         self.parse()
-        self.printResults()
+        self.print_results()
 
 
 def main():
+    """main entry point"""
     if len(sys.argv) < 2:
-        raise Exception("Pass an argument in")
+        raise ParseException("Pass an argument in")
 
-    output = Config(sys.argv[1])
+    output = ConfigParser(sys.argv[1])
     output.start()
 
 
-main()
+if __name__ == "__main__":
+    main()

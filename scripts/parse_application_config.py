@@ -14,8 +14,12 @@ class ApplicationSettings:
         """create from bytes"""
         application_name = buffer.read(260 * 2).decode("utf-16")
         application_path = buffer.read(260 * 2).decode("utf-16")
-        fullscreen = int.from_bytes(buffer.read(4), byteorder=sys.byteorder, signed=True)
-        borderless = int.from_bytes(buffer.read(4), byteorder=sys.byteorder, signed=True)
+        fullscreen = int.from_bytes(
+            buffer.read(4), byteorder=sys.byteorder, signed=True
+        )
+        borderless = int.from_bytes(
+            buffer.read(4), byteorder=sys.byteorder, signed=True
+        )
         enabled = int.from_bytes(buffer.read(4), byteorder=sys.byteorder, signed=True)
         return cls(
             application_name=application_name,
@@ -40,7 +44,14 @@ class ApplicationSettings:
         """enabled"""
         return self._enabled == 1
 
-    def __init__(self, application_name: str, application_path: str, fullscreen: int, borderless: int, enabled: int):
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        application_name: str,
+        application_path: str,
+        fullscreen: int,
+        borderless: int,
+        enabled: int,
+    ):
         self.application_name = application_name
         self.application_path = application_path
         self._fullscreen = fullscreen
@@ -59,6 +70,7 @@ class ApplicationSettings:
 
 
 class ApplicationList:
+    """List of applications settings"""
 
     @classmethod
     def _from_bytes(cls, buffer: BytesIO) -> Self:
