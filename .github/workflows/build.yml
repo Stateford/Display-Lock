@@ -64,7 +64,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@master
 
     - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
       name: Create release
