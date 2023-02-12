@@ -47,6 +47,11 @@ jobs:
       
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
+      
+    - name: Python Depdendeicnes
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install -r ${{github.workspace}}/requirements.txt
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
