@@ -66,10 +66,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+    # - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+    - name: get release
       uses: actions/download-artifact@v2
       with:
         name: Display Lock
+        path: ${{github.workspace}}/build/src/release
+
+    # - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
+    - name: check releases
+      run: ls ${{github.workspace}}/build/src/release
 
     - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
       name: Create release
