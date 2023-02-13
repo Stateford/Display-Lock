@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file
 
+# [2.1.8]
+- Fixed a bug when adding / removing applications from the applications white list
+
 # [2.1.7]
 - Added application whitelist
     - Users can add applications to a whitelist and locking will begin as soon as they are detected
