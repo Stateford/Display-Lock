@@ -251,6 +251,7 @@ int CALLBACK cursorLockApplications(void *parameters)
 
     while (*(args->clipRunning))
     {
+        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
         for (int i = 0; i < args->applicationList->count; i++)
         {
             APPLICATION_SETTINGS application = args->applicationList->applications[i];
@@ -314,6 +315,9 @@ int CALLBACK cursorLockApplications(void *parameters)
             }
             Sleep(1);
         }
+
+        ReleaseMutex(mutex);
+        CloseHandle(mutex);
     }
 
     ClipCursor(NULL);
