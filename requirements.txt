@@ -1,1 +1,1 @@
-conan
+conan==1.59.0
