@@ -68,7 +68,7 @@ jobs:
 
     - if: github.event_name == 'push' && contains(github.ref, 'refs/tags')
       name: get release
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4.1.7
       with:
         name: Display Lock
         path: ${{github.workspace}}/build/src/release
