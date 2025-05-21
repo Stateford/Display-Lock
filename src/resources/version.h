@@ -1,8 +1,8 @@
 #pragma once
 
-#define CONFIGURATION "Debug"
+#define CONFIGURATION "Release"
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 1
-#define VERSION_REVISION 8
-#define VERSION_BUILD 1000
-#define FILE_VERSION "2.1.8.1000"
+#define VERSION_REVISION 9
+#define VERSION_BUILD 0
+#define FILE_VERSION "2.1.9.0"
