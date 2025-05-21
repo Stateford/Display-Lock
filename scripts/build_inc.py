@@ -29,12 +29,18 @@ def write_header(file_path: str, config: str, version: str, build: str):
 
 def main():
     """main entry point"""
-    print(sys.argv)
     if len(sys.argv) < 3:
         raise BuildError("Something went wrong with build")
 
+    # Find the project root directory (where scripts/ is located)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+
+    # Direct path to version.h file
+    version_path = os.path.join(project_root, "src", "resources", "version.h")
+
     write_header(
-        os.path.abspath("./Display-Lock/resources/version.h"),
+        version_path,
         sys.argv[1],
         sys.argv[2],
         sys.argv[3],
@@ -46,4 +52,7 @@ if __name__ == "__main__":
         main()
     except BuildError as error:
         print(error)
+        sys.exit(1)
+    except OSError as error:
+        print(f"OS Error: {error}")
         sys.exit(1)
