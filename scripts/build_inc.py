@@ -34,7 +34,7 @@ def main():
         raise BuildError("Something went wrong with build")
 
     write_header(
-        os.path.abspath("./Display-Lock/resources/version.h"),
+        os.path.abspath("./src/resources/version.h"),
         sys.argv[1],
         sys.argv[2],
         sys.argv[3],

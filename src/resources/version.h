@@ -1,25 +1,8 @@
 #pragma once
 
-#ifndef CONFIGURATION
-#define CONFIGURATION ""
-#endif
-
-#ifndef VERSION_MAJOR
-#define VERSION_MAJOR 0
-#endif
-
-#ifndef VERSION_MINOR
-#define VERSION_MINOR 0
-#endif
-
-#ifndef VERSION_REVISION
-#define VERSION_REVISION 0
-#endif
-
-#ifndef VERSION_BUILD
-#define VERSION_BUILD 0
-#endif
-
-#ifndef FILE_VERSION
-#define FILE_VERSION ""
-#endif
+#define CONFIGURATION "Debug"
+#define VERSION_MAJOR 2
+#define VERSION_MINOR 1
+#define VERSION_REVISION 8
+#define VERSION_BUILD 1000
+#define FILE_VERSION "2.1.8.1000"
