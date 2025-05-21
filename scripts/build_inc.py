@@ -29,44 +29,18 @@ def write_header(file_path: str, config: str, version: str, build: str):
 
 def main():
     """main entry point"""
-    print(f"Current working directory: {os.getcwd()}")
-    print(f"Script directory: {os.path.dirname(os.path.abspath(__file__))}")
-    print(f"Arguments: {sys.argv}")
-    
     if len(sys.argv) < 3:
         raise BuildError("Something went wrong with build")
 
-    # Find the project root (where we expect src/resources to be)
+    # Find the project root directory (where scripts/ is located)
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.dirname(script_dir)  # Assuming script is in a scripts/ directory at project root
-    
-    # Try different possible locations for the version.h file
-    possible_paths = [
-        os.path.join(project_root, "src", "resources", "version.h"),  # Project root/src/resources/version.h
-        os.path.join(project_root, "Display-Lock", "resources", "version.h"),  # Project root/Display-Lock/resources/version.h
-        os.path.join(os.getcwd(), "src", "resources", "version.h"),  # Current dir/src/resources/version.h
-        os.path.join(os.getcwd(), "Display-Lock", "resources", "version.h"),  # Current dir/Display-Lock/resources/version.h
-    ]
-    
-    # Print all possible paths for debugging
-    print("Searching for version.h in the following locations:")
-    for path in possible_paths:
-        print(f"- {path} ({os.path.exists(path)})")
-        
-    # Try to find the first existing directory path
-    for path in possible_paths:
-        dir_path = os.path.dirname(path)
-        if os.path.exists(dir_path):
-            print(f"Found resources directory at: {dir_path}")
-            use_path = path
-            break
-    else:
-        # If we can't find any of the directories, default to the new path
-        use_path = os.path.join(project_root, "src", "resources", "version.h")
-        print(f"None of the directories found, defaulting to: {use_path}")
-    
+    project_root = os.path.dirname(script_dir)
+
+    # Direct path to version.h file
+    version_path = os.path.join(project_root, "src", "resources", "version.h")
+
     write_header(
-        use_path,
+        version_path,
         sys.argv[1],
         sys.argv[2],
         sys.argv[3],
@@ -79,8 +53,6 @@ if __name__ == "__main__":
     except BuildError as error:
         print(error)
         sys.exit(1)
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        import traceback
-        traceback.print_exc()
+    except OSError as error:
+        print(f"OS Error: {error}")
         sys.exit(1)
