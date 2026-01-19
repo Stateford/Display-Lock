@@ -7,7 +7,8 @@
       "Bash(\"build/tests/Release/display-lock-unittests.exe\")",
       "Bash(\"display-lock-unittests.exe\")",
       "Bash(\"./display-lock-unittests.exe\")",
-      "Bash(xxd:*)"
+      "Bash(xxd:*)",
+      "Bash(\"C:\\\\Users\\\\japos\\\\git\\\\Display-Lock\\\\build\\\\tests\\\\Debug\\\\display-lock-unittests.exe\")"
     ]
   }
 }
