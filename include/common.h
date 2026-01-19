@@ -25,6 +25,12 @@
 #define APPLICATION_VIEW 2
 
 #define APPLICATION_MUTEX_NAME L"DLockApplicationMutex"
+
+// Magic number constants
+#define MAX_WINDOW_COUNT 35
+#define MAX_TITLE_LENGTH 500
+#define MAX_CLASS_NAME 500
+
 // custom messages
 
 #define NOTIFY_MSG (WM_USER + 0x1)
@@ -86,7 +92,7 @@ struct MAIN_WINDOW_CONTROLS
 
 struct WINDOW
 {
-    char title[500];
+    char title[MAX_TITLE_LENGTH];
     int x;
     int y;
     RECT size;
@@ -97,7 +103,7 @@ struct WINDOW
 struct WINDOWLIST
 {
     int count;
-    WINDOW windows[35];
+    WINDOW windows[MAX_WINDOW_COUNT];
 };
 
 struct WINDOW_VIEW_CONTROLS
@@ -125,7 +131,7 @@ struct SETTINGS_VIEW_CONTROLS
 
 struct MENU
 {
-    void (*closeThread)(HANDLE thread, BOOL *status);
+    void (*closeThread)(HANDLE *thread, volatile BOOL *status);
     void (*updateComboBox)(HWND control, WINDOWLIST *windows, void (*callback)(WINDOWLIST *));
     BOOL (*startThread)
     (HANDLE *thread, int (*callback)(void *parameters), void *args);
@@ -145,7 +151,7 @@ struct SETTINGS
 struct ARGS
 {
     SETTINGS *settings;
-    BOOL *clipRunning;
+    volatile BOOL *clipRunning;
     WINDOW selectedWindow;
     HWND hWnd;
     MAIN_WINDOW_CONTROLS controls;
@@ -154,7 +160,8 @@ struct ARGS
 struct APPLICATION_ARGS
 {
     APPLICATION_LIST *applicationList;
-    BOOL *clipRunning;
+    volatile BOOL *clipRunning;
+    HANDLE mutex;
 };
 
 union VERSION

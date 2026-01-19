@@ -26,10 +26,16 @@ void resizeString(STRING *string, int size)
     char *data = string->data;
     if (string->data != NULL)
     {
-        string->data = (char *)realloc(string->data, ((size_t)newSize + 1));
-        if (string->data == NULL)
+        char *temp = (char *)realloc(string->data, ((size_t)newSize + 1));
+        if (temp == NULL)
+        {
             free(data);
-        string->size = size;
+            string->data = NULL;
+            string->size = 0;
+            return;
+        }
+        string->data = temp;
+        string->size = newSize;
     }
 }
 

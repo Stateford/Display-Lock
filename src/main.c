@@ -91,6 +91,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
+    if (hAccelTable != NULL)
+        DestroyAcceleratorTable(hAccelTable);
+
     return (int)msg.wParam;
 }
 
@@ -172,15 +175,18 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             initalUpdate = !compareVersion(&gVersion);
         }
 
-        CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
+        {
+            HWND hMainDlg = CreateDialog(NULL, MAKEINTRESOURCE(IDD_MAIN_VIEW), hWnd, MainWindow);
+            if (hMainDlg == NULL)
+            {
+                // Dialog creation failed
+                return -1;
+            }
+        }
         invokeReadSettings(&settings);
         notifyInit(hWnd, &sysTray);
         Shell_NotifyIcon(NIM_ADD, &sysTray);
         Shell_NotifyIcon(NIM_SETVERSION, &sysTray);
-
-        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-        ReleaseMutex(mutex);
-        CloseHandle(mutex);
 
         break;
 
@@ -405,7 +411,7 @@ INT_PTR CALLBACK windowViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM l
         }
         break;
     case WM_DESTROY:
-        menu.closeThread(windowControls.clipThread, &running);
+        menu.closeThread(&windowControls.clipThread, &running);
         break;
     default:
         return DefWindowProc(hDlg, message, wParam, lParam);
@@ -524,6 +530,12 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
         args.applicationList = &applicationList;
         args.clipRunning = &applicationRunning;
+        args.mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
+        if (args.mutex == NULL)
+        {
+            // Mutex creation failed
+            return (INT_PTR)FALSE;
+        }
 
         startApplicationThread(&controls.clipThread, cursorLockApplications, (void *)&args);
 
@@ -568,13 +580,10 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
 
             if (GetOpenFileName(&ofn))
             {
+                DWORD waitResult = WaitForSingleObject(args.mutex, INFINITE);
 
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
-
-                if ((result == 0) || (result == WAIT_ABANDONED))
+                if ((waitResult == WAIT_OBJECT_0) || (waitResult == WAIT_ABANDONED))
                 {
-
                     APPLICATION_SETTINGS application;
                     ZeroMemory(&application, sizeof(application));
                     createApplicationSettings(ofn.lpstrFile, &application);
@@ -582,33 +591,27 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
                     if (addApplication(&applicationList, application))
                         SendMessage(controls.listView, LB_ADDSTRING, 0, (LPARAM)application.application_name);
                 }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
+                ReleaseMutex(args.mutex);
             }
 
             break;
         case IDC_BTN_APP_RMV:
         {
-
-            int current_selected = 0;
-            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
-            if (result != LB_ERR)
+            int current_selected = (int)SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+            if (current_selected != LB_ERR)
             {
+                DWORD waitResult = WaitForSingleObject(args.mutex, INFINITE);
 
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
-
-                if ((result == 0) || (result == WAIT_ABANDONED))
+                if ((waitResult == WAIT_OBJECT_0) || (waitResult == WAIT_ABANDONED))
                 {
                     SendMessage(controls.listView, LB_DELETESTRING, current_selected, 0);
                     removeApplication(&applicationList, current_selected);
                 }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
+                ReleaseMutex(args.mutex);
             }
 
-            result = SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
-            if (result != LB_ERR)
+            int selResult = (int)SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
+            if (selResult != LB_ERR)
             {
                 EnableWindow(controls.settingsButton, TRUE);
                 EnableWindow(controls.removeButton, TRUE);
@@ -622,22 +625,18 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
         break;
         case IDC_BTN_APP_SETTINGS:
         {
-            int current_selected = 0;
-            int result = SendMessage(controls.listView, LB_GETCURSEL, (WPARAM)&current_selected, 0);
+            int current_selected = (int)SendMessage(controls.listView, LB_GETCURSEL, 0, 0);
 
-            if (result != LB_ERR)
+            if (current_selected != LB_ERR)
             {
+                DWORD waitResult = WaitForSingleObject(args.mutex, INFINITE);
 
-                HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-                DWORD result = WaitForSingleObject(mutex, INFINITE);
-
-                if ((result == 0) || (result == WAIT_ABANDONED))
+                if ((waitResult == WAIT_OBJECT_0) || (waitResult == WAIT_ABANDONED))
                 {
-                    APPLICATION_SETTINGS *settings = &applicationList.applications[current_selected];
-                    DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)settings);
+                    APPLICATION_SETTINGS *appSettings = &applicationList.applications[current_selected];
+                    DialogBoxParam(hInst, MAKEINTRESOURCE(IDC_APP_SETTINGS), hDlg, appSettingsProc, (LPARAM)appSettings);
                 }
-                ReleaseMutex(mutex);
-                CloseHandle(mutex);
+                ReleaseMutex(args.mutex);
             }
         }
         break;
@@ -648,14 +647,13 @@ INT_PTR CALLBACK applicationsViewProc(HWND hDlg, UINT message, WPARAM wParam, LP
     }
     case WM_DESTROY:
     {
-        closeApplicationThread(controls.clipThread, args.clipRunning);
+        closeApplicationThread(&controls.clipThread, args.clipRunning);
         closeApplicationList(&applicationList);
 
-        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-        if (mutex != NULL)
+        if (args.mutex != NULL)
         {
-            ReleaseMutex(mutex);
-            CloseHandle(mutex);
+            CloseHandle(args.mutex);
+            args.mutex = NULL;
         }
         EndDialog(hDlg, LOWORD(wParam));
         return (INT_PTR)TRUE;

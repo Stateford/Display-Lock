@@ -203,7 +203,7 @@ void windowsButtonStop(MENU menu, WINDOW_VIEW_CONTROLS *windowControls)
     EnableWindow(windowControls->startButton, TRUE);
     EnableWindow(windowControls->stopButton, FALSE);
     EnableWindow(windowControls->comboBox, TRUE);
-    menu.closeThread(windowControls->clipThread, windowControls->runningClip);
+    menu.closeThread(&windowControls->clipThread, windowControls->runningClip);
 }
 
 void invokeReadSettings(SETTINGS *settings)
