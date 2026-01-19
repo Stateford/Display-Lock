@@ -1,4 +1,0 @@
-mypy
-pylint
-flake8
-bandit

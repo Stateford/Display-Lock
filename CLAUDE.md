@@ -17,12 +17,11 @@ cmake --build build --config Release
 cmake -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build --config Debug
 
-# Run tests (requires Conan for GTest dependency)
-pip install conan==1.59.0
+# Run tests
 ctest --test-dir build -C Release
 ```
 
-The build requires Visual Studio 2022 (MSVC) on Windows. Conan package manager is used to fetch Google Test for unit testing.
+The build requires Visual Studio 2022 (MSVC) on Windows.
 
 ## Architecture
 
@@ -48,7 +47,7 @@ The build requires Visual Studio 2022 (MSVC) on Windows. Conan package manager i
 
 ## Testing
 
-Tests use Google Test (fetched via Conan). Test files are in `tests/` with test resources copied to the build directory.
+Tests use Google Test (fetched via CMake FetchContent). Test files are in `tests/` with test resources copied to the build directory.
 
 ```bash
 # Run a single test

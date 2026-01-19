@@ -1,36 +1,19 @@
 project(display-lock-unittests)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR}/tests)
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_BINARY_DIR}/tests)
+include(FetchContent)
 
-message(STATUS "BINARY PATH ${CMAKE_BINARY_DIR}")
-
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
-  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
-  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
-                "${CMAKE_BINARY_DIR}/conan.cmake"
-                TLS_VERIFY ON)
-endif()
-
-include(${CMAKE_BINARY_DIR}/conan.cmake)
-
-conan_cmake_configure(
-    REQUIRES gtest/1.13.0 
-    GENERATORS cmake_find_package
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG v1.14.0
 )
 
-conan_cmake_autodetect(settings)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-conan_cmake_install(
-    PATH_OR_REFERENCE .
-    BUILD missing
-    REMOTE conancenter
-    SETTINGS ${settings}
-)
+FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-
-find_package(GTest REQUIRED)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
