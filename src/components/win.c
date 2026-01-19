@@ -25,6 +25,7 @@ struct PREVIOUSRECT
     int x;
     int y;
     LONG_PTR previousStyle;
+    LONG_PTR previousExStyle;
     LONG_PTR currentStyle;
 };
 
@@ -103,13 +104,23 @@ inline BOOL checkResizeStyle(HWND activeWindow)
     return (GetWindowLongPtr(activeWindow, GWL_STYLE) & WS_SIZEBOX);
 }
 
-// toggles borderlessWindow
-inline void toggleBorderlessWindow(HWND activeWindow)
+// removes border styles to make window borderless
+inline void removeBorderStyles(HWND activeWindow)
 {
-    // XOR WS_OVERLAPPED, WS_THICKFRAME, WS_SYSMENU, WS_CAPTION
-    SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE) ^ WS_OVERLAPPED ^ WS_THICKFRAME ^ WS_SYSMENU ^ WS_CAPTION);
-    // XOR WS_EX_WINDOWEDGE
-    SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE) ^ WS_EX_WINDOWEDGE);
+    const LONG_PTR mask = WS_OVERLAPPED | WS_THICKFRAME | WS_SYSMENU | WS_CAPTION;
+    const LONG_PTR exMask = WS_EX_WINDOWEDGE;
+
+    SetWindowLongPtr(activeWindow, GWL_STYLE, GetWindowLongPtr(activeWindow, GWL_STYLE) & ~mask);
+    SetWindowLongPtr(activeWindow, GWL_EXSTYLE, GetWindowLongPtr(activeWindow, GWL_EXSTYLE) & ~exMask);
+    SetWindowPos(activeWindow, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+}
+
+// restores original border styles
+inline void restoreBorderStyles(HWND activeWindow, LONG_PTR originalStyle, LONG_PTR originalExStyle)
+{
+    SetWindowLongPtr(activeWindow, GWL_STYLE, originalStyle);
+    SetWindowLongPtr(activeWindow, GWL_EXSTYLE, originalExStyle);
+    SetWindowPos(activeWindow, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 }
 
 // resizes borderless window
@@ -125,7 +136,7 @@ void resizeBorderless(WINDOW activeWindow, PREVIOUSRECT *prev)
     prev->x = activeWindow.size.left;
     prev->y = activeWindow.size.top;
 
-    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
+    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, SWP_FRAMECHANGED);
 }
 
 // enable fullscreen
@@ -140,13 +151,13 @@ void enableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
     prev->x = activeWindow.size.left;
     prev->y = activeWindow.size.top;
 
-    SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
+    SetWindowPos(activeWindow.hWnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), SWP_FRAMECHANGED);
 }
 
 // disable full screen
 inline void disableFullScreen(WINDOW activeWindow, PREVIOUSRECT *prev)
 {
-    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, 0);
+    SetWindowPos(activeWindow.hWnd, NULL, prev->x, prev->y, prev->width, prev->height, SWP_FRAMECHANGED);
 }
 
 // check if process is still running
@@ -168,10 +179,11 @@ int CALLBACK cursorLock(void *arguments)
     PREVIOUSRECT previousRect;
 
     previousRect.previousStyle = GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE);
+    previousRect.previousExStyle = GetWindowLongPtr(selectedWindow.hWnd, GWL_EXSTYLE);
 
     if (settings->borderless)
     {
-        toggleBorderlessWindow(selectedWindow.hWnd);
+        removeBorderStyles(selectedWindow.hWnd);
         if (!settings->fullScreen)
             resizeBorderless(selectedWindow, &previousRect);
     }
@@ -218,10 +230,11 @@ int CALLBACK cursorLock(void *arguments)
             break;
         }
 
-        // check fi the window style has changed
+        // check if the window style has changed
         if (previousRect.currentStyle != GetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE))
         {
             SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, previousRect.currentStyle);
+            SetWindowPos(selectedWindow.hWnd, NULL, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 
             if (settings->borderless && !settings->fullScreen)
                 resizeBorderless(selectedWindow, &previousRect);
@@ -243,16 +256,8 @@ int CALLBACK cursorLock(void *arguments)
         Sleep(1);
     }
 
-    // if window style was changed, change it back
-    if (styleChanged)
-        SetWindowLongPtr(selectedWindow.hWnd, GWL_STYLE, previousRect.previousStyle);
-
-    if (settings->borderless)
-    {
-        toggleBorderlessWindow(selectedWindow.hWnd);
-        if (!settings->fullScreen)
-            resizeBorderless(selectedWindow, &previousRect);
-    }
+    // Restore original styles (handles borderless, styleChanged, etc. all at once)
+    restoreBorderStyles(selectedWindow.hWnd, previousRect.previousStyle, previousRect.previousExStyle);
 
     if (settings->fullScreen)
         disableFullScreen(selectedWindow, &previousRect);

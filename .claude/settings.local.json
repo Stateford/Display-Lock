@@ -7,9 +7,6 @@
       "Bash(\"build/tests/Release/display-lock-unittests.exe\")",
       "Bash(\"display-lock-unittests.exe\")",
       "Bash(\"./display-lock-unittests.exe\")",
-<<<<<<< Updated upstream
-      "Bash(xxd:*)"
-=======
       "Bash(xxd:*)",
       "Bash(\"C:\\\\Users\\\\japos\\\\git\\\\Display-Lock\\\\build\\\\tests\\\\Debug\\\\display-lock-unittests.exe\")",
       "Bash(iconv:*)",
@@ -27,7 +24,6 @@
       "Bash(python:*)",
       "Bash(ls:*)",
       "Bash(./display-lock-unittests.exe:*)"
->>>>>>> Stashed changes
     ]
   }
 }
