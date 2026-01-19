@@ -20,7 +20,7 @@ BOOL createApplicationDirectory(wchar_t *outPath);
 BOOL createApplicationSettings(const wchar_t *appPath, APPLICATION_SETTINGS *application);
 
 BOOL startApplicationThread(HANDLE *thread, int (*callback)(void *parameters), void *args);
-void closeApplicationThread(HANDLE thread, BOOL *status);
+void closeApplicationThread(HANDLE *thread, volatile BOOL *status);
 DWORD getPidFromName(const wchar_t *name);
 
 BOOL CALLBACK EnumWindowsProcPID(HWND hwnd, LPARAM lParam);

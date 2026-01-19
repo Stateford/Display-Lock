@@ -30,15 +30,42 @@ BOOL readApplicationList(APPLICATION_LIST *applicationList, const wchar_t *path)
         return FALSE;
     }
 
-    fread(&applicationList->count, sizeof(int), 1, file);
-    applicationList->applications = (APPLICATION_SETTINGS *)malloc(sizeof(APPLICATION_SETTINGS) * applicationList->count);
-    for (int i = 0; i < applicationList->count; i++)
+    if (fread(&applicationList->count, sizeof(int), 1, file) != 1)
     {
-        fread(&applicationList->applications[i], sizeof(APPLICATION_SETTINGS), 1, file);
+        applicationList->count = 0;
+        applicationList->applications = NULL;
+        fclose(file);
+        return FALSE;
+    }
+
+    if (applicationList->count > 0)
+    {
+        applicationList->applications = (APPLICATION_SETTINGS *)malloc(sizeof(APPLICATION_SETTINGS) * applicationList->count);
+        if (applicationList->applications == NULL)
+        {
+            applicationList->count = 0;
+            fclose(file);
+            return FALSE;
+        }
+
+        for (int i = 0; i < applicationList->count; i++)
+        {
+            if (fread(&applicationList->applications[i], sizeof(APPLICATION_SETTINGS), 1, file) != 1)
+            {
+                free(applicationList->applications);
+                applicationList->applications = NULL;
+                applicationList->count = 0;
+                fclose(file);
+                return FALSE;
+            }
+        }
+    }
+    else
+    {
+        applicationList->applications = NULL;
     }
 
     fclose(file);
-    _fcloseall();
 
     return TRUE;
 }
@@ -64,7 +91,6 @@ BOOL writeApplicationList(APPLICATION_LIST *applicationList, const wchar_t *path
     }
 
     fclose(file);
-    _fcloseall();
 
     return TRUE;
 }
@@ -76,6 +102,8 @@ BOOL addApplication(APPLICATION_LIST *applicationList, APPLICATION_SETTINGS appl
     {
         applicationList->count = 1;
         applicationList->applications = (APPLICATION_SETTINGS *)malloc(sizeof(APPLICATION_SETTINGS));
+        if (applicationList->applications == NULL)
+            return FALSE;
         applicationList->applications[0] = application;
     }
     else
@@ -87,8 +115,11 @@ BOOL addApplication(APPLICATION_LIST *applicationList, APPLICATION_SETTINGS appl
                 return FALSE;
         }
 
+        APPLICATION_SETTINGS *temp = (APPLICATION_SETTINGS *)realloc(applicationList->applications, sizeof(APPLICATION_SETTINGS) * (applicationList->count + 1));
+        if (temp == NULL)
+            return FALSE;
+        applicationList->applications = temp;
         applicationList->count++;
-        applicationList->applications = (APPLICATION_SETTINGS *)realloc(applicationList->applications, sizeof(APPLICATION_SETTINGS) * applicationList->count);
         applicationList->applications[applicationList->count - 1] = application;
     }
 
@@ -119,7 +150,10 @@ BOOL removeApplication(APPLICATION_LIST *applicationList, int index)
         }
 
         applicationList->count--;
-        applicationList->applications = (APPLICATION_SETTINGS *)realloc(applicationList->applications, sizeof(APPLICATION_SETTINGS) * applicationList->count);
+        APPLICATION_SETTINGS *temp = (APPLICATION_SETTINGS *)realloc(applicationList->applications, sizeof(APPLICATION_SETTINGS) * applicationList->count);
+        if (temp != NULL)
+            applicationList->applications = temp;
+        // If realloc fails, keep the old pointer (memory is still valid, just larger than needed)
     }
 
     return TRUE;
@@ -153,7 +187,7 @@ BOOL createApplicationDirectory(wchar_t *outPath)
     if (!SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
         return FALSE;
 
-    wcscpy(outPath, path);
+    wcscpy_s(outPath, MAX_PATH, path);
 
     // create directory
     PathAppend(outPath, TEXT("DisplayLock"));
@@ -173,8 +207,8 @@ BOOL createApplicationSettings(const wchar_t *appPath, APPLICATION_SETTINGS *app
     if (basename == appPath)
         return FALSE;
 
-    wcscpy(application->application_path, appPath);
-    wcscpy(application->application_name, basename);
+    wcscpy_s(application->application_path, MAX_PATH, appPath);
+    wcscpy_s(application->application_name, MAX_PATH, basename);
     application->borderless = FALSE;
     application->fullscreen = FALSE;
     application->enabled = TRUE;
@@ -185,7 +219,7 @@ BOOL createApplicationSettings(const wchar_t *appPath, APPLICATION_SETTINGS *app
 BOOL startApplicationThread(HANDLE *thread, int (*callback)(void *parameters), void *args)
 {
     // TODO: check better error checking
-    *thread = (HANDLE)_beginthreadex(NULL, 0, callback, args, 0, NULL);
+    *thread = (HANDLE)(uintptr_t)_beginthreadex(NULL, 0, callback, args, 0, NULL);
 
     if (*thread == NULL)
         return FALSE;
@@ -194,15 +228,15 @@ BOOL startApplicationThread(HANDLE *thread, int (*callback)(void *parameters), v
 }
 
 // safely closes the thread
-void closeApplicationThread(HANDLE thread, BOOL *status)
+void closeApplicationThread(HANDLE *thread, volatile BOOL *status)
 {
     // check to see if thread is running
-    if (thread != NULL)
+    if (*thread != NULL)
     {
         *status = FALSE;
-        WaitForSingleObject(thread, INFINITE);
-        CloseHandle(thread);
-        thread = NULL;
+        WaitForSingleObject(*thread, INFINITE);
+        CloseHandle(*thread);
+        *thread = NULL;
     }
 }
 
@@ -251,8 +285,7 @@ int CALLBACK cursorLockApplications(void *parameters)
 
     while (*(args->clipRunning))
     {
-        HANDLE mutex = CreateMutex(NULL, FALSE, APPLICATION_MUTEX_NAME);
-        WaitForSingleObject(mutex, INFINITE);
+        WaitForSingleObject(args->mutex, INFINITE);
 
         for (int i = 0; i < args->applicationList->count; i++)
         {
@@ -260,53 +293,53 @@ int CALLBACK cursorLockApplications(void *parameters)
 
             if (application.enabled)
             {
-                EnumWindowsProcPIDArgs args;
-                args.pid = getPidFromName(application.application_name);
-                args.hwnd = NULL;
+                EnumWindowsProcPIDArgs enumArgs;
+                enumArgs.pid = getPidFromName(application.application_name);
+                enumArgs.hwnd = NULL;
 
-                if (args.pid != 0)
-                    EnumWindows(EnumWindowsProcPID, (LPARAM)&args);
+                if (enumArgs.pid != 0)
+                    EnumWindows(EnumWindowsProcPID, (LPARAM)&enumArgs);
 
-                if (args.hwnd != NULL)
+                if (enumArgs.hwnd != NULL)
                 {
                     RECT rect;
-                    GetWindowRect(args.hwnd, &rect);
+                    GetWindowRect(enumArgs.hwnd, &rect);
 
                     if (application.borderless)
                     {
-                        const long long borderlessStyle = GetWindowLongPtr(args.hwnd, GWL_STYLE);
-                        const long long borderlessStyleEx = GetWindowLongPtr(args.hwnd, GWL_EXSTYLE);
+                        const long long borderlessStyle = GetWindowLongPtr(enumArgs.hwnd, GWL_STYLE);
+                        const long long borderlessStyleEx = GetWindowLongPtr(enumArgs.hwnd, GWL_EXSTYLE);
 
                         const long long mask = WS_OVERLAPPED | WS_THICKFRAME | WS_SYSMENU | WS_CAPTION;
                         const long long exMask = WS_EX_WINDOWEDGE;
 
                         if ((borderlessStyle & mask) != 0)
-                            SetWindowLongPtr(args.hwnd, GWL_STYLE, borderlessStyle & ~mask);
+                            SetWindowLongPtr(enumArgs.hwnd, GWL_STYLE, borderlessStyle & ~mask);
 
                         if ((borderlessStyleEx & exMask) != 0)
-                            SetWindowLongPtr(args.hwnd, GWL_EXSTYLE, borderlessStyleEx & ~exMask);
+                            SetWindowLongPtr(enumArgs.hwnd, GWL_EXSTYLE, borderlessStyleEx & ~exMask);
                     }
                     else if (application.fullscreen)
                     {
-                        RECT rect = {0};
-                        GetClientRect(args.hwnd, &rect);
-                        ClientToScreen(args.hwnd, (LPPOINT)&rect.left);
-                        ClientToScreen(args.hwnd, (LPPOINT)&rect.right);
+                        RECT fsRect = {0};
+                        GetClientRect(enumArgs.hwnd, &fsRect);
+                        ClientToScreen(enumArgs.hwnd, (LPPOINT)&fsRect.left);
+                        ClientToScreen(enumArgs.hwnd, (LPPOINT)&fsRect.right);
 
-                        if (rect.left != 0 || rect.top != 0 || rect.right != GetSystemMetrics(SM_CXSCREEN) || rect.bottom != GetSystemMetrics(SM_CYSCREEN))
-                            SetWindowPos(args.hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
+                        if (fsRect.left != 0 || fsRect.top != 0 || fsRect.right != GetSystemMetrics(SM_CXSCREEN) || fsRect.bottom != GetSystemMetrics(SM_CYSCREEN))
+                            SetWindowPos(enumArgs.hwnd, NULL, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), 0);
                     }
 
                     // TODO: lock cursor
                     HWND active = GetForegroundWindow();
 
-                    if (args.hwnd == active)
+                    if (enumArgs.hwnd == active)
                     {
                         GetCursorPos(&cursorPosition);
                         RECT windowRect = {0};
-                        GetClientRect(args.hwnd, &windowRect);
-                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.left);
-                        ClientToScreen(args.hwnd, (LPPOINT)&windowRect.right);
+                        GetClientRect(enumArgs.hwnd, &windowRect);
+                        ClientToScreen(enumArgs.hwnd, (LPPOINT)&windowRect.left);
+                        ClientToScreen(enumArgs.hwnd, (LPPOINT)&windowRect.right);
 
                         if ((cursorPosition.y <= windowRect.bottom && cursorPosition.y >= windowRect.top) && (cursorPosition.x >= windowRect.left && cursorPosition.x <= windowRect.right))
                             ClipCursor(&windowRect);
@@ -315,11 +348,10 @@ int CALLBACK cursorLockApplications(void *parameters)
                     }
                 }
             }
-            Sleep(1);
         }
 
-        ReleaseMutex(mutex);
-        CloseHandle(mutex);
+        ReleaseMutex(args->mutex);
+        Sleep(1);
     }
 
     ClipCursor(NULL);

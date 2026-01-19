@@ -53,14 +53,14 @@ BOOL startThread(HANDLE *thread, int (*callback)(void *parameters), void *args)
 }
 
 // safely closes the thread
-void closeThread(HANDLE thread, BOOL *status)
+void closeThread(HANDLE *thread, volatile BOOL *status)
 {
     // check to see if thread is running
-    if (thread != NULL)
+    if (*thread != NULL)
     {
         *status = FALSE;
-        WaitForSingleObject(thread, INFINITE);
-        CloseHandle(thread);
-        thread = NULL;
+        WaitForSingleObject(*thread, INFINITE);
+        CloseHandle(*thread);
+        *thread = NULL;
     }
 }

@@ -80,7 +80,7 @@ BOOL findPath(wchar_t *outPath)
     if (!SUCCEEDED(hr))
         return FALSE;
 
-    wcscpy(outPath, path);
+    wcscpy_s(outPath, MAX_PATH, path);
     LPCWSTR x = L"DisplayLock\\settings.DLOCK";
     PathAppend(outPath, x);
 
@@ -95,7 +95,7 @@ BOOL createDirectory(wchar_t *outPath)
     if (!SUCCEEDED(SHGetKnownFolderPath(&FOLDERID_RoamingAppData, 0, NULL, &path)))
         return FALSE;
 
-    wcscpy(outPath, path);
+    wcscpy_s(outPath, MAX_PATH, path);
 
     // create directory
     PathAppend(outPath, TEXT("DisplayLock"));
@@ -120,10 +120,14 @@ BOOL readSettings(SETTINGS *settings, const wchar_t *versionStr, const wchar_t *
         return FALSE;
     }
 
-    fread(settings, sizeof(SETTINGS), 1, file);
+    if (fread(settings, sizeof(SETTINGS), 1, file) != 1)
+    {
+        fclose(file);
+        defaultSettings(settings, versionStr);
+        return FALSE;
+    }
 
     fclose(file);
-    _fcloseall();
 
     if (!checkVersion(settings, versionStr))
         defaultSettings(settings, versionStr);
@@ -144,7 +148,6 @@ BOOL writeSettings(SETTINGS settings, const wchar_t *path)
 
     fwrite(&settings, sizeof(settings), 1, file);
     fclose(file);
-    _fcloseall();
 
     return TRUE;
 }

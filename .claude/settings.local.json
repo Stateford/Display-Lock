@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(cmake:*)",
+      "Bash(ctest:*)",
+      "Bash(\"build/tests/Release/display-lock-unittests.exe\")",
+      "Bash(\"display-lock-unittests.exe\")",
+      "Bash(\"./display-lock-unittests.exe\")",
+      "Bash(xxd:*)"
+    ]
+  }
+}

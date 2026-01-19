@@ -162,7 +162,7 @@ int CALLBACK cursorLock(void *arguments)
     ARGS *args = (ARGS *)arguments;
     SETTINGS *settings = args->settings;
     WINDOW selectedWindow = args->selectedWindow;
-    BOOL *isRunning = args->clipRunning;
+    volatile BOOL *isRunning = args->clipRunning;
     POINT cursorPos;
     BOOL styleChanged = FALSE;
     PREVIOUSRECT previousRect;
