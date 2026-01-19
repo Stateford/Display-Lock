@@ -138,7 +138,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
     hInst = hInstance; // Store instance handle in our global variable
 
     HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU,
-                             CW_USEDEFAULT, 0, 300, 240, NULL, NULL, hInstance, NULL);
+                             CW_USEDEFAULT, 0, 300, 258, NULL, NULL, hInstance, NULL);
 
     if (!hWnd)
     {
@@ -236,7 +236,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ShowWindow(hWnd, TRUE);
             break;
         case ID_CONTEXTMENU_EXIT:
-            SendMessage(hWnd, WM_CLOSE, 0, 0);
+            SendMessage(hWnd, WM_FORCE_CLOSE, 0, 0);
             break;
         case ID_CONTEXTMENU_SETTINGS_MINIMIZE:
             settings.minimize = !settings.minimize;
@@ -269,7 +269,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         case IDM_EXIT:
         {
-            SendMessage(hWnd, WM_CLOSE, 0, 0);
+            SendMessage(hWnd, WM_FORCE_CLOSE, 0, 0);
             break;
         }
         default:
@@ -292,6 +292,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     break;
     case WM_CLOSE:
+        if (settings.minimizeToTray)
+        {
+            ShowWindow(hWnd, SW_HIDE);
+        }
+        else
+        {
+            Shell_NotifyIcon(NIM_DELETE, &sysTray);
+            shutDown(settings);
+            DestroyWindow(hWnd);
+        }
+        break;
+
+    case WM_FORCE_CLOSE:
         Shell_NotifyIcon(NIM_DELETE, &sysTray);
         shutDown(settings);
         DestroyWindow(hWnd);
@@ -479,6 +492,12 @@ INT_PTR CALLBACK settingsViewProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
             EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
             settingsControls.settingsChanged = TRUE;
             settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
+            break;
+
+        case IDC_CHECK_SETTINGS_TRAY_CLOSE:
+            EnableWindow(GetDlgItem(hDlg, IDC_BUTTON_SETTINGS_SAVE), TRUE);
+            settingsControls.settingsChanged = TRUE;
+            settings.minimizeToTray = (BOOL)SendMessage(settingsControls.minimizeToTray, BM_GETCHECK, 0, 0);
             break;
 
         case IDC_HOTKEY:

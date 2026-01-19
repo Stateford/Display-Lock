@@ -35,6 +35,7 @@
 
 #define NOTIFY_MSG (WM_USER + 0x1)
 #define APP_SETTINGS_INIT (WM_USER + 0x2)
+#define WM_FORCE_CLOSE (WM_USER + 0x3)
 
 #define NOTIFY_SETTINGS_CHANGED (NOTIFY_MSG + 0x1)
 
@@ -127,6 +128,7 @@ struct SETTINGS_VIEW_CONTROLS
     HWND fullScreen;
     HWND hotkey;
     HWND checkForUpdatesStartup;
+    HWND minimizeToTray;
 };
 
 struct MENU
@@ -146,6 +148,7 @@ struct SETTINGS
     BOOL borderless;
     BOOL fullScreen;
     BOOL checkUpdateStartup;
+    BOOL minimizeToTray;
 };
 
 struct ARGS

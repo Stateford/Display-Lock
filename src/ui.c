@@ -122,6 +122,7 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *setti
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
     SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
+    SendMessage(settingsControls.minimizeToTray, BM_SETCHECK, settings->minimizeToTray, 0);
 
     EnableWindow(settingsControls.borderless, !running);
     EnableWindow(settingsControls.foreground, !running);
@@ -129,6 +130,7 @@ void settingsShowWindow(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *setti
     EnableWindow(settingsControls.minimize, !running);
     EnableWindow(settingsControls.hotkey, !running);
     EnableWindow(settingsControls.checkForUpdatesStartup, !running);
+    EnableWindow(settingsControls.minimizeToTray, !running);
 }
 
 void settingsSave(HWND hWnd, SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS settings, SETTINGS *previousSettings)
@@ -138,6 +140,7 @@ void settingsSave(HWND hWnd, SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS s
     settings.fullScreen = (BOOL)SendMessage(settingsControls.fullScreen, BM_GETCHECK, 0, 0);
     settings.minimize = (BOOL)SendMessage(settingsControls.minimize, BM_GETCHECK, 0, 0);
     settings.checkUpdateStartup = (BOOL)SendMessage(settingsControls.checkForUpdatesStartup, BM_GETCHECK, 0, 0);
+    settings.minimizeToTray = (BOOL)SendMessage(settingsControls.minimizeToTray, BM_GETCHECK, 0, 0);
 
     *previousSettings = settings;
 }
@@ -150,6 +153,7 @@ void settingsCancel(SETTINGS_VIEW_CONTROLS settingsControls, SETTINGS *settings,
     SendMessage(settingsControls.fullScreen, BM_SETCHECK, settings->fullScreen, 0);
     SendMessage(settingsControls.minimize, BM_SETCHECK, settings->minimize, 0);
     SendMessage(settingsControls.checkForUpdatesStartup, BM_SETCHECK, settings->checkUpdateStartup, 0);
+    SendMessage(settingsControls.minimizeToTray, BM_SETCHECK, settings->minimizeToTray, 0);
     // SendMessage(settingsControls.hotkey, HKM_SETHOTKEY, 0, 0);
 }
 

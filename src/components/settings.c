@@ -29,6 +29,7 @@ void initalizeSettings(HWND hDlg, SETTINGS_VIEW_CONTROLS *settingsControls)
     settingsControls->fullScreen = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_FULL_SCREEN);
     settingsControls->hotkey = GetDlgItem(hDlg, IDC_HOTKEY);
     settingsControls->checkForUpdatesStartup = GetDlgItem(hDlg, IDC_CHECK_STARTUP_UPDATES);
+    settingsControls->minimizeToTray = GetDlgItem(hDlg, IDC_CHECK_SETTINGS_TRAY_CLOSE);
     settingsControls->settingsChanged = FALSE;
 }
 
@@ -52,6 +53,7 @@ void defaultSettings(SETTINGS *settings, const wchar_t *versionStr)
     settings->fullScreen = FALSE;
     settings->minimize = TRUE;
     settings->checkUpdateStartup = TRUE;
+    settings->minimizeToTray = FALSE;
 }
 
 BOOL checkVersion(SETTINGS *settings, const wchar_t *versionStr)

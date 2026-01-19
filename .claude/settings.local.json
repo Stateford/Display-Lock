@@ -8,7 +8,22 @@
       "Bash(\"display-lock-unittests.exe\")",
       "Bash(\"./display-lock-unittests.exe\")",
       "Bash(xxd:*)",
-      "Bash(\"C:\\\\Users\\\\japos\\\\git\\\\Display-Lock\\\\build\\\\tests\\\\Debug\\\\display-lock-unittests.exe\")"
+      "Bash(\"C:\\\\Users\\\\japos\\\\git\\\\Display-Lock\\\\build\\\\tests\\\\Debug\\\\display-lock-unittests.exe\")",
+      "Bash(iconv:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File fix_resource.ps1)",
+      "Bash(powershell -Command \"Get-Content ''src/resources/resource.h'' -Encoding Unicode | Select-String ''TRAY_CLOSE''\")",
+      "Bash(git checkout:*)",
+      "Bash(python fix_resource.py:*)",
+      "Bash(python fix_resource_rc.py:*)",
+      "Bash(git diff:*)",
+      "Bash(python fix_resource_rc2.py:*)",
+      "Bash(powershell -Command \"Get-Content ''src/resources/resource.rc'' -Encoding Unicode | Select-String ''TRAY_CLOSE''\")",
+      "Bash(powershell -Command \"Get-Content ''src/resources/resource.rc'' -Encoding Unicode | Select-String ''STARTUP''\")",
+      "Bash(python fix_resource_rc3.py:*)",
+      "Bash(./build/tests/Release/display-lock-unittests.exe:*)",
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(./display-lock-unittests.exe:*)"
     ]
   }
 }
